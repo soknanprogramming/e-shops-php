@@ -1,0 +1,71 @@
+<?php
+
+class UserRepository {
+    protected $conn;
+
+    public function __construct(PDO $conn) {
+        $this->conn = $conn;
+    }
+
+    public function create(array $data) {
+        $sql = "INSERT INTO `User` (name, first_name, last_name, email, password, provider, provider_id, avatar, is_admin) 
+                VALUES (:name, :first_name, :last_name, :email, :password, :provider, :provider_id, :avatar, :is_admin)";
+        
+        $stmt = $this->conn->prepare($sql);
+        
+        $stmt->execute([
+            ':name' => $data['name'],
+            ':first_name' => $data['first_name'],
+            ':last_name' => $data['last_name'],
+            ':email' => $data['email'] ?? null,
+            ':password' => $data['password'] ?? null,
+            ':provider' => $data['provider'] ?? null,
+            ':provider_id' => $data['provider_id'] ?? null,
+            ':avatar' => $data['avatar'] ?? 0,
+            ':is_admin' => $data['is_admin'] ?? 0
+        ]);
+        
+        return $this->conn->lastInsertId();
+    }
+
+    public function findById($id) {
+        $sql = "SELECT * FROM `User` WHERE id = :id";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute([':id' => $id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function findByEmail($email) {
+        $sql = "SELECT * FROM `User` WHERE email = :email";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute([':email' => $email]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function update($id, array $data) {
+        $fields = [];
+        $params = [':id' => $id];
+        $allowed = ['name', 'first_name', 'last_name', 'email', 'password', 'provider', 'provider_id', 'avatar', 'is_admin'];
+
+        foreach ($data as $key => $value) {
+            if (in_array($key, $allowed)) {
+                $fields[] = "`$key` = :$key";
+                $params[":$key"] = $value;
+            }
+        }
+
+        if (empty($fields)) {
+            return false;
+        }
+
+        $sql = "UPDATE `User` SET " . implode(', ', $fields) . " WHERE id = :id";
+        $stmt = $this->conn->prepare($sql);
+        return $stmt->execute($params);
+    }
+
+    public function delete($id) {
+        $sql = "DELETE FROM `User` WHERE id = :id";
+        $stmt = $this->conn->prepare($sql);
+        return $stmt->execute([':id' => $id]);
+    }
+}
