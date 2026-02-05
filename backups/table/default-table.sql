@@ -12,7 +12,7 @@ CREATE TABLE `User` (
     `first_name` VARCHAR(50) NOT NULL,
     `last_name` VARCHAR(50) NOT NULL,
     `email` VARCHAR(50) NULL,
-    `password` VARCHAR(50) NULL,
+    `password` VARCHAR(255) NULL,
     `provider` VARCHAR(200) NULL,
     `provider_id` VARCHAR(200) NULL,
     `avatar` BOOLEAN NOT NULL,
