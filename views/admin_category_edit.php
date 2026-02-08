@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once '../repos/CategoryRepository.php';
 require_once '../configs/connect.php';
 
 // 1. Check Auth
@@ -15,9 +16,8 @@ if (!isset($_GET['id'])) {
 }
 
 $id = $_GET['id'];
-$stmt = $conn->prepare("SELECT * FROM category WHERE id = :id");
-$stmt->execute([':id' => $id]);
-$category = $stmt->fetch(PDO::FETCH_ASSOC);
+$categoryRepo = new CategoryRepository($conn);
+$category = $categoryRepo->findById($id);
 
 if (!$category) {
     header("Location: admin_category.php?error=Category not found");

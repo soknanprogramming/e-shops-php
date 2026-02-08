@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once '../repos/CategoryRepository.php';
 require_once '../configs/connect.php';
 
 // 1. Check if user is logged in
@@ -17,9 +18,8 @@ if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] != 1) {
 // 3. Fetch Categories
 $categories = [];
 try {
-    $stmt = $conn->prepare("SELECT * FROM category ORDER BY id DESC");
-    $stmt->execute();
-    $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $categoryRepo = new CategoryRepository($conn);
+    $categories = $categoryRepo->getAll();
 } catch (PDOException $e) {
     echo "Error: " . $e->getMessage();
 }
@@ -78,7 +78,7 @@ try {
                             </td>
                             <td>
                                 <a href="admin_category_edit.php?id=<?php echo $cat['id']; ?>">Edit</a> | 
-                                <a href="#" style="color:red;">Delete</a>
+                                <a href="../controllers/category.php?action=delete&id=<?php echo $cat['id']; ?>" style="color:red;" onclick="return confirm('Are you sure you want to delete this category?');">Delete</a>
                             </td>
                         </tr>
                     <?php endforeach; ?>

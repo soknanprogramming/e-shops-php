@@ -1,6 +1,9 @@
 <?php
 session_start();
+require_once '../repos/CategoryRepository.php';
 require_once '../configs/connect.php';
+
+$categoryRepo = new CategoryRepository($conn);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_category'])) {
     
@@ -41,11 +44,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_category'])) {
     if (move_uploaded_file($image["tmp_name"], $target_file)) {
         try {
             // 4. Insert into Database
-            $sql = "INSERT INTO category (name, category_image) VALUES (:name, :image)";
-            $stmt = $conn->prepare($sql);
-            $stmt->execute([
-                ':name' => $name,
-                ':image' => $new_filename
+            $categoryRepo->create([
+                'name' => $name,
+                'category_image' => $new_filename
             ]);
 
             header("Location: ../views/admin_category.php?success=Category added successfully");
@@ -98,17 +99,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_category'])) {
     }
 
     try {
-        $sql = "UPDATE category SET name = :name, category_image = :image WHERE id = :id";
-        $stmt = $conn->prepare($sql);
-        $stmt->execute([
-            ':name' => $name,
-            ':image' => $final_image_name,
-            ':id' => $id
+        $categoryRepo->update([
+            'id' => $id,
+            'name' => $name,
+            'category_image' => $final_image_name
         ]);
         header("Location: ../views/admin_category.php?success=Category updated successfully");
         exit();
     } catch (PDOException $e) {
         header("Location: ../views/admin_category_edit.php?id=$id&error=" . $e->getMessage());
+        exit();
+    }
+}
+
+if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])) {
+    
+    // 1. Auth Check
+    if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] != 1) {
+        header("Location: ../views/login.php");
+        exit();
+    }
+
+    $id = $_GET['id'];
+
+    try {
+        // Delete image file
+        $category = $categoryRepo->findById($id);
+        if ($category && !empty($category['category_image'])) {
+            $image_path = "../uploads/categories/" . $category['category_image'];
+            if (file_exists($image_path)) {
+                unlink($image_path);
+            }
+        }
+
+        $categoryRepo->delete($id);
+        header("Location: ../views/admin_category.php?success=Category deleted successfully");
+        exit();
+    } catch (PDOException $e) {
+        header("Location: ../views/admin_category.php?error=" . $e->getMessage());
         exit();
     }
 }
