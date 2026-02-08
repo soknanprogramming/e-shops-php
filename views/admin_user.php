@@ -42,6 +42,12 @@ try {
     
     <div class="main-content">
         <h1>User Management</h1>
+        <?php if (isset($_GET['error'])): ?>
+            <p style="color: red;"><?php echo htmlspecialchars($_GET['error']); ?></p>
+        <?php endif; ?>
+        <?php if (isset($_GET['success'])): ?>
+            <p style="color: green;"><?php echo htmlspecialchars($_GET['success']); ?></p>
+        <?php endif; ?>
 
         <table>
             <thead>
@@ -50,6 +56,7 @@ try {
                     <th>Name</th>
                     <th>Email</th>
                     <th>Role</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -59,6 +66,17 @@ try {
                         <td><?php echo htmlspecialchars($user['name']); ?></td>
                         <td><?php echo htmlspecialchars($user['email']); ?></td>
                         <td><?php echo $user['is_admin'] ? 'Admin' : 'User'; ?></td>
+                        <td>
+                            <?php if ($user['id'] != $_SESSION['user_id']): ?>
+                                <a href="../controllers/user.php?action=toggle_role&id=<?php echo $user['id']; ?>" 
+                                   onclick="return confirm('Are you sure you want to change this user\'s role?');"
+                                   style="color: blue; text-decoration: underline; cursor: pointer;">
+                                    <?php echo $user['is_admin'] ? 'Remove Admin' : 'Make Admin'; ?>
+                                </a>
+                            <?php else: ?>
+                                <span style="color: gray;">(You)</span>
+                            <?php endif; ?>
+                        </td>
                     </tr>
                 <?php endforeach; ?>
             </tbody>
