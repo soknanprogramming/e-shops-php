@@ -55,7 +55,7 @@ try {
     <div class="main-content">
         <div style="display:flex; justify-content:space-between; align-items:center;">
             <h1>Category Management</h1>
-            <a href="#" class="btn-add">Add New Category</a>
+            <a href="admin_category_add.php" class="btn-add">Add New Category</a>
         </div>
 
         <table>
@@ -73,9 +73,11 @@ try {
                         <tr>
                             <td><?php echo htmlspecialchars($cat['id']); ?></td>
                             <td><?php echo htmlspecialchars($cat['name']); ?></td>
-                            <td><?php echo htmlspecialchars($cat['category_image']); ?></td>
                             <td>
-                                <a href="#">Edit</a> | 
+                                <img src="../uploads/categories/<?php echo htmlspecialchars($cat['category_image']); ?>" alt="Category Image" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
+                            </td>
+                            <td>
+                                <a href="admin_category_edit.php?id=<?php echo $cat['id']; ?>">Edit</a> | 
                                 <a href="#" style="color:red;">Delete</a>
                             </td>
                         </tr>
