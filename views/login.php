@@ -27,7 +27,7 @@
             </div>
         <?php endif; ?>
 
-        <form action="auth.php" method="POST">
+        <form action="../controllers/auth.php" method="POST">
             <div class="form-group">
                 <label for="email">Email</label>
                 <input type="email" id="email" name="email" required placeholder="Enter your email">

@@ -2,9 +2,9 @@
 session_start();
 
 // Adjust path to reach the repository from views/controllers/
-require_once '../../repos/UserRepository.php';
+require_once '../repos/UserRepository.php';
 
-require_once '../../configs/connect.php';
+require_once '../configs/connect.php';
 
 $userRepo = new UserRepository($conn);
 
@@ -21,13 +21,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // 1. Validate Passwords Match
         if ($password !== $confirm_password) {
-            header("Location: ../login/register.php?error=Passwords do not match");
+            header("Location: ../views/register.php?error=Passwords do not match");
             exit();
         }
 
         // 2. Check if Email Exists
         if ($userRepo->findByEmail($email)) {
-            header("Location: ../login/register.php?error=Email already registered");
+            header("Location: ../views/register.php?error=Email already registered");
             exit();
         }
 
@@ -47,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // 4. Create User
         $userRepo->create($data);
-        header("Location: ../login/login.php?success=Registration successful. Please login.");
+        header("Location: ../views/login.php?success=Registration successful. Please login.");
         exit();
     }
 
@@ -61,10 +61,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($user && password_verify($password, $user['password'])) {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['user_name'] = $user['name'];
-            header("Location: ../../index.php");
+            header("Location: ../views/home.php");
             exit();
         } else {
-            header("Location: ../login/login.php?error=Invalid email or password");
+            header("Location: ../views/login.php?error=Invalid email or password");
             exit();
         }
     }
