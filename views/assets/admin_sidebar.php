@@ -15,6 +15,7 @@
     </div>
     <ul class="sidebar-menu">
         <li><a href="admin.php">Dashboard</a></li>
+        <li><a href="admin_user.php">Users</a></li>
         <li><a href="admin_category.php">Category</a></li>
         <li><a href="home.php">View Website</a></li>
     </ul>
