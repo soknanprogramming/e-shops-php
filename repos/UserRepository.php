@@ -75,4 +75,12 @@ class UserRepository {
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function search($term) {
+        $term = "%$term%";
+        $sql = "SELECT * FROM `User` WHERE name LIKE :term OR email LIKE :term ORDER BY id DESC";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute([':term' => $term]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }

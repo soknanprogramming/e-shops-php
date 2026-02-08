@@ -17,9 +17,15 @@ if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] != 1) {
 
 // 3. Fetch Users
 $users = [];
+$search = $_GET['search'] ?? '';
+
 try {
     $userRepo = new UserRepository($conn);
-    $users = $userRepo->getAll();
+    if (!empty($search)) {
+        $users = $userRepo->search($search);
+    } else {
+        $users = $userRepo->getAll();
+    }
 } catch (PDOException $e) {
     echo "Error: " . $e->getMessage();
 }
@@ -42,6 +48,17 @@ try {
     
     <div class="main-content">
         <h1>User Management</h1>
+        
+        <div style="margin-bottom: 20px;">
+            <form action="" method="GET" style="display: flex; gap: 10px;">
+                <input type="text" name="search" placeholder="Search by name or email" value="<?php echo htmlspecialchars($search); ?>" style="padding: 8px; width: 300px; border: 1px solid #ccc; border-radius: 4px;">
+                <button type="submit" style="padding: 8px 15px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">Search</button>
+                <?php if (!empty($search)): ?>
+                    <a href="admin_user.php" style="padding: 8px 15px; background-color: #6c757d; color: white; text-decoration: none; border-radius: 4px; display: inline-block;">Reset</a>
+                <?php endif; ?>
+            </form>
+        </div>
+
         <?php if (isset($_GET['error'])): ?>
             <p style="color: red;"><?php echo htmlspecialchars($_GET['error']); ?></p>
         <?php endif; ?>
