@@ -66,13 +66,25 @@ CREATE TABLE `category` (
 ) ENGINE=InnoDB CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- 6. Table: liked
-CREATE TABLE `liked` (
+-- CREATE TABLE `liked` (
+--     `id` INT AUTO_INCREMENT PRIMARY KEY,
+--     `user_id` INT NOT NULL,
+--     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+--     `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
+--     FOREIGN KEY (`user_id`) REFERENCES `User`(`id`)
+-- ) ENGINE=InnoDB CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+-- above if not used
+
+CREATE TABLE `product_likes` (
     `id` INT AUTO_INCREMENT PRIMARY KEY,
     `user_id` INT NOT NULL,
-    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
-    FOREIGN KEY (`user_id`) REFERENCES `User`(`id`)
+    `product_id` INT NOT NULL,
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (`user_id`) REFERENCES `User`(`id`) ON DELETE CASCADE,
+    FOREIGN KEY (`product_id`) REFERENCES `Product`(`id`) ON DELETE CASCADE,
+    UNIQUE KEY `unique_like` (`user_id`, `product_id`)
 ) ENGINE=InnoDB CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 
 -- 7. Table: comment
 CREATE TABLE `comment` (

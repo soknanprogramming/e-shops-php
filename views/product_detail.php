@@ -2,6 +2,7 @@
 session_start();
 require_once '../configs/connect.php';
 require_once '../repos/ProductRepository.php';
+require_once '../repos/LikeRepository.php';
 
 if (!isset($_GET['id'])) {
     header("Location: home.php");
@@ -15,6 +16,11 @@ if (!$product) {
     echo "Product not found.";
     exit();
 }
+
+$likeRepo = new LikeRepository($conn);
+$likeCount = $likeRepo->getCount($product['id']);
+$hasLiked = isset($_SESSION['user_id']) ? $likeRepo->hasLiked($_SESSION['user_id'], $product['id']) : false;
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -68,7 +74,17 @@ if (!$product) {
 
             <!-- Product Info -->
             <div class="info">
-                <h1><?php echo htmlspecialchars($product['name']); ?></h1>
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <h1 style="margin-top: 0;"><?php echo htmlspecialchars($product['name']); ?></h1>
+                    
+                    <form action="../controllers/like.php" method="POST">
+                        <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
+                        <button type="submit" style="background: none; border: none; cursor: pointer; font-size: 1.5rem; color: <?php echo $hasLiked ? '#e91e63' : '#ccc'; ?>;" title="<?php echo $hasLiked ? 'Unlike' : 'Like'; ?>">
+                            <?php echo $hasLiked ? '♥' : '♡'; ?> <span style="font-size: 1rem; color: #333;"><?php echo $likeCount; ?></span>
+                        </button>
+                    </form>
+                </div>
+
                 <div class="price">
                     $<?php echo number_format($product['prices'], 2); ?>
                     <?php if($product['discounts'] > 0): ?>
