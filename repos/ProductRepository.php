@@ -20,6 +20,55 @@ class ProductRepository {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function search($params = []) {
+        $sql = "SELECT p.*, pi.main_image, c.name as category_name, u.name as owner_name 
+                FROM Product p 
+                LEFT JOIN product_image pi ON p.product_image_id = pi.id 
+                LEFT JOIN category c ON p.category_id = c.id
+                LEFT JOIN User u ON p.owner_id = u.id
+                WHERE 1=1";
+        
+        $args = [];
+
+        if (!empty($params['category_id'])) {
+            $sql .= " AND p.category_id = :category_id";
+            $args[':category_id'] = $params['category_id'];
+        }
+
+        if (!empty($params['min_price'])) {
+            $sql .= " AND p.prices >= :min_price";
+            $args[':min_price'] = $params['min_price'];
+        }
+
+        if (!empty($params['max_price'])) {
+            $sql .= " AND p.prices <= :max_price";
+            $args[':max_price'] = $params['max_price'];
+        }
+
+        if (!empty($params['has_discount'])) {
+            $sql .= " AND p.discounts > 0";
+        }
+
+        $sql .= " ORDER BY p.id DESC";
+
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute($args);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getByCategoryId($categoryId) {
+        $sql = "SELECT p.*, pi.main_image, c.name as category_name, u.name as owner_name 
+                FROM Product p 
+                LEFT JOIN product_image pi ON p.product_image_id = pi.id 
+                LEFT JOIN category c ON p.category_id = c.id
+                LEFT JOIN User u ON p.owner_id = u.id
+                WHERE p.category_id = :category_id
+                ORDER BY p.id DESC";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute([':category_id' => $categoryId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function getByOwnerId($ownerId) {
         $sql = "SELECT p.*, pi.main_image, c.name as category_name 
                 FROM Product p 
