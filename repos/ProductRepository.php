@@ -64,6 +64,11 @@ class ProductRepository {
             $args[':seller'] = '%' . $params['seller'] . '%';
         }
 
+        if (!empty($params['liked_by_user_id'])) {
+            $sql .= " AND p.id IN (SELECT product_id FROM product_likes WHERE user_id = :liked_by_user_id)";
+            $args[':liked_by_user_id'] = $params['liked_by_user_id'];
+        }
+
         if (isset($params['sort']) && $params['sort'] === 'oldest') {
             $sql .= " ORDER BY p.id ASC";
         } else {
@@ -128,6 +133,11 @@ class ProductRepository {
         if (!empty($params['seller'])) {
             $sql .= " AND u.name LIKE :seller";
             $args[':seller'] = '%' . $params['seller'] . '%';
+        }
+
+        if (!empty($params['liked_by_user_id'])) {
+            $sql .= " AND p.id IN (SELECT product_id FROM product_likes WHERE user_id = :liked_by_user_id)";
+            $args[':liked_by_user_id'] = $params['liked_by_user_id'];
         }
 
         $stmt = $this->conn->prepare($sql);

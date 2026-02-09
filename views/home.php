@@ -22,9 +22,14 @@ $filters = [
     'location' => $_GET['location'] ?? null,
     'seller' => $_GET['seller'] ?? null,
     'sort' => $_GET['sort'] ?? 'newest',
+    'liked_only' => isset($_GET['liked_only']) ? 1 : 0,
     'limit' => $limit,
     'offset' => ($page - 1) * $limit
 ];
+
+if ($filters['liked_only'] && isset($_SESSION['user_id'])) {
+    $filters['liked_by_user_id'] = $_SESSION['user_id'];
+}
 
 $totalProducts = $productRepo->countSearch($filters);
 $totalPages = ceil($totalProducts / $limit);
@@ -113,6 +118,12 @@ $products = $productRepo->search($filters);
                     <input type="checkbox" id="has_discount" name="has_discount" value="1" <?php echo isset($_GET['has_discount']) ? 'checked' : ''; ?>>
                     <label for="has_discount">Discount</label>
                 </div>
+                <?php if(isset($_SESSION['user_id'])): ?>
+                <div>
+                    <input type="checkbox" id="liked_only" name="liked_only" value="1" <?php echo isset($_GET['liked_only']) ? 'checked' : ''; ?>>
+                    <label for="liked_only">Liked</label>
+                </div>
+                <?php endif; ?>
                 <button type="submit">Filter</button>
                 <a href="home.php" style="margin-left: 10px; color: #6c757d; text-decoration: none;">Clear</a>
             </div>

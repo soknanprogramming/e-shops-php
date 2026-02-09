@@ -3,6 +3,7 @@ session_start();
 require_once '../configs/connect.php';
 require_once '../repos/ProductRepository.php';
 require_once '../repos/LikeRepository.php';
+require_once '../repos/CommentRepository.php';
 
 if (!isset($_GET['id'])) {
     header("Location: home.php");
@@ -20,6 +21,9 @@ if (!$product) {
 $likeRepo = new LikeRepository($conn);
 $likeCount = $likeRepo->getCount($product['id']);
 $hasLiked = isset($_SESSION['user_id']) ? $likeRepo->hasLiked($_SESSION['user_id'], $product['id']) : false;
+
+$commentRepo = new CommentRepository($conn);
+$comments = $commentRepo->getAllByProductId($product['id']);
 
 ?>
 <!DOCTYPE html>
@@ -52,6 +56,11 @@ $hasLiked = isset($_SESSION['user_id']) ? $likeRepo->hasLiked($_SESSION['user_id
         .seller-box { background-color: #f1f3f5; padding: 15px; border-radius: 8px; margin-top: 30px; }
         .seller-box h3 { margin-top: 0; font-size: 1.1rem; }
         .contact-btn { display: inline-block; background-color: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; margin-top: 10px; }
+
+        .comments-section { margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px; }
+        .comment-item { background: #f8f9fa; padding: 10px; border-radius: 4px; margin-bottom: 10px; }
+        .comment-user { font-weight: bold; font-size: 0.9rem; color: #333; }
+        .comment-date { font-size: 0.8rem; color: #888; margin-left: 10px; }
     </style>
 </head>
 <body>
@@ -111,6 +120,31 @@ $hasLiked = isset($_SESSION['user_id']) ? $likeRepo->hasLiked($_SESSION['user_id
                         <p><strong>Phone 2:</strong> <?php echo htmlspecialchars($product['phone2']); ?></p>
                     <?php endif; ?>
                     <a href="tel:<?php echo htmlspecialchars($product['phone1']); ?>" class="contact-btn">Call Now</a>
+                </div>
+
+                <!-- Comments Section -->
+                <div class="comments-section">
+                    <h3>Comments</h3>
+                    
+                    <?php if(empty($comments)): ?>
+                        <p style="color: #666; font-style: italic;">No comments yet.</p>
+                    <?php else: ?>
+                        <?php foreach($comments as $cmt): ?>
+                            <div class="comment-item">
+                                <span class="comment-user"><?php echo htmlspecialchars($cmt['user_name']); ?></span>
+                                <span class="comment-date"><?php echo date('d M Y H:i', strtotime($cmt['created_at'])); ?></span>
+                                <p style="margin: 5px 0 0;"><?php echo nl2br(htmlspecialchars($cmt['comment'])); ?></p>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+
+                    <?php if(isset($_SESSION['user_id'])): ?>
+                        <form action="../controllers/comment.php" method="POST" style="margin-top: 20px;">
+                            <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
+                            <textarea name="comment" rows="3" placeholder="Write a comment..." style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;" required></textarea>
+                            <button type="submit" name="add_comment" style="margin-top: 10px; background-color: #007bff; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">Post Comment</button>
+                        </form>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
