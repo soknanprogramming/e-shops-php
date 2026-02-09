@@ -48,7 +48,24 @@ $bio = $profile['bio'] ?? '';
                 <div class="success-msg"><?php echo htmlspecialchars($_GET['success']); ?></div>
             <?php endif; ?>
 
-            <form action="../controllers/profile.php" method="POST">
+            <form action="../controllers/profile.php" method="POST" enctype="multipart/form-data">
+                
+                <div class="form-group">
+                    <label>Profile Picture</label>
+                    <?php if(!empty($profile['user_image'])): ?>
+                        <img src="../uploads/profiles/<?php echo htmlspecialchars($profile['user_image']); ?>" style="width: 100px; height: 100px; object-fit: cover; border-radius: 50%; display: block; margin-bottom: 10px;">
+                    <?php endif; ?>
+                    <input type="file" name="user_image" accept="image/*">
+                </div>
+
+                <div class="form-group">
+                    <label>Background Image</label>
+                    <?php if(!empty($profile['background_image'])): ?>
+                        <img src="../uploads/profiles/<?php echo htmlspecialchars($profile['background_image']); ?>" style="width: 100%; height: 150px; object-fit: cover; border-radius: 4px; display: block; margin-bottom: 10px;">
+                    <?php endif; ?>
+                    <input type="file" name="background_image" accept="image/*">
+                </div>
+
                 <div style="display: flex; gap: 15px;">
                     <div class="form-group" style="flex: 1;">
                         <label for="first_name">First Name</label>

@@ -19,9 +19,9 @@ class ProfileRepository {
         $existing = $this->getByUserId($userId);
 
         if ($existing) {
-            $sql = "UPDATE user_profile SET phone1 = :p1, phone2 = :p2, bio = :bio WHERE user_id = :uid";
+            $sql = "UPDATE user_profile SET phone1 = :p1, phone2 = :p2, bio = :bio, user_image = :uimg, background_image = :bimg WHERE user_id = :uid";
         } else {
-            $sql = "INSERT INTO user_profile (user_id, phone1, phone2, bio) VALUES (:uid, :p1, :p2, :bio)";
+            $sql = "INSERT INTO user_profile (user_id, phone1, phone2, bio, user_image, background_image) VALUES (:uid, :p1, :p2, :bio, :uimg, :bimg)";
         }
 
         $stmt = $this->conn->prepare($sql);
@@ -29,7 +29,9 @@ class ProfileRepository {
             ':uid' => $userId,
             ':p1' => $data['phone1'],
             ':p2' => $data['phone2'] ?? null,
-            ':bio' => $data['bio'] ?? null
+            ':bio' => $data['bio'] ?? null,
+            ':uimg' => $data['user_image'] ?? null,
+            ':bimg' => $data['background_image'] ?? null
         ]);
     }
 }
