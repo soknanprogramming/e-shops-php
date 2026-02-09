@@ -20,6 +20,18 @@ class ProductRepository {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function getByOwnerId($ownerId) {
+        $sql = "SELECT p.*, pi.main_image, c.name as category_name 
+                FROM Product p 
+                LEFT JOIN product_image pi ON p.product_image_id = pi.id 
+                LEFT JOIN category c ON p.category_id = c.id
+                WHERE p.owner_id = :owner_id
+                ORDER BY p.id DESC";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute([':owner_id' => $ownerId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function create($data) {
         // 1. Insert Image first to get the ID
         $sqlImg = "INSERT INTO product_image (main_image) VALUES (:main_image)";
@@ -27,18 +39,53 @@ class ProductRepository {
         $stmtImg->execute([':main_image' => $data['image']]);
         $imageId = $this->conn->lastInsertId();
 
-        // 2. Insert Product
-        // Note: We are using default IDs (1) for profile, liked, and comment to satisfy DB constraints for this example.
-        $sql = "INSERT INTO Product (name, prices, category_id, owner_id, product_image_id, showed, profile_id, liked_id, comment_id) 
-                VALUES (:name, :prices, :category_id, :owner_id, :product_image_id, 1, 1, 1, 1)";
+        // 2. Get or Create Profile ID (Fix for Foreign Key Constraint)
+        $stmtProfile = $this->conn->prepare("SELECT id FROM user_profile WHERE user_id = :uid");
+        $stmtProfile->execute([':uid' => $data['owner_id']]);
+        $profileData = $stmtProfile->fetch(PDO::FETCH_ASSOC);
+        
+        if ($profileData) {
+            $profileId = $profileData['id'];
+        } else {
+            // Create default profile if not exists (phone1 is required)
+            $sqlCreateProfile = "INSERT INTO user_profile (user_id, phone1) VALUES (:uid, '012345678')";
+            $stmtCreateProfile = $this->conn->prepare($sqlCreateProfile);
+            $stmtCreateProfile->execute([':uid' => $data['owner_id']]);
+            $profileId = $this->conn->lastInsertId();
+        }
+
+        // 3. Ensure Liked/Comment IDs exist (Fix for Foreign Key Constraint)
+        $likedId = 1;
+        $stmtCheckLiked = $this->conn->query("SELECT id FROM liked WHERE id = 1");
+        if (!$stmtCheckLiked->fetch()) {
+             $this->conn->query("INSERT INTO liked (user_id) VALUES ({$data['owner_id']})");
+             $likedId = $this->conn->lastInsertId();
+        }
+
+        $commentId = 1;
+        $stmtCheckComment = $this->conn->query("SELECT id FROM comment WHERE id = 1");
+        if (!$stmtCheckComment->fetch()) {
+             $this->conn->query("INSERT INTO comment (user_id, comment) VALUES ({$data['owner_id']}, 'No comments')");
+             $commentId = $this->conn->lastInsertId();
+        }
+
+        // 4. Insert Product
+        $sql = "INSERT INTO Product (name, prices, discounts, category_id, owner_id, product_image_id, location, description, showed, profile_id, liked_id, comment_id) 
+                VALUES (:name, :prices, :discounts, :category_id, :owner_id, :product_image_id, :location, :description, 1, :profile_id, :liked_id, :comment_id)";
         
         $stmt = $this->conn->prepare($sql);
         $stmt->execute([
             ':name' => $data['name'],
             ':prices' => $data['prices'],
+            ':discounts' => $data['discounts'],
             ':category_id' => $data['category_id'],
             ':owner_id' => $data['owner_id'],
-            ':product_image_id' => $imageId
+            ':product_image_id' => $imageId,
+            ':location' => $data['location'],
+            ':description' => $data['description'],
+            ':profile_id' => $profileId,
+            ':liked_id' => $likedId,
+            ':comment_id' => $commentId
         ]);
         
         return $this->conn->lastInsertId();

@@ -34,6 +34,7 @@ $products = $productRepo->getAll();
             <?php if (isset($_SESSION['user_id'])): ?>
                 <span>Hello, <?php echo htmlspecialchars($_SESSION['user_name']); ?></span>
                 <a href="product_create.php" style="background-color: #28a745; padding: 5px 10px; border-radius: 4px;">Post Product</a>
+                <a href="user_dashboard.php">My Dashboard</a>
                 <?php if (isset($_SESSION['is_admin']) && $_SESSION['is_admin']): ?>
                     <a href="admin.php">Admin</a>
                 <?php endif; ?>

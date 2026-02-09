@@ -13,6 +13,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_product'])) {
 
     $name = $_POST['name'];
     $prices = $_POST['prices'];
+    $discounts = !empty($_POST['discounts']) ? $_POST['discounts'] : 0;
+    $location = $_POST['location'];
+    $description = $_POST['description'];
     $category_id = $_POST['category_id'];
     $image = $_FILES['image'];
 
@@ -32,12 +35,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_product'])) {
             $productRepo->create([
                 'name' => $name,
                 'prices' => $prices,
+                'discounts' => $discounts,
                 'category_id' => $category_id,
                 'owner_id' => $_SESSION['user_id'],
-                'image' => $new_filename
+                'image' => $new_filename,
+                'location' => $location,
+                'description' => $description
             ]);
 
-            header("Location: ../views/home.php?success=Product posted successfully");
+            header("Location: ../views/user_dashboard.php?success=Product posted successfully");
             exit();
         } catch (PDOException $e) {
             echo "Database Error: " . $e->getMessage();
