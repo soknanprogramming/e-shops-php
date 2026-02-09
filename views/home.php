@@ -9,6 +9,10 @@ $categories = $categoryRepo->getAll();
 
 $productRepo = new ProductRepository($conn);
 
+// Pagination Logic
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$limit = 12; // Products per page
+
 $filters = [
     'category_id' => $_GET['category_id'] ?? null,
     'min_price' => $_GET['min_price'] ?? null,
@@ -16,9 +20,14 @@ $filters = [
     'has_discount' => isset($_GET['has_discount']) ? 1 : 0,
     'name' => $_GET['name'] ?? null,
     'location' => $_GET['location'] ?? null,
-    'seller' => $_GET['seller'] ?? null
+    'seller' => $_GET['seller'] ?? null,
+    'sort' => $_GET['sort'] ?? 'newest',
+    'limit' => $limit,
+    'offset' => ($page - 1) * $limit
 ];
 
+$totalProducts = $productRepo->countSearch($filters);
+$totalPages = ceil($totalProducts / $limit);
 $products = $productRepo->search($filters);
 ?>
 <!DOCTYPE html>
@@ -88,6 +97,13 @@ $products = $productRepo->search($filters);
 
             <div class="filter-row">
                 <div>
+                    <label>Sort By:</label>
+                    <select name="sort" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                        <option value="newest" <?php echo (!isset($_GET['sort']) || $_GET['sort'] == 'newest') ? 'selected' : ''; ?>>Newest First</option>
+                        <option value="oldest" <?php echo (isset($_GET['sort']) && $_GET['sort'] == 'oldest') ? 'selected' : ''; ?>>Oldest First</option>
+                    </select>
+                </div>
+                <div>
                     <label>Price:</label>
                     <input type="number" name="min_price" placeholder="Min" value="<?php echo htmlspecialchars($_GET['min_price'] ?? ''); ?>">
                     -
@@ -117,6 +133,34 @@ $products = $productRepo->search($filters);
                 </div>
             <?php endforeach; ?>
         </div>
+
+        <!-- Pagination Links -->
+        <?php if ($totalPages > 1): ?>
+            <div style="margin-top: 30px; display: flex; justify-content: center; gap: 5px;">
+                <?php 
+                // Helper to keep existing filters in URL
+                function getUrl($pageNum) {
+                    $params = $_GET;
+                    $params['page'] = $pageNum;
+                    return 'home.php?' . http_build_query($params);
+                }
+                ?>
+
+                <?php if ($page > 1): ?>
+                    <a href="<?php echo getUrl($page - 1); ?>" style="padding: 8px 12px; border: 1px solid #ddd; text-decoration: none; border-radius: 4px; background: white;">&laquo; Prev</a>
+                <?php endif; ?>
+
+                <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                    <a href="<?php echo getUrl($i); ?>" style="padding: 8px 12px; border: 1px solid #ddd; text-decoration: none; border-radius: 4px; <?php echo $i == $page ? 'background: #007bff; color: white;' : 'background: white; color: #333;'; ?>">
+                        <?php echo $i; ?>
+                    </a>
+                <?php endfor; ?>
+
+                <?php if ($page < $totalPages): ?>
+                    <a href="<?php echo getUrl($page + 1); ?>" style="padding: 8px 12px; border: 1px solid #ddd; text-decoration: none; border-radius: 4px; background: white;">Next &raquo;</a>
+                <?php endif; ?>
+            </div>
+        <?php endif; ?>
     </div>
 </body>
 </html>

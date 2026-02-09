@@ -64,11 +64,76 @@ class ProductRepository {
             $args[':seller'] = '%' . $params['seller'] . '%';
         }
 
-        $sql .= " ORDER BY p.id DESC";
+        if (isset($params['sort']) && $params['sort'] === 'oldest') {
+            $sql .= " ORDER BY p.id ASC";
+        } else {
+            $sql .= " ORDER BY p.id DESC";
+        }
+
+        if (isset($params['limit']) && isset($params['offset'])) {
+            $sql .= " LIMIT :limit OFFSET :offset";
+        }
+
+        $stmt = $this->conn->prepare($sql);
+        
+        foreach ($args as $key => $val) {
+            $stmt->bindValue($key, $val);
+        }
+        if (isset($params['limit']) && isset($params['offset'])) {
+            $stmt->bindValue(':limit', (int) $params['limit'], PDO::PARAM_INT);
+            $stmt->bindValue(':offset', (int) $params['offset'], PDO::PARAM_INT);
+        }
+
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function countSearch($params = []) {
+        $sql = "SELECT COUNT(*) as total 
+                FROM Product p 
+                LEFT JOIN User u ON p.owner_id = u.id
+                WHERE 1=1";
+        
+        $args = [];
+
+        if (!empty($params['category_id'])) {
+            $sql .= " AND p.category_id = :category_id";
+            $args[':category_id'] = $params['category_id'];
+        }
+
+        if (!empty($params['min_price'])) {
+            $sql .= " AND p.prices >= :min_price";
+            $args[':min_price'] = $params['min_price'];
+        }
+
+        if (!empty($params['max_price'])) {
+            $sql .= " AND p.prices <= :max_price";
+            $args[':max_price'] = $params['max_price'];
+        }
+
+        if (!empty($params['has_discount'])) {
+            $sql .= " AND p.discounts > 0";
+        }
+
+        if (!empty($params['name'])) {
+            $sql .= " AND p.name LIKE :name";
+            $args[':name'] = '%' . $params['name'] . '%';
+        }
+
+        if (!empty($params['location'])) {
+            $sql .= " AND p.location LIKE :location";
+            $args[':location'] = '%' . $params['location'] . '%';
+        }
+
+        if (!empty($params['seller'])) {
+            $sql .= " AND u.name LIKE :seller";
+            $args[':seller'] = '%' . $params['seller'] . '%';
+        }
 
         $stmt = $this->conn->prepare($sql);
         $stmt->execute($args);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result['total'];
     }
 
     public function getByCategoryId($categoryId) {
