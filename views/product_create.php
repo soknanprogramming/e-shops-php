@@ -67,8 +67,16 @@ $categories = $catRepo->getAll();
                 <textarea name="description" rows="5" placeholder="Describe your product..." required></textarea>
             </div>
             <div class="form-group">
-                <label for="image">Product Image</label>
+                <label for="image">Main Image (Required)</label>
                 <input type="file" name="image" accept="image/*" required>
+            </div>
+            <div class="form-group">
+                <label>Additional Images (Optional)</label>
+                <input type="file" name="image1" accept="image/*" style="margin-bottom: 5px;">
+                <input type="file" name="image2" accept="image/*" style="margin-bottom: 5px;">
+                <input type="file" name="image3" accept="image/*" style="margin-bottom: 5px;">
+                <input type="file" name="image4" accept="image/*" style="margin-bottom: 5px;">
+                <input type="file" name="image5" accept="image/*" style="margin-bottom: 5px;">
             </div>
             <button type="submit" name="create_product">Post Product</button>
         </form>

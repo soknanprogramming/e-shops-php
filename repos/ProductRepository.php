@@ -34,9 +34,17 @@ class ProductRepository {
 
     public function create($data) {
         // 1. Insert Image first to get the ID
-        $sqlImg = "INSERT INTO product_image (main_image) VALUES (:main_image)";
+        $sqlImg = "INSERT INTO product_image (main_image, image1, image2, image3, image4, image5) 
+                   VALUES (:main_image, :image1, :image2, :image3, :image4, :image5)";
         $stmtImg = $this->conn->prepare($sqlImg);
-        $stmtImg->execute([':main_image' => $data['image']]);
+        $stmtImg->execute([
+            ':main_image' => $data['image'],
+            ':image1' => $data['image1'] ?? null,
+            ':image2' => $data['image2'] ?? null,
+            ':image3' => $data['image3'] ?? null,
+            ':image4' => $data['image4'] ?? null,
+            ':image5' => $data['image5'] ?? null
+        ]);
         $imageId = $this->conn->lastInsertId();
 
         // 2. Get or Create Profile ID (Fix for Foreign Key Constraint)
