@@ -49,6 +49,21 @@ class ProductRepository {
             $sql .= " AND p.discounts > 0";
         }
 
+        if (!empty($params['name'])) {
+            $sql .= " AND p.name LIKE :name";
+            $args[':name'] = '%' . $params['name'] . '%';
+        }
+
+        if (!empty($params['location'])) {
+            $sql .= " AND p.location LIKE :location";
+            $args[':location'] = '%' . $params['location'] . '%';
+        }
+
+        if (!empty($params['seller'])) {
+            $sql .= " AND u.name LIKE :seller";
+            $args[':seller'] = '%' . $params['seller'] . '%';
+        }
+
         $sql .= " ORDER BY p.id DESC";
 
         $stmt = $this->conn->prepare($sql);
