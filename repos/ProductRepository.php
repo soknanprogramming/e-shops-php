@@ -32,6 +32,23 @@ class ProductRepository {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function getById($id) {
+        $sql = "SELECT p.*, 
+                       pi.main_image, pi.image1, pi.image2, pi.image3, pi.image4, pi.image5,
+                       c.name as category_name, 
+                       u.name as owner_name,
+                       up.phone1, up.phone2
+                FROM Product p 
+                LEFT JOIN product_image pi ON p.product_image_id = pi.id 
+                LEFT JOIN category c ON p.category_id = c.id
+                LEFT JOIN User u ON p.owner_id = u.id
+                LEFT JOIN user_profile up ON p.profile_id = up.id
+                WHERE p.id = :id";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute([':id' => $id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
     public function create($data) {
         // 1. Insert Image first to get the ID
         $sqlImg = "INSERT INTO product_image (main_image, image1, image2, image3, image4, image5) 
