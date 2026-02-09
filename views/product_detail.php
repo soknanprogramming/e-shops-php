@@ -67,6 +67,8 @@ $comments = $commentRepo->getAllByProductId($product['id']);
     <?php include './assets/topbar.php'; ?>
 
     <div class="container">
+        <a href="javascript:history.back()" style="display: inline-block; margin-bottom: 15px; text-decoration: none; color: #6c757d;">&larr; Back</a>
+
         <div class="detail-card">
             <!-- Image Gallery -->
             <div class="gallery">

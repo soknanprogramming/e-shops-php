@@ -64,14 +64,21 @@ $myProducts = $productRepo->getByOwnerId($_SESSION['user_id']);
                         <tr>
                             <td>
                                 <?php if($prod['main_image']): ?>
-                                    <img src="../uploads/products/<?php echo htmlspecialchars($prod['main_image']); ?>" class="product-img" alt="Product">
+                                    <a href="product_detail.php?id=<?php echo $prod['id']; ?>">
+                                        <img src="../uploads/products/<?php echo htmlspecialchars($prod['main_image']); ?>" class="product-img" alt="Product">
+                                    </a>
                                 <?php endif; ?>
                             </td>
-                            <td><?php echo htmlspecialchars($prod['name']); ?></td>
+                            <td>
+                                <a href="product_detail.php?id=<?php echo $prod['id']; ?>" style="text-decoration: none; color: #333; font-weight: bold;">
+                                    <?php echo htmlspecialchars($prod['name']); ?>
+                                </a>
+                            </td>
                             <td>$<?php echo number_format($prod['prices'], 2); ?></td>
                             <td><?php echo htmlspecialchars($prod['category_name']); ?></td>
                             <td><?php echo $prod['showed'] ? '<span style="color:green">Active</span>' : '<span style="color:red">Hidden</span>'; ?></td>
                             <td>
+                                <a href="product_detail.php?id=<?php echo $prod['id']; ?>" class="action-link">View</a>
                                 <a href="product_edit.php?id=<?php echo $prod['id']; ?>" class="action-link">Edit</a>
                                 <a href="../controllers/product.php?action=delete&id=<?php echo $prod['id']; ?>" class="action-link delete" onclick="return confirm('Are you sure you want to delete this product?')">Delete</a>
                             </td>
