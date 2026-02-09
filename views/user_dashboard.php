@@ -72,8 +72,8 @@ $myProducts = $productRepo->getByOwnerId($_SESSION['user_id']);
                             <td><?php echo htmlspecialchars($prod['category_name']); ?></td>
                             <td><?php echo $prod['showed'] ? '<span style="color:green">Active</span>' : '<span style="color:red">Hidden</span>'; ?></td>
                             <td>
-                                <a href="#" class="action-link">Edit</a>
-                                <a href="#" class="action-link delete" onclick="return confirm('Are you sure?')">Delete</a>
+                                <a href="product_edit.php?id=<?php echo $prod['id']; ?>" class="action-link">Edit</a>
+                                <a href="../controllers/product.php?action=delete&id=<?php echo $prod['id']; ?>" class="action-link delete" onclick="return confirm('Are you sure you want to delete this product?')">Delete</a>
                             </td>
                         </tr>
                     <?php endforeach; ?>

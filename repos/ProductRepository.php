@@ -254,4 +254,84 @@ class ProductRepository {
         
         return $this->conn->lastInsertId();
     }
+
+    public function update($id, $data) {
+        // 1. Update Product Table
+        $sql = "UPDATE Product SET 
+                name = :name, 
+                prices = :prices, 
+                discounts = :discounts, 
+                category_id = :category_id, 
+                location = :location, 
+                description = :description 
+                WHERE id = :id AND owner_id = :owner_id";
+        
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute([
+            ':name' => $data['name'],
+            ':prices' => $data['prices'],
+            ':discounts' => $data['discounts'],
+            ':category_id' => $data['category_id'],
+            ':location' => $data['location'],
+            ':description' => $data['description'],
+            ':id' => $id,
+            ':owner_id' => $data['owner_id']
+        ]);
+
+        // 2. Update Images if provided
+        $stmtGetImg = $this->conn->prepare("SELECT product_image_id FROM Product WHERE id = :id");
+        $stmtGetImg->execute([':id' => $id]);
+        $imgId = $stmtGetImg->fetchColumn();
+
+        if ($imgId) {
+            $imageUpdates = [];
+            $imageParams = [':id' => $imgId];
+
+            if (!empty($data['image'])) {
+                $imageUpdates[] = "main_image = :main_image";
+                $imageParams[':main_image'] = $data['image'];
+            }
+            for ($i = 1; $i <= 5; $i++) {
+                if (!empty($data['image'.$i])) {
+                    $imageUpdates[] = "image$i = :image$i";
+                    $imageParams[":image$i"] = $data['image'.$i];
+                }
+            }
+
+            if (!empty($imageUpdates)) {
+                $sqlImg = "UPDATE product_image SET " . implode(', ', $imageUpdates) . " WHERE id = :id";
+                $stmtImg = $this->conn->prepare($sqlImg);
+                $stmtImg->execute($imageParams);
+            }
+        }
+    }
+
+    public function delete($id, $ownerId) {
+        // 1. Get Image info before deleting to return for file deletion
+        $sqlGet = "SELECT pi.* FROM Product p 
+                   JOIN product_image pi ON p.product_image_id = pi.id 
+                   WHERE p.id = :id AND p.owner_id = :owner_id";
+        $stmtGet = $this->conn->prepare($sqlGet);
+        $stmtGet->execute([':id' => $id, ':owner_id' => $ownerId]);
+        $images = $stmtGet->fetch(PDO::FETCH_ASSOC);
+
+        if (!$images) {
+            return false; // Product not found or not owned by user
+        }
+
+        // 2. Delete Product (Cascades to likes/comments if configured, otherwise manual cleanup might be needed)
+        $sqlDel = "DELETE FROM Product WHERE id = :id AND owner_id = :owner_id";
+        $stmtDel = $this->conn->prepare($sqlDel);
+        
+        if ($stmtDel->execute([':id' => $id, ':owner_id' => $ownerId])) {
+            // 3. Delete Image Record from DB
+            $sqlDelImg = "DELETE FROM product_image WHERE id = :id";
+            $stmtDelImg = $this->conn->prepare($sqlDelImg);
+            $stmtDelImg->execute([':id' => $images['id']]);
+            
+            return $images; // Return image data to delete files
+        }
+        
+        return false;
+    }
 }
