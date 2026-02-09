@@ -5,6 +5,7 @@
     <ul class="sidebar-menu">
         <li><a href="home.php">Back to Shop</a></li>
         <li><a href="user_dashboard.php">My Products</a></li>
+        <li><a href="user_profile.php">My Profile</a></li>
         <li><a href="product_create.php">Post New Product</a></li>
         <li><a href="logout.php" style="color: #dc3545;">Logout</a></li>
     </ul>
