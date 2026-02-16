@@ -2,10 +2,20 @@
 session_start();
 require_once '../configs/connect.php';
 require_once '../repos/CategoryRepository.php';
+require_once '../repos/ProfileRepository.php';
 
 // 1. Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
+    exit();
+}
+
+// Check if user has a phone number
+$profileRepo = new ProfileRepository($conn);
+$userProfile = $profileRepo->getByUserId($_SESSION['user_id']);
+
+if (empty($userProfile) || empty($userProfile['phone1'])) {
+    header("Location: user_profile.php?error=Please update your phone number before posting a product.");
     exit();
 }
 

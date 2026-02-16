@@ -36,6 +36,7 @@ $bio = $profile['bio'] ?? '';
         button { padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 1rem; }
         button:hover { background-color: #0056b3; }
         .success-msg { color: #155724; background-color: #d4edda; border: 1px solid #c3e6cb; padding: 10px; border-radius: 4px; margin-bottom: 20px; }
+        .error-msg { color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; padding: 10px; border-radius: 4px; margin-bottom: 20px; }
     </style>
 </head>
 <body>
@@ -44,6 +45,9 @@ $bio = $profile['bio'] ?? '';
         <div class="profile-container">
             <h2>My Profile</h2>
             
+            <?php if (isset($_GET['error'])): ?>
+                <div class="error-msg"><?php echo htmlspecialchars($_GET['error']); ?></div>
+            <?php endif; ?>
             <?php if (isset($_GET['success'])): ?>
                 <div class="success-msg"><?php echo htmlspecialchars($_GET['success']); ?></div>
             <?php endif; ?>
