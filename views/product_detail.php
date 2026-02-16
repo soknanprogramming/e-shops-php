@@ -32,42 +32,74 @@ $comments = $commentRepo->getAllByProductId($product['id']);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo htmlspecialchars($product['name']); ?> - Details</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: sans-serif; margin: 0; padding: 0; background-color: #f8f9fa; }
-        .container { padding: 20px; max-width: 1000px; margin: 0 auto; }
+        :root {
+            --primary: #007bff;
+            --primary-dark: #0056b3;
+            --secondary: #6c757d;
+            --success: #28a745;
+            --danger: #dc3545;
+            --bg-light: #f4f6f8;
+            --text-dark: #343a40;
+            --text-muted: #6c757d;
+            --border-color: #e9ecef;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.07);
+            --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+        }
+        body { font-family: 'Inter', sans-serif; margin: 0; padding: 0; background-color: var(--bg-light); color: var(--text-dark); }
+        .container { padding: 40px 20px; max-width: 1100px; margin: 0 auto; }
         
-        .detail-card { background: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); overflow: hidden; display: flex; flex-wrap: wrap; }
-        
-        .gallery { flex: 1; min-width: 300px; padding: 20px; }
-        .main-img { width: 100%; height: 400px; object-fit: contain; border: 1px solid #eee; border-radius: 4px; margin-bottom: 10px; }
-        .thumbnails { display: flex; gap: 10px; overflow-x: auto; }
-        .thumbnails img { width: 60px; height: 60px; object-fit: cover; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; opacity: 0.7; }
-        .thumbnails img:hover { opacity: 1; border-color: #007bff; }
+        .back-link { display: inline-flex; align-items: center; margin-bottom: 20px; text-decoration: none; color: var(--text-muted); font-weight: 500; transition: color 0.2s; }
+        .back-link:hover { color: var(--primary); }
 
-        .info { flex: 1; min-width: 300px; padding: 20px; border-left: 1px solid #eee; }
-        .info h1 { margin-top: 0; color: #333; }
-        .price { font-size: 1.5rem; color: #28a745; font-weight: bold; margin: 10px 0; }
-        .discount { color: #dc3545; text-decoration: line-through; font-size: 1rem; margin-left: 10px; }
-        .meta { color: #6c757d; font-size: 0.9rem; margin-bottom: 20px; }
-        .meta span { margin-right: 15px; }
+        .detail-card { background: white; border-radius: 16px; box-shadow: var(--shadow-md); overflow: hidden; display: flex; flex-wrap: wrap; border: 1px solid var(--border-color); }
         
-        .description { margin-top: 20px; line-height: 1.6; color: #555; }
-        
-        .seller-box { background-color: #f1f3f5; padding: 15px; border-radius: 8px; margin-top: 30px; }
-        .seller-box h3 { margin-top: 0; font-size: 1.1rem; }
-        .contact-btn { display: inline-block; background-color: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; margin-top: 10px; }
+        .gallery { flex: 1; min-width: 350px; padding: 30px; background-color: #fff; }
+        .main-img { width: 100%; height: 400px; object-fit: contain; border-radius: 12px; margin-bottom: 15px; background-color: #f8f9fa; }
+        .thumbnails { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px; }
+        .thumbnails img { width: 70px; height: 70px; object-fit: cover; border: 2px solid transparent; border-radius: 8px; cursor: pointer; opacity: 0.7; transition: all 0.2s; }
+        .thumbnails img:hover, .thumbnails img.active { opacity: 1; border-color: var(--primary); transform: translateY(-2px); }
 
-        .comments-section { margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px; }
-        .comment-item { background: #f8f9fa; padding: 10px; border-radius: 4px; margin-bottom: 10px; }
-        .comment-user { font-weight: bold; font-size: 0.9rem; color: #333; }
-        .comment-date { font-size: 0.8rem; color: #888; margin-left: 10px; }
+        .info { flex: 1; min-width: 350px; padding: 40px; border-left: 1px solid var(--border-color); }
+        .info h1 { margin-top: 0; font-size: 2rem; font-weight: 700; color: var(--text-dark); line-height: 1.2; }
+        
+        .price-tag { display: flex; align-items: center; margin: 15px 0; }
+        .price { font-size: 2rem; color: var(--primary); font-weight: 700; }
+        .discount { color: var(--danger); text-decoration: line-through; font-size: 1.1rem; margin-left: 12px; opacity: 0.8; }
+        
+        .meta { display: flex; flex-wrap: wrap; gap: 20px; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid var(--border-color); }
+        .meta-item { display: flex; align-items: center; gap: 8px; color: var(--text-muted); font-size: 0.95rem; }
+        .meta-item strong { color: var(--text-dark); }
+        
+        .description { margin-bottom: 30px; line-height: 1.7; color: #4a5568; }
+        .description h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 10px; color: var(--text-dark); }
+        
+        .seller-box { background-color: #f8f9fa; padding: 25px; border-radius: 12px; border: 1px solid var(--border-color); }
+        .seller-box h3 { margin: 0 0 15px; font-size: 1.1rem; font-weight: 600; }
+
+        .comments-section { margin-top: 40px; }
+        .comments-section h3 { font-size: 1.3rem; font-weight: 700; margin-bottom: 20px; }
+        .comment-item { background: white; padding: 20px; border-radius: 12px; margin-bottom: 15px; border: 1px solid var(--border-color); box-shadow: var(--shadow-sm); }
+        .comment-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
+        .comment-user { font-weight: 600; color: var(--text-dark); }
+        .comment-date { font-size: 0.85rem; color: var(--text-muted); }
+        
+        textarea { width: 100%; padding: 15px; border: 1px solid var(--border-color); border-radius: 8px; font-family: inherit; resize: vertical; transition: border-color 0.2s; }
+        textarea:focus { outline: none; border-color: var(--primary); }
+        .btn-submit { background-color: var(--primary); color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: 600; margin-top: 10px; transition: background 0.2s; }
+        .btn-submit:hover { background-color: var(--primary-dark); }
+        
+        .like-btn { background: none; border: none; cursor: pointer; font-size: 1.8rem; transition: transform 0.2s; padding: 0; }
+        .like-btn:hover { transform: scale(1.1); }
     </style>
 </head>
 <body>
     <?php include './assets/topbar.php'; ?>
 
     <div class="container">
-        <a href="javascript:history.back()" style="display: inline-block; margin-bottom: 15px; text-decoration: none; color: #6c757d;">&larr; Back</a>
+        <a href="javascript:history.back()" class="back-link">&larr; Back to Products</a>
 
         <div class="detail-card">
             <!-- Image Gallery -->
@@ -90,23 +122,25 @@ $comments = $commentRepo->getAllByProductId($product['id']);
                     
                     <form action="../controllers/like.php" method="POST">
                         <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
-                        <button type="submit" style="background: none; border: none; cursor: pointer; font-size: 1.5rem; color: <?php echo $hasLiked ? '#e91e63' : '#ccc'; ?>;" title="<?php echo $hasLiked ? 'Unlike' : 'Like'; ?>">
+                        <button type="submit" class="like-btn" style="color: <?php echo $hasLiked ? '#e91e63' : '#ccc'; ?>;" title="<?php echo $hasLiked ? 'Unlike' : 'Like'; ?>">
                             <?php echo $hasLiked ? '♥' : '♡'; ?> <span style="font-size: 1rem; color: #333;"><?php echo $likeCount; ?></span>
                         </button>
                     </form>
                 </div>
 
-                <div class="price">
+                <div class="price-tag">
+                    <span class="price">
                     $<?php echo number_format($product['prices'], 2); ?>
+                    </span>
                     <?php if($product['discounts'] > 0): ?>
                         <span class="discount">$<?php echo number_format($product['prices'] + $product['discounts'], 2); ?></span>
                     <?php endif; ?>
                 </div>
                 
                 <div class="meta">
-                    <span><strong>Category:</strong> <?php echo htmlspecialchars($product['category_name']); ?></span>
-                    <span><strong>Location:</strong> <?php echo htmlspecialchars($product['location']); ?></span>
-                    <span><strong>Posted:</strong> <?php echo date('d M Y', strtotime($product['created_at'])); ?></span>
+                    <div class="meta-item"><strong>Category:</strong> <?php echo htmlspecialchars($product['category_name']); ?></div>
+                    <div class="meta-item"><strong>Location:</strong> <?php echo htmlspecialchars($product['location']); ?></div>
+                    <div class="meta-item"><strong>Posted:</strong> <?php echo date('d M Y', strtotime($product['created_at'])); ?></div>
                 </div>
 
                 <div class="description">
@@ -121,7 +155,6 @@ $comments = $commentRepo->getAllByProductId($product['id']);
                     <?php if(!empty($product['phone2'])): ?>
                         <p><strong>Phone 2:</strong> <?php echo htmlspecialchars($product['phone2']); ?></p>
                     <?php endif; ?>
-                    <a href="tel:<?php echo htmlspecialchars($product['phone1']); ?>" class="contact-btn">Call Now</a>
                 </div>
 
                 <!-- Comments Section -->
@@ -133,8 +166,10 @@ $comments = $commentRepo->getAllByProductId($product['id']);
                     <?php else: ?>
                         <?php foreach($comments as $cmt): ?>
                             <div class="comment-item">
-                                <span class="comment-user"><?php echo htmlspecialchars($cmt['user_name']); ?></span>
-                                <span class="comment-date"><?php echo date('d M Y H:i', strtotime($cmt['created_at'])); ?></span>
+                                <div class="comment-header">
+                                    <span class="comment-user"><?php echo htmlspecialchars($cmt['user_name']); ?></span>
+                                    <span class="comment-date"><?php echo date('d M Y H:i', strtotime($cmt['created_at'])); ?></span>
+                                </div>
                                 <p style="margin: 5px 0 0;"><?php echo nl2br(htmlspecialchars($cmt['comment'])); ?></p>
                             </div>
                         <?php endforeach; ?>
@@ -143,8 +178,8 @@ $comments = $commentRepo->getAllByProductId($product['id']);
                     <?php if(isset($_SESSION['user_id'])): ?>
                         <form action="../controllers/comment.php" method="POST" style="margin-top: 20px;">
                             <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
-                            <textarea name="comment" rows="3" placeholder="Write a comment..." style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;" required></textarea>
-                            <button type="submit" name="add_comment" style="margin-top: 10px; background-color: #007bff; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">Post Comment</button>
+                            <textarea name="comment" rows="3" placeholder="Write a comment..." required></textarea>
+                            <button type="submit" name="add_comment" class="btn-submit">Post Comment</button>
                         </form>
                     <?php endif; ?>
                 </div>
