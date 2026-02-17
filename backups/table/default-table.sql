@@ -66,45 +66,23 @@ CREATE TABLE `category` (
 ) ENGINE=InnoDB CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- 6. Table: liked
--- CREATE TABLE `liked` (
---     `id` INT AUTO_INCREMENT PRIMARY KEY,
---     `user_id` INT NOT NULL,
---     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
---     `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
---     FOREIGN KEY (`user_id`) REFERENCES `User`(`id`)
--- ) ENGINE=InnoDB CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
--- above if not used
-
-CREATE TABLE `product_likes` (
+CREATE TABLE `liked` (
     `id` INT AUTO_INCREMENT PRIMARY KEY,
     `user_id` INT NOT NULL,
-    `product_id` INT NOT NULL,
-    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (`user_id`) REFERENCES `User`(`id`) ON DELETE CASCADE,
-    FOREIGN KEY (`product_id`) REFERENCES `Product`(`id`) ON DELETE CASCADE,
-    UNIQUE KEY `unique_like` (`user_id`, `product_id`)
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
+    FOREIGN KEY (`user_id`) REFERENCES `User`(`id`)
 ) ENGINE=InnoDB CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
 -- 7. Table: comment
--- CREATE TABLE `comment` (
---     `id` INT AUTO_INCREMENT PRIMARY KEY,
---     `user_id` INT NOT NULL,
---     `comment` VARCHAR(200) NOT NULL, -- Supporting Khmer comments
---     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
---     `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
---     FOREIGN KEY (`user_id`) REFERENCES `User`(`id`)
--- ) ENGINE=InnoDB CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
--- above if not used
-
-CREATE TABLE `product_comments` (
+CREATE TABLE `comment` (
     `id` INT AUTO_INCREMENT PRIMARY KEY,
-    `product_id` INT NOT NULL,
     `user_id` INT NOT NULL,
-    `comment` TEXT NOT NULL,
-    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (`product_id`) REFERENCES `Product`(`id`) ON DELETE CASCADE,
-    FOREIGN KEY (`user_id`) REFERENCES `User`(`id`) ON DELETE CASCADE
+    `comment` VARCHAR(200) NOT NULL, -- Supporting Khmer comments
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
+    FOREIGN KEY (`user_id`) REFERENCES `User`(`id`)
 ) ENGINE=InnoDB CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
@@ -131,4 +109,26 @@ CREATE TABLE `Product` (
     FOREIGN KEY (`profile_id`) REFERENCES `user_profile`(`id`),
     FOREIGN KEY (`liked_id`) REFERENCES `liked`(`id`),
     FOREIGN KEY (`comment_id`) REFERENCES `comment`(`id`)
+) ENGINE=InnoDB CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- 9. Table: product_likes
+CREATE TABLE `product_likes` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `user_id` INT NOT NULL,
+    `product_id` INT NOT NULL,
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (`user_id`) REFERENCES `User`(`id`) ON DELETE CASCADE,
+    FOREIGN KEY (`product_id`) REFERENCES `Product`(`id`) ON DELETE CASCADE,
+    UNIQUE KEY `unique_like` (`user_id`, `product_id`)
+) ENGINE=InnoDB CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- 10. Table: product_comments
+CREATE TABLE `product_comments` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `product_id` INT NOT NULL,
+    `user_id` INT NOT NULL,
+    `comment` TEXT NOT NULL,
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (`product_id`) REFERENCES `Product`(`id`) ON DELETE CASCADE,
+    FOREIGN KEY (`user_id`) REFERENCES `User`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
