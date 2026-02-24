@@ -45,7 +45,7 @@ class UserRepository {
     public function update($id, array $data) {
         $fields = [];
         $params = [':id' => $id];
-        $allowed = ['name', 'first_name', 'last_name', 'email', 'password', 'provider', 'provider_id', 'avatar', 'is_admin'];
+        $allowed = ['name', 'first_name', 'last_name', 'email', 'password', 'provider', 'provider_id', 'avatar', 'is_admin', 'can_post', 'request_post_permission'];
 
         foreach ($data as $key => $value) {
             if (in_array($key, $allowed)) {

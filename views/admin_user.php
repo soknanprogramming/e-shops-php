@@ -1,46 +1,37 @@
 <?php
 session_start();
-require_once '../repos/UserRepository.php';
 require_once '../configs/connect.php';
 
-// 1. Check if user is logged in
-if (!isset($_SESSION['user_id'])) {
+// 1. Auth Check
+if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] != 1) {
     header("Location: login.php");
     exit();
 }
 
-// 2. Check if user is an admin
-if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] != 1) {
-    header("Location: home.php");
-    exit();
-}
-
-// 3. Fetch Users
-$users = [];
-$search = $_GET['search'] ?? '';
-
-try {
-    $userRepo = new UserRepository($conn);
-    if (!empty($search)) {
-        $users = $userRepo->search($search);
-    } else {
-        $users = $userRepo->getAll();
-    }
-} catch (PDOException $e) {
-    echo "Error: " . $e->getMessage();
-}
+// 2. Fetch All Users
+$stmt = $conn->prepare("SELECT * FROM User ORDER BY created_at DESC");
+$stmt->execute();
+$users = $stmt->fetchAll();
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Users</title>
+    <title>Manage Users</title>
     <style>
-        body { margin: 0; font-family: sans-serif; display: flex; min-height: 100vh; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; }
-        th, td { padding: 12px; border: 1px solid #dee2e6; text-align: left; }
-        th { background-color: #e9ecef; }
+        body { font-family: sans-serif; display: flex; }
+        .main-content { flex-grow: 1; padding: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #f4f4f4; }
+        .btn { padding: 5px 10px; text-decoration: none; color: white; border-radius: 4px; font-size: 0.9rem; }
+        .btn-green { background-color: #28a745; }
+        .btn-red { background-color: #dc3545; }
+        .btn-blue { background-color: #007bff; }
+        .badge { padding: 3px 8px; border-radius: 10px; font-size: 0.8rem; color: white; }
+        .bg-success { background-color: #28a745; }
+        .bg-secondary { background-color: #6c757d; }
     </style>
 </head>
 <body>
@@ -49,21 +40,11 @@ try {
     <div class="main-content">
         <h1>User Management</h1>
         
-        <div style="margin-bottom: 20px;">
-            <form action="" method="GET" style="display: flex; gap: 10px;">
-                <input type="text" name="search" placeholder="Search by name or email" value="<?php echo htmlspecialchars($search); ?>" style="padding: 8px; width: 300px; border: 1px solid #ccc; border-radius: 4px;">
-                <button type="submit" style="padding: 8px 15px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">Search</button>
-                <?php if (!empty($search)): ?>
-                    <a href="admin_user.php" style="padding: 8px 15px; background-color: #6c757d; color: white; text-decoration: none; border-radius: 4px; display: inline-block;">Reset</a>
-                <?php endif; ?>
-            </form>
-        </div>
-
-        <?php if (isset($_GET['error'])): ?>
-            <p style="color: red;"><?php echo htmlspecialchars($_GET['error']); ?></p>
-        <?php endif; ?>
         <?php if (isset($_GET['success'])): ?>
             <p style="color: green;"><?php echo htmlspecialchars($_GET['success']); ?></p>
+        <?php endif; ?>
+        <?php if (isset($_GET['error'])): ?>
+            <p style="color: red;"><?php echo htmlspecialchars($_GET['error']); ?></p>
         <?php endif; ?>
 
         <table>
@@ -73,28 +54,34 @@ try {
                     <th>Name</th>
                     <th>Email</th>
                     <th>Role</th>
+                    <th>Posting Permission</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
                 <?php foreach ($users as $user): ?>
-                    <tr>
-                        <td><?php echo htmlspecialchars($user['id']); ?></td>
-                        <td><?php echo htmlspecialchars($user['name']); ?></td>
-                        <td><?php echo htmlspecialchars($user['email']); ?></td>
-                        <td><?php echo $user['is_admin'] ? 'Admin' : 'User'; ?></td>
-                        <td>
-                            <?php if ($user['id'] != $_SESSION['user_id']): ?>
-                                <a href="../controllers/user.php?action=toggle_role&id=<?php echo $user['id']; ?>" 
-                                   onclick="return confirm('Are you sure you want to change this user\'s role?');"
-                                   style="color: blue; text-decoration: underline; cursor: pointer;">
-                                    <?php echo $user['is_admin'] ? 'Remove Admin' : 'Make Admin'; ?>
-                                </a>
-                            <?php else: ?>
-                                <span style="color: gray;">(You)</span>
+                <tr>
+                    <td><?php echo $user['id']; ?></td>
+                    <td><?php echo htmlspecialchars($user['name']); ?></td>
+                    <td><?php echo htmlspecialchars($user['email']); ?></td>
+                    <td><?php echo $user['is_admin'] ? 'Admin' : 'User'; ?></td>
+                    <td>
+                        <?php if ($user['can_post']): ?>
+                            <span class="badge bg-success">Allowed</span>
+                        <?php else: ?>
+                            <span class="badge bg-secondary">Restricted</span>
+                            <?php if (isset($user['request_post_permission']) && $user['request_post_permission'] == 1): ?>
+                                <span class="badge" style="background-color: #ffc107; color: black; margin-left: 5px;">Requesting</span>
                             <?php endif; ?>
-                        </td>
-                    </tr>
+                        <?php endif; ?>
+                    </td>
+                    <td>
+                        <a href="../controllers/user.php?action=toggle_permission&id=<?php echo $user['id']; ?>" class="btn <?php echo $user['can_post'] ? 'btn-red' : 'btn-green'; ?>">
+                            <?php echo $user['can_post'] ? 'Revoke Post' : 'Allow Post'; ?>
+                        </a>
+                        <a href="../controllers/user.php?action=toggle_role&id=<?php echo $user['id']; ?>" class="btn btn-blue">Toggle Role</a>
+                    </td>
+                </tr>
                 <?php endforeach; ?>
             </tbody>
         </table>

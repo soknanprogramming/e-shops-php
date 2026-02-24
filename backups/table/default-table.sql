@@ -17,6 +17,8 @@ CREATE TABLE `User` (
     `provider_id` VARCHAR(200) NULL,
     `avatar` BOOLEAN NOT NULL,
     `is_admin` BOOLEAN NOT NULL,
+    `can_post` BOOLEAN DEFAULT 0,
+    `request_post_permission` BOOLEAN DEFAULT 0,
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL
 ) ENGINE=InnoDB CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

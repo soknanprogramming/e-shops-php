@@ -37,4 +37,39 @@ if (isset($_GET['action']) && $_GET['action'] === 'toggle_role' && isset($_GET['
         exit();
     }
 }
+
+// 3. Toggle Post Permission Action
+if (isset($_GET['action']) && $_GET['action'] === 'toggle_permission' && isset($_GET['id'])) {
+    $id = $_GET['id'];
+
+    $user = $userRepo->findById($id);
+    
+    if ($user) {
+        // Toggle: if 1 becomes 0, if 0 becomes 1
+        $new_status = (isset($user['can_post']) && $user['can_post'] == 1) ? 0 : 1;
+        
+        $updateData = ['can_post' => $new_status];
+        
+        // If granting permission, reset the request flag
+        if ($new_status == 1) {
+            $updateData['request_post_permission'] = 0;
+        }
+
+        $userRepo->update($id, $updateData);
+        
+        $msg = $new_status ? "User allowed to post products" : "User posting permission revoked";
+        header("Location: ../views/admin_user.php?success=" . urlencode($msg));
+        exit();
+    } else {
+        header("Location: ../views/admin_user.php?error=User not found");
+        exit();
+    }
+}
+
+// 4. Request Permission Action (User side)
+if (isset($_GET['action']) && $_GET['action'] === 'request_permission') {
+    $userRepo->update($_SESSION['user_id'], ['request_post_permission' => 1]);
+    header("Location: ../views/user_dashboard.php?success=Permission requested successfully. Please wait for admin approval.");
+    exit();
+}
 ?>

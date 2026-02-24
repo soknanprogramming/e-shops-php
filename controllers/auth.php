@@ -42,7 +42,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'email' => $email,
             'password' => $hashed_password,
             'is_admin' => 0,
-            'avatar' => 0
+            'avatar' => 0,
+            'can_post' => 0
         ];
 
         // 4. Create User
@@ -62,6 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['user_name'] = $user['name'];
             $_SESSION['is_admin'] = $user['is_admin'];
+            $_SESSION['can_post'] = $user['can_post'] ?? 0;
             header("Location: ../views/home.php");
             exit();
         } else {

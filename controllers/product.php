@@ -22,6 +22,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_product'])) {
         exit();
     }
 
+    // Fetch fresh user permissions from DB to prevent using a stale session value
+    $stmtUser = $conn->prepare("SELECT can_post FROM User WHERE id = ?");
+    $stmtUser->execute([$_SESSION['user_id']]);
+    $user = $stmtUser->fetch();
+
+    // Check if user has permission to post
+    if (!$user || $user['can_post'] != 1) {
+        header("Location: ../views/user_dashboard.php?error=You need admin approval to post products");
+        exit();
+    }
+
     $name = $_POST['name'];
     $prices = $_POST['prices'];
     $discounts = !empty($_POST['discounts']) ? $_POST['discounts'] : 0;
