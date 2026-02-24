@@ -21,7 +21,7 @@ $profileRepo = new ProfileRepository($conn);
 $userProfile = $profileRepo->getByUserId($_SESSION['user_id']);
 
 if (empty($userProfile) || empty($userProfile['phone1'])) {
-    header("Location: user_profile.php?error=Please update your phone number before posting a product.");
+    header("Location: user_profile.php?error=You must have at least one phone number to post a product");
     exit();
 }
 

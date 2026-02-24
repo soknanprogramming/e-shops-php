@@ -2,6 +2,7 @@
 session_start();
 require_once '../configs/connect.php';
 require_once '../repos/ProductRepository.php';
+require_once '../repos/ProfileRepository.php';
 
 // Helper function for uploading
 function upload_file($file, $prefix, $target_dir) {
@@ -30,6 +31,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_product'])) {
     // Check if user has permission to post
     if (!$user || $user['can_post'] != 1) {
         header("Location: ../views/user_dashboard.php?error=You need admin approval to post products");
+        exit();
+    }
+
+    // Check if user has a phone number
+    $profileRepo = new ProfileRepository($conn);
+    $userProfile = $profileRepo->getByUserId($_SESSION['user_id']);
+
+    if (empty($userProfile) || empty($userProfile['phone1'])) {
+        header("Location: ../views/user_profile.php?error=You must have at least one phone number to post a product");
         exit();
     }
 

@@ -13,6 +13,11 @@ $stmtUser = $conn->prepare("SELECT can_post, request_post_permission FROM User W
 $stmtUser->execute([$_SESSION['user_id']]);
 $currentUser = $stmtUser->fetch();
 
+// 1.2 Fetch User Profile (to check for phone number)
+$stmtProfile = $conn->prepare("SELECT phone1 FROM user_profile WHERE user_id = ?");
+$stmtProfile->execute([$_SESSION['user_id']]);
+$userProfile = $stmtProfile->fetch();
+
 // 2. Fetch My Products
 $stmt = $conn->prepare("SELECT p.*, pi.main_image FROM Product p LEFT JOIN product_image pi ON p.product_image_id = pi.id WHERE p.owner_id = ? ORDER BY p.created_at DESC");
 $stmt->execute([$_SESSION['user_id']]);
@@ -67,6 +72,14 @@ $myProducts = $stmt->fetchAll();
         <?php if ($currentUser['can_post'] != 1): ?>
             <div class="alert">
                 <strong>Notice:</strong> You currently do not have permission to post products. Please contact an administrator for approval.
+            </div>
+        <?php endif; ?>
+
+        <!-- Phone Number Warning -->
+        <?php if (empty($userProfile) || empty($userProfile['phone1'])): ?>
+            <div class="alert" style="background-color: #f8d7da; color: #721c24; border-color: #f5c6cb;">
+                <strong>Action Required:</strong> You must have at least one phone number to post a product. 
+                <a href="user_profile.php" style="color: #721c24; text-decoration: underline;">Update Profile</a>
             </div>
         <?php endif; ?>
 
