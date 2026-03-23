@@ -1,8 +1,15 @@
 <?php
-$host = 'localhost';
-$user = 'root';
-$password = '';
-$database = 'khmer24_db';
+// $host = 'localhost';
+// $user = 'root';
+// $password = '';
+// $database = 'khmer24_db';
+
+// Docker
+$host = 'mysql_db';
+$user = 'app_user';
+$password = 'secret';
+$database = 'app_db';
+
 
 try {
     $conn = new PDO("mysql:host=$host;dbname=$database;charset=utf8mb4", $user, $password);
