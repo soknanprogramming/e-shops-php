@@ -69,6 +69,11 @@ class ProductRepository {
             $args[':liked_by_user_id'] = $params['liked_by_user_id'];
         }
 
+        // Visibility Filter (default to showed = 1 unless specifically searching for all)
+        if (!isset($params['include_hidden']) || $params['include_hidden'] !== true) {
+            $sql .= " AND p.showed = 1";
+        }
+
         if (isset($params['sort']) && $params['sort'] === 'oldest') {
             $sql .= " ORDER BY p.id ASC";
         } else {
@@ -138,6 +143,11 @@ class ProductRepository {
         if (!empty($params['liked_by_user_id'])) {
             $sql .= " AND p.id IN (SELECT product_id FROM product_likes WHERE user_id = :liked_by_user_id)";
             $args[':liked_by_user_id'] = $params['liked_by_user_id'];
+        }
+
+        // Visibility Filter
+        if (!isset($params['include_hidden']) || $params['include_hidden'] !== true) {
+            $sql .= " AND p.showed = 1";
         }
 
         $stmt = $this->conn->prepare($sql);
@@ -306,32 +316,51 @@ class ProductRepository {
         }
     }
 
-    public function delete($id, $ownerId) {
-        // 1. Get Image info before deleting to return for file deletion
+    public function delete($id, $ownerId = null) {
+        // 1. Get Image info before deleting
         $sqlGet = "SELECT pi.* FROM Product p 
                    JOIN product_image pi ON p.product_image_id = pi.id 
-                   WHERE p.id = :id AND p.owner_id = :owner_id";
+                   WHERE p.id = :id";
+        
+        $params = [':id' => $id];
+        if ($ownerId !== null) {
+            $sqlGet .= " AND p.owner_id = :owner_id";
+            $params[':owner_id'] = $ownerId;
+        }
+
         $stmtGet = $this->conn->prepare($sqlGet);
-        $stmtGet->execute([':id' => $id, ':owner_id' => $ownerId]);
+        $stmtGet->execute($params);
         $images = $stmtGet->fetch(PDO::FETCH_ASSOC);
 
         if (!$images) {
-            return false; // Product not found or not owned by user
+            return false;
         }
 
-        // 2. Delete Product (Cascades to likes/comments if configured, otherwise manual cleanup might be needed)
-        $sqlDel = "DELETE FROM Product WHERE id = :id AND owner_id = :owner_id";
+        // 2. Delete Product
+        $sqlDel = "DELETE FROM Product WHERE id = :id";
+        $delParams = [':id' => $id];
+        if ($ownerId !== null) {
+            $sqlDel .= " AND owner_id = :owner_id";
+            $delParams[':owner_id'] = $ownerId;
+        }
+
         $stmtDel = $this->conn->prepare($sqlDel);
         
-        if ($stmtDel->execute([':id' => $id, ':owner_id' => $ownerId])) {
+        if ($stmtDel->execute($delParams)) {
             // 3. Delete Image Record from DB
             $sqlDelImg = "DELETE FROM product_image WHERE id = :id";
             $stmtDelImg = $this->conn->prepare($sqlDelImg);
             $stmtDelImg->execute([':id' => $images['id']]);
             
-            return $images; // Return image data to delete files
+            return $images;
         }
         
         return false;
+    }
+
+    public function toggleVisibility($id, $showed) {
+        $sql = "UPDATE Product SET showed = :showed WHERE id = :id";
+        $stmt = $this->conn->prepare($sql);
+        return $stmt->execute([':showed' => $showed, ':id' => $id]);
     }
 }

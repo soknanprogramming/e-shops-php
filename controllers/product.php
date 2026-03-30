@@ -156,7 +156,11 @@ if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])
     }
 
     $productRepo = new ProductRepository($conn);
-    $deletedImages = $productRepo->delete($_GET['id'], $_SESSION['user_id']);
+    
+    // If admin, they can delete any product. If regular user, only their own.
+    $ownerId = (isset($_SESSION['is_admin']) && $_SESSION['is_admin'] == 1) ? null : $_SESSION['user_id'];
+    
+    $deletedImages = $productRepo->delete($_GET['id'], $ownerId);
 
     if ($deletedImages) {
         // Delete physical files
@@ -170,9 +174,31 @@ if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])
                 }
             }
         }
-        header("Location: ../views/user_dashboard.php?success=Product deleted successfully");
+        
+        $redirect = (isset($_SESSION['is_admin']) && $_SESSION['is_admin'] == 1) ? "../views/admin_product.php" : "../views/user_dashboard.php";
+        header("Location: " . $redirect . "?success=Product deleted successfully");
     } else {
-        header("Location: ../views/user_dashboard.php?error=Failed to delete product");
+        $redirect = (isset($_SESSION['is_admin']) && $_SESSION['is_admin'] == 1) ? "../views/admin_product.php" : "../views/user_dashboard.php";
+        header("Location: " . $redirect . "?error=Failed to delete product");
+    }
+    exit();
+}
+
+// Admin Toggle Visibility
+if (isset($_GET['action']) && $_GET['action'] === 'toggle_visibility' && isset($_GET['id']) && isset($_GET['status'])) {
+    if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] != 1) {
+        header("Location: ../views/login.php");
+        exit();
+    }
+
+    $id = $_GET['id'];
+    $status = $_GET['status'] == 1 ? 1 : 0;
+
+    $productRepo = new ProductRepository($conn);
+    if ($productRepo->toggleVisibility($id, $status)) {
+        header("Location: ../views/admin_product.php?success=Product visibility updated");
+    } else {
+        header("Location: ../views/admin_product.php?error=Failed to update visibility");
     }
     exit();
 }

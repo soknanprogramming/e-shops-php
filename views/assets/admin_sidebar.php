@@ -16,6 +16,7 @@
     <ul class="sidebar-menu">
         <li><a href="admin.php">Dashboard</a></li>
         <li><a href="admin_user.php">Users</a></li>
+        <li><a href="admin_product.php">Products</a></li>
         <li><a href="admin_category.php">Category</a></li>
         <li><a href="home.php">View Website</a></li>
         <li><a href="logout.php" style="color: #dc3545;">Logout</a></li>

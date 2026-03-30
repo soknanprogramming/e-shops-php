@@ -124,7 +124,12 @@ $myProducts = $stmt->fetchAll();
             <div class="product-grid">
                 <?php foreach ($myProducts as $product): ?>
                     <div class="product-card">
-                        <img src="../uploads/products/<?php echo htmlspecialchars($product['main_image'] ?? 'default.png'); ?>" alt="Product Image">
+                        <div style="position: relative;">
+                            <img src="../uploads/products/<?php echo htmlspecialchars($product['main_image'] ?? 'default.png'); ?>" alt="Product Image" style="<?php echo !$product['showed'] ? 'filter: grayscale(1); opacity: 0.6;' : ''; ?>">
+                            <?php if (!$product['showed']): ?>
+                                <div style="position: absolute; top: 10px; right: 10px; background: #dc3545; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem;">HIDDEN BY ADMIN</div>
+                            <?php endif; ?>
+                        </div>
                         <h3><?php echo htmlspecialchars($product['name']); ?></h3>
                         <p>$<?php echo htmlspecialchars($product['prices']); ?></p>
                         <div style="margin-top: 10px;">
