@@ -53,13 +53,49 @@ $myProducts = $stmt->fetchAll();
             <?php if ($currentUser['can_post'] == 1): ?>
                 <a href="product_create.php" class="btn btn-primary">+ Post New Product</a>
             <?php else: ?>
-                <?php if ($currentUser['request_post_permission'] == 1): ?>
-                    <span class="btn btn-disabled" style="background-color: #ffc107; color: #000;">Request Pending...</span>
-                <?php else: ?>
-                    <a href="../controllers/user.php?action=request_permission" class="btn btn-primary" style="background-color: #17a2b8;">Request Permission</a>
-                <?php endif; ?>
+                <div id="request-container">
+                    <?php if ($currentUser['request_post_permission'] == 1): ?>
+                        <span class="btn btn-disabled" style="background-color: #ffc107; color: #000;">Request Pending...</span>
+                    <?php else: ?>
+                        <button id="request-btn" class="btn btn-primary" style="background-color: #17a2b8; border: none; cursor: pointer;">Request Permission</button>
+                    <?php endif; ?>
+                </div>
             <?php endif; ?>
         </div>
+
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const requestBtn = document.getElementById('request-btn');
+            if (requestBtn) {
+                requestBtn.addEventListener('click', function() {
+                    requestBtn.disabled = true;
+                    requestBtn.innerText = 'Sending...';
+                    
+                    fetch('../controllers/user.php?action=request_permission', {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            document.getElementById('request-container').innerHTML = '<span class="btn btn-disabled" style="background-color: #ffc107; color: #000;">Request Pending...</span>';
+                        } else {
+                            alert('Error: ' + data.message);
+                            requestBtn.disabled = false;
+                            requestBtn.innerText = 'Request Permission';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred. Please try again.');
+                        requestBtn.disabled = false;
+                        requestBtn.innerText = 'Request Permission';
+                    });
+                });
+            }
+        });
+        </script>
 
         <?php if (isset($_GET['success'])): ?>
             <p style="color: green;"><?php echo htmlspecialchars($_GET['success']); ?></p>

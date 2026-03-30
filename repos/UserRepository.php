@@ -83,4 +83,11 @@ class UserRepository {
         $stmt->execute([':term' => $term]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function getPendingRequests() {
+        $sql = "SELECT * FROM `User` WHERE request_post_permission = 1 AND (can_post = 0 OR can_post IS NULL) ORDER BY created_at DESC";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }

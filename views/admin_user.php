@@ -8,8 +8,12 @@ if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] != 1) {
     exit();
 }
 
-// 2. Fetch All Users
-$stmt = $conn->prepare("SELECT * FROM User ORDER BY created_at DESC");
+// 2. Fetch Users
+if (isset($_GET['filter']) && $_GET['filter'] === 'requesting') {
+    $stmt = $conn->prepare("SELECT * FROM User WHERE request_post_permission = 1 AND (can_post = 0 OR can_post IS NULL) ORDER BY created_at DESC");
+} else {
+    $stmt = $conn->prepare("SELECT * FROM User ORDER BY created_at DESC");
+}
 $stmt->execute();
 $users = $stmt->fetchAll();
 ?>
@@ -32,6 +36,9 @@ $users = $stmt->fetchAll();
         .badge { padding: 3px 8px; border-radius: 10px; font-size: 0.8rem; color: white; }
         .bg-success { background-color: #28a745; }
         .bg-secondary { background-color: #6c757d; }
+        .filter-links { margin-bottom: 15px; }
+        .filter-links a { margin-right: 15px; text-decoration: none; color: #007bff; }
+        .filter-links a.active { font-weight: bold; color: black; }
     </style>
 </head>
 <body>
@@ -39,6 +46,11 @@ $users = $stmt->fetchAll();
     
     <div class="main-content">
         <h1>User Management</h1>
+        
+        <div class="filter-links">
+            <a href="admin_user.php" class="<?php echo !isset($_GET['filter']) ? 'active' : ''; ?>">All Users</a>
+            <a href="admin_user.php?filter=requesting" class="<?php echo (isset($_GET['filter']) && $_GET['filter'] === 'requesting') ? 'active' : ''; ?>">Pending Requests</a>
+        </div>
         
         <?php if (isset($_GET['success'])): ?>
             <p style="color: green;"><?php echo htmlspecialchars($_GET['success']); ?></p>

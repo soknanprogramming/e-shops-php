@@ -4,7 +4,7 @@ require_once '../repos/UserRepository.php';
 require_once '../configs/connect.php';
 
 // 1. Auth Check
-if (!isset($_SESSION['user_id']) || !isset($_SESSION['is_admin']) || $_SESSION['is_admin'] != 1) {
+if (!isset($_SESSION['user_id'])) {
     header("Location: ../views/login.php");
     exit();
 }
@@ -13,6 +13,11 @@ $userRepo = new UserRepository($conn);
 
 // 2. Toggle Role Action
 if (isset($_GET['action']) && $_GET['action'] === 'toggle_role' && isset($_GET['id'])) {
+    if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] != 1) {
+        header("Location: ../views/home.php");
+        exit();
+    }
+    
     $id = $_GET['id'];
 
     // Prevent changing own role to avoid locking yourself out
@@ -40,6 +45,11 @@ if (isset($_GET['action']) && $_GET['action'] === 'toggle_role' && isset($_GET['
 
 // 3. Toggle Post Permission Action
 if (isset($_GET['action']) && $_GET['action'] === 'toggle_permission' && isset($_GET['id'])) {
+    if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] != 1) {
+        header("Location: ../views/home.php");
+        exit();
+    }
+
     $id = $_GET['id'];
 
     $user = $userRepo->findById($id);
@@ -68,7 +78,14 @@ if (isset($_GET['action']) && $_GET['action'] === 'toggle_permission' && isset($
 
 // 4. Request Permission Action (User side)
 if (isset($_GET['action']) && $_GET['action'] === 'request_permission') {
-    $userRepo->update($_SESSION['user_id'], ['request_post_permission' => 1]);
+    $success = $userRepo->update($_SESSION['user_id'], ['request_post_permission' => 1]);
+    
+    if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest') {
+        header('Content-Type: application/json');
+        echo json_encode(['success' => $success, 'message' => 'Permission requested successfully.']);
+        exit();
+    }
+    
     header("Location: ../views/user_dashboard.php?success=Permission requested successfully. Please wait for admin approval.");
     exit();
 }
