@@ -74,3 +74,6 @@ The project uses Vanilla CSS with CSS Variables for consistent theming (defined 
 - `/uploads`: User-uploaded media (ignored by git).
 - `/views`: Frontend pages and layout assets.
 - `/views/assets`: Shared UI components like sidebars and topbars.
+
+## Working with Database easy way
+- if we have need update database schema please add alter or update code to backups/sql_update.sql and add comment on top of sql code
