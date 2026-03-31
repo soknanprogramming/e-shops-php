@@ -76,5 +76,8 @@ The project uses Vanilla CSS with CSS Variables for consistent theming (defined 
 - `/views/assets`: Shared UI components like sidebars and topbars.
 
 ## Working with Database easy way
-- after look up ./backups/table/default-table.sql you should also  look up ./backups/sql_update.sql too because we have update default schema
-- if we have need update database schema please add alter or update code to backups/sql_update.sql and add comment on top of sql code
+- after look up @/backups/table/default-table.sql you should also  look up @/backups/sql_update.sql too because we have update default schema
+- if we have need update database schema please add alter or update code to @backups/sql_update.sql and add comment on top of sql code
+
+## UI Design
+- UI should look similar to @ai/DESIGN.md
