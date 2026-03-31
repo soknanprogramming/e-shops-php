@@ -54,7 +54,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_product'])) {
     // 2. Handle Image Upload
     $target_dir = "../uploads/products/";
     if (!is_dir($target_dir)) {
-        mkdir($target_dir, 0777, true);
+        if (!mkdir($target_dir, 0777, true)) {
+            die("Failed to create target directory: " . $target_dir);
+        }
+    }
+
+    if (!is_writable($target_dir)) {
+        die("Target directory is not writable: " . realpath($target_dir));
+    }
+
+    // Check for PHP Upload Errors
+    if ($image['error'] !== UPLOAD_ERR_OK) {
+        $error_messages = [
+            UPLOAD_ERR_INI_SIZE   => 'The uploaded file exceeds the upload_max_filesize directive in php.ini.',
+            UPLOAD_ERR_FORM_SIZE  => 'The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form.',
+            UPLOAD_ERR_PARTIAL    => 'The uploaded file was only partially uploaded.',
+            UPLOAD_ERR_NO_FILE    => 'No file was uploaded.',
+            UPLOAD_ERR_NO_TMP_DIR => 'Missing a temporary folder.',
+            UPLOAD_ERR_CANT_WRITE => 'Failed to write file to disk.',
+            UPLOAD_ERR_EXTENSION  => 'A PHP extension stopped the file upload.',
+        ];
+        $msg = $error_messages[$image['error']] ?? 'Unknown upload error.';
+        die("PHP Upload Error: " . $msg);
     }
 
     $new_filename = upload_file($image, 'prod_main_', $target_dir);
