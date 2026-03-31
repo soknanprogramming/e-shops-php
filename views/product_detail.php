@@ -117,6 +117,29 @@ $comments = $commentRepo->getAllByProductId($product['id']);
 
             <!-- Product Info -->
             <div class="info">
+                <?php if (isset($_SESSION['is_admin']) && $_SESSION['is_admin']): ?>
+                    <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ffeeba; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <strong>Admin Actions:</strong> 
+                            <?php if (!$product['showed']): ?>
+                                <span style="color: #dc3545; font-weight: bold;">(CURRENTLY HIDDEN)</span>
+                            <?php else: ?>
+                                <span style="color: #28a745; font-weight: bold;">(VISIBLE)</span>
+                            <?php endif; ?>
+                        </div>
+                        <a href="../controllers/product.php?action=toggle_visibility&id=<?php echo $product['id']; ?>&status=<?php echo $product['showed'] ? '0' : '1'; ?>&redirect=product_detail.php" 
+                           style="background: <?php echo $product['showed'] ? '#dc3545' : '#28a745'; ?>; color: white; padding: 8px 15px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 0.85rem;">
+                            <?php echo $product['showed'] ? 'Hide Product' : 'Show Product'; ?>
+                        </a>
+                    </div>
+                <?php endif; ?>
+
+                <?php if (isset($_GET['success'])): ?>
+                    <div style="color: #155724; background-color: #d4edda; border: 1px solid #c3e6cb; padding: 10px; border-radius: 8px; margin-bottom: 20px;">
+                        <?php echo htmlspecialchars($_GET['success']); ?>
+                    </div>
+                <?php endif; ?>
+
                 <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                     <h1 style="margin-top: 0;"><?php echo htmlspecialchars($product['name']); ?></h1>
                     

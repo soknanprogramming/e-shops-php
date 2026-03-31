@@ -193,12 +193,26 @@ if (isset($_GET['action']) && $_GET['action'] === 'toggle_visibility' && isset($
 
     $id = $_GET['id'];
     $status = $_GET['status'] == 1 ? 1 : 0;
+    $redirect = $_GET['redirect'] ?? 'admin_product.php';
+
+    // Security check for redirect to prevent open redirect vulnerabilities
+    // Only allow specific views
+    $allowed_redirects = ['admin_product.php', 'product_detail.php'];
+    $redirect_base = basename($redirect);
+    if (!in_array($redirect_base, $allowed_redirects)) {
+        $redirect = 'admin_product.php';
+    } else {
+        // If it's product_detail.php, keep the ID in the redirect
+        if ($redirect_base === 'product_detail.php' && isset($_GET['id'])) {
+            $redirect = 'product_detail.php?id=' . $_GET['id'];
+        }
+    }
 
     $productRepo = new ProductRepository($conn);
     if ($productRepo->toggleVisibility($id, $status)) {
-        header("Location: ../views/admin_product.php?success=Product visibility updated");
+        header("Location: ../views/" . $redirect . (strpos($redirect, '?') !== false ? '&' : '?') . "success=Product visibility updated");
     } else {
-        header("Location: ../views/admin_product.php?error=Failed to update visibility");
+        header("Location: ../views/" . $redirect . (strpos($redirect, '?') !== false ? '&' : '?') . "error=Failed to update visibility");
     }
     exit();
 }
