@@ -7,8 +7,8 @@ Generate a commit message, listing & summarizing the main changes, based on the 
 !{git diff --staged}
 Use emojis for types of changes:
 
- -for style changes use 🎨
- -for bug fixes use 🐛
- -for new features use 🧁
- -for docs use 📄
+ - for style changes use 🎨
+ - for bug fixes use 🐛
+ - for new features use 🧁
+ - for docs use 📄
 '''
