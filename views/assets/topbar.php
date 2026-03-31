@@ -188,14 +188,24 @@
         letter-spacing: 0.05em;
     }
     .filter-item input, .filter-item select {
-        background: rgba(255,255,255,0.05);
-        border: 1px solid rgba(255,255,255,0.1);
-        color: #fef3d5;
+        background: rgba(0, 0, 0, 0.2); /* Darker background for contrast */
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: #ffffff; /* Bright white text */
         font-size: 0.85rem;
-        padding: 4px 8px;
+        padding: 6px 10px;
         border-radius: 4px;
         outline: none;
-        max-width: 100px;
+        max-width: 120px;
+        transition: all 0.3s;
+    }
+    .filter-item input:focus, .filter-item select:focus {
+        background: rgba(0, 0, 0, 0.4);
+        border-color: #9d7c39;
+    }
+    /* Style options specifically for better visibility in some browsers */
+    .filter-item select option {
+        background-color: #1a3325;
+        color: #ffffff;
     }
     .filter-checkboxes {
         display: flex;
