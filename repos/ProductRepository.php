@@ -50,7 +50,7 @@ class ProductRepository {
         }
 
         if (!empty($params['name'])) {
-            $sql .= " AND p.name LIKE :name";
+            $sql .= " AND (p.name LIKE :name OR p.description LIKE :name OR p.location LIKE :name OR c.name LIKE :name OR u.name LIKE :name)";
             $args[':name'] = '%' . $params['name'] . '%';
         }
 
@@ -101,6 +101,7 @@ class ProductRepository {
     public function countSearch($params = []) {
         $sql = "SELECT COUNT(*) as total 
                 FROM Product p 
+                LEFT JOIN category c ON p.category_id = c.id
                 LEFT JOIN User u ON p.owner_id = u.id
                 WHERE 1=1";
         
@@ -126,7 +127,7 @@ class ProductRepository {
         }
 
         if (!empty($params['name'])) {
-            $sql .= " AND p.name LIKE :name";
+            $sql .= " AND (p.name LIKE :name OR p.description LIKE :name OR p.location LIKE :name OR c.name LIKE :name OR u.name LIKE :name)";
             $args[':name'] = '%' . $params['name'] . '%';
         }
 
