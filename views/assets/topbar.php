@@ -34,7 +34,7 @@
                         <?php if (isset($_SESSION['is_admin']) && $_SESSION['is_admin']): ?>
                             <a href="admin.php" class="admin-link">Admin</a>
                         <?php endif; ?>
-                        <a href="product_create.php" class="btn-post">New Entry</a>
+                        <a href="product_create.php" class="btn-post">Post Product</a>
                         <a href="logout.php" class="btn-logout">Logout</a>
                     <?php else: ?>
                         <a href="login.php">Login</a>
