@@ -54,10 +54,7 @@
                 if(isset($_GET['category_id'])) echo '<input type="hidden" name="category_id" value="'.htmlspecialchars($_GET['category_id']).'">';
                 ?>
 
-                <div class="filter-item">
-                    <label>Origin</label>
-                    <input type="text" name="location" placeholder="City/Province" value="<?php echo htmlspecialchars($_GET['location'] ?? ''); ?>">
-                </div>
+
                 
                 <div class="filter-item">
                     <label>Min $</label>

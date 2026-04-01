@@ -19,7 +19,6 @@ $filters = [
     'max_price' => $_GET['max_price'] ?? null,
     'has_discount' => isset($_GET['has_discount']) ? 1 : 0,
     'name' => $_GET['name'] ?? null,
-    'location' => $_GET['location'] ?? null,
     'seller' => $_GET['seller'] ?? null,
     'sort' => $_GET['sort'] ?? 'newest',
     'liked_only' => isset($_GET['liked_only']) ? 1 : 0,
