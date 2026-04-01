@@ -81,7 +81,7 @@ $products = $productRepo->search($filters);
             margin: 0 auto; 
         }
         
-        @media (max-width: 1024px) {
+        @media (max-width: 1200px) {
             .container { padding: 40px 2rem; }
         }
 
@@ -107,6 +107,12 @@ $products = $productRepo->search($filters);
             max-width: 600px;
             margin: 0;
         }
+        
+        @media (max-width: 768px) {
+            .hero-section { margin-bottom: 2rem; text-align: center; }
+            .hero-section h1 { font-size: 2.5rem; }
+            .hero-section p { font-size: 1rem; margin: 0 auto; }
+        }
 
         /* Category Nav - Editorial Style */
         .category-nav { 
@@ -117,6 +123,7 @@ $products = $productRepo->search($filters);
             margin-bottom: 2rem; 
             scrollbar-width: none; 
             -ms-overflow-style: none;
+            -webkit-overflow-scrolling: touch;
         }
         .category-nav::-webkit-scrollbar { display: none; }
         .category-nav a { 
@@ -140,7 +147,6 @@ $products = $productRepo->search($filters);
             border-color: var(--primary);
             box-shadow: 0 4px 12px rgba(26, 51, 37, 0.15);
         }
-        .category-nav img { width: 20px; height: 20px; object-fit: cover; border-radius: 50%; }
 
         /* Product Grid */
         .product-grid { 
@@ -148,6 +154,16 @@ $products = $productRepo->search($filters);
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
             gap: 3rem; 
         }
+        
+        @media (max-width: 992px) {
+            .product-grid { gap: 1.5rem; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
+        }
+        
+        @media (max-width: 576px) {
+            .product-grid { grid-template-columns: 1fr; }
+            .container { padding: 20px 1rem; }
+        }
+
         .product-card { 
             background: #ffffff; 
             border-radius: var(--radius-md); 
@@ -236,9 +252,22 @@ $products = $productRepo->search($filters);
         </header>
 
         <nav class="category-nav">
-            <a href="home.php" class="<?php echo !isset($_GET['category_id']) ? 'active' : ''; ?>">All Collections</a>
+            <?php 
+            // Helper to get URL with preserved params
+            function getCategoryUrl($catId = null) {
+                $params = $_GET;
+                if ($catId === null) {
+                    unset($params['category_id']);
+                } else {
+                    $params['category_id'] = $catId;
+                }
+                unset($params['page']); // Reset page when changing category
+                return 'home.php?' . http_build_query($params);
+            }
+            ?>
+            <a href="<?php echo getCategoryUrl(); ?>" class="<?php echo !isset($_GET['category_id']) ? 'active' : ''; ?>">All Collections</a>
             <?php foreach ($categories as $cat): ?>
-                <a href="home.php?category_id=<?php echo $cat['id']; ?>" class="<?php echo (isset($_GET['category_id']) && $_GET['category_id'] == $cat['id']) ? 'active' : ''; ?>">
+                <a href="<?php echo getCategoryUrl($cat['id']); ?>" class="<?php echo (isset($_GET['category_id']) && $_GET['category_id'] == $cat['id']) ? 'active' : ''; ?>">
                     <?php echo htmlspecialchars($cat['name']); ?>
                 </a>
             <?php endforeach; ?>

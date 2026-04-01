@@ -1,5 +1,5 @@
 <div class="header-fixed-container">
-    <!-- Tier 1: Main Nav (Always Visible at Top) -->
+    <!-- Tier 1: Main Nav -->
     <div class="navbar-main" id="navbarMain">
         <div class="container-nav">
             <div class="navbar-content">
@@ -7,13 +7,26 @@
                     <a href="home.php">Sana</a>
                 </div>
                 
+                <!-- Search Form -->
                 <form action="home.php" method="GET" class="header-search">
+                    <?php 
+                    foreach ($_GET as $key => $value) {
+                        if ($key !== 'name' && $key !== 'page') {
+                            echo '<input type="hidden" name="'.htmlspecialchars($key).'" value="'.htmlspecialchars($value).'">';
+                        }
+                    }
+                    ?>
                     <div class="search-input-wrapper">
                         <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                         <input type="text" name="name" placeholder="Search nomenclature..." value="<?php echo htmlspecialchars($_GET['name'] ?? ''); ?>">
                     </div>
                     <button type="submit">Search</button>
                 </form>
+
+                <!-- Mobile Menu Toggle (Simplified) -->
+                <button class="mobile-menu-btn" onclick="document.querySelector('.links').classList.toggle('active')">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
 
                 <div class="links">
                     <?php if (isset($_SESSION['user_id'])): ?>
@@ -32,16 +45,14 @@
         </div>
     </div>
 
-    <!-- Tier 2: Advanced Filters (Slides Behind Tier 1) -->
+    <!-- Tier 2: Advanced Filters -->
     <div class="filter-bar" id="filterBar">
         <div class="container-nav">
             <form action="home.php" method="GET" class="advanced-filters">
-                <?php if(isset($_GET['name'])): ?>
-                    <input type="hidden" name="name" value="<?php echo htmlspecialchars($_GET['name']); ?>">
-                <?php endif; ?>
-                <?php if(isset($_GET['category_id'])): ?>
-                    <input type="hidden" name="category_id" value="<?php echo htmlspecialchars($_GET['category_id']); ?>">
-                <?php endif; ?>
+                <?php 
+                if(isset($_GET['name'])) echo '<input type="hidden" name="name" value="'.htmlspecialchars($_GET['name']).'">';
+                if(isset($_GET['category_id'])) echo '<input type="hidden" name="category_id" value="'.htmlspecialchars($_GET['category_id']).'">';
+                ?>
 
                 <div class="filter-item">
                     <label>Origin</label>
@@ -87,7 +98,6 @@
 </div>
 
 <style>
-    /* Always keep same padding to prevent body jumps */
     body {
         padding-top: 130px !important; 
     }
@@ -102,7 +112,7 @@
         border-bottom: 1px solid rgba(255,255,255,0.1);
         display: flex;
         align-items: center;
-        z-index: 1001; /* Above Filter Bar */
+        z-index: 1001; 
         box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     }
 
@@ -111,21 +121,21 @@
         top: 70px;
         left: 0;
         width: 100%;
-        height: 50px;
+        height: auto;
+        min-height: 50px;
         background-color: #1a3325;
         border-bottom: 2px solid #9d7c39;
         display: flex;
         align-items: center;
-        z-index: 1000; /* Below Navbar Main */
+        z-index: 1000;
         box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-        /* Immediate transition if any */
         transition: transform 0.2s ease-in-out; 
+        padding: 8px 0;
     }
 
-    /* Hide by sliding BEHIND the main nav */
     .filter-hidden {
         transform: translateY(-100%);
-        pointer-events: none; /* Prevent clicks when hidden */
+        pointer-events: none;
     }
 
     .container-nav {
@@ -134,7 +144,6 @@
         padding: 0 6rem;
         width: 100%;
     }
-    @media (max-width: 1024px) { .container-nav { padding: 0 1.5rem; } }
 
     .navbar-content {
         display: flex;
@@ -179,11 +188,42 @@
     .links a:hover { color: #fef3d5; }
     .btn-post { background: #9d7c39; color: #fff !important; padding: 8px 16px !important; border-radius: 4px !important; }
 
+    .mobile-menu-btn { display: none; background: transparent; border: none; color: white; cursor: pointer; }
+
+    /* Responsive Queries */
+    @media (max-width: 1200px) {
+        .container-nav { padding: 0 2rem; }
+    }
+
+    @media (max-width: 992px) {
+        .advanced-filters { gap: 1rem; }
+        .filter-item input { max-width: 90px; }
+    }
+
     @media (max-width: 768px) {
-        .navbar-main { height: auto; padding: 1rem 0; }
-        .navbar-content { flex-wrap: wrap; }
-        .header-search { order: 3; max-width: 100%; }
-        body { padding-top: 180px !important; }
+        body { padding-top: 110px !important; }
+        .navbar-main { height: auto; padding: 10px 0; }
+        .navbar-content { flex-wrap: wrap; gap: 10px; }
+        .header-search { order: 3; width: 100%; max-width: 100%; }
+        .logo { order: 1; }
+        .mobile-menu-btn { display: block; order: 2; }
+        .links { 
+            display: none; 
+            width: 100%; 
+            order: 4; 
+            flex-direction: column; 
+            gap: 10px; 
+            padding: 10px 0;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        .links.active { display: flex; }
+        .filter-bar { top: auto; position: fixed; top: unset; bottom: 0; border-top: 2px solid #9d7c39; border-bottom: none; }
+        .filter-hidden { transform: translateY(100%); }
+        .advanced-filters { justify-content: center; overflow-x: auto; padding-bottom: 5px; flex-wrap: nowrap; scrollbar-width: none; }
+        .advanced-filters::-webkit-scrollbar { display: none; }
+        .filter-item label { display: none; }
+        .filter-item input, .filter-item select { padding: 8px; }
+        body { padding-bottom: 70px; } /* Space for bottom filter bar on mobile */
     }
 </style>
 
@@ -195,7 +235,6 @@
         window.addEventListener('scroll', function() {
             const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
             
-            // At the top, always show
             if (scrollTop <= 5) {
                 filterBar.classList.remove('filter-hidden');
                 lastScrollTop = scrollTop;
@@ -203,12 +242,10 @@
             }
 
             if (scrollTop > lastScrollTop) {
-                // Scrolling Down -> Hide immediately
                 if (!filterBar.classList.contains('filter-hidden')) {
                     filterBar.classList.add('filter-hidden');
                 }
             } else {
-                // Scrolling Up -> Show immediately
                 if (filterBar.classList.contains('filter-hidden')) {
                     filterBar.classList.remove('filter-hidden');
                 }
