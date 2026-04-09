@@ -18,18 +18,9 @@ $filters = [
     'seller' => $_GET['seller'] ?? null,
 ];
 
-if (isset($_GET['status']) && $_GET['status'] !== '') {
-    // If status is 1 or 0, we need a custom way to handle it because search() defaults to showed=1
-    // Actually search() in ProductRepository.php only adds 'AND p.showed = 1' if include_hidden is NOT true.
-    // Let's modify ProductRepository::search to handle specific showed status if requested.
-}
-
-// Since I want to filter by showed status specifically in admin, I might need to adjust search() 
-// or just filter here for now if the list is small. 
-// But let's use search and handle status.
 $products = $productRepo->search($filters);
 
-// Manual filter for status if needed (since search() doesn't have a specific 'showed' param yet)
+// Manual filter for status
 if (isset($_GET['status']) && $_GET['status'] !== '') {
     $status = (int)$_GET['status'];
     $products = array_filter($products, function($p) use ($status) {
@@ -43,136 +34,401 @@ if (isset($_GET['status']) && $_GET['status'] !== '') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Products</title>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: sans-serif; display: flex; margin: 0; background-color: #f4f7f6; }
-        .sidebar { width: 250px; flex-shrink: 0; }
-        .main-content { flex-grow: 1; padding: 30px; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-        .filter-card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        .filter-form { display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap; }
-        .form-group { display: flex; flex-direction: column; gap: 5px; }
-        .form-group label { font-size: 0.85rem; font-weight: 600; color: #666; }
-        input, select { padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.9rem; }
-        .btn-filter { background: #007bff; color: white; border: none; padding: 8px 20px; border-radius: 4px; cursor: pointer; font-weight: 600; }
-        .btn-reset { background: #6c757d; color: white; text-decoration: none; padding: 8px 15px; border-radius: 4px; font-size: 0.9rem; }
-        
-        table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; }
-        th { background-color: #f8f9fa; font-weight: 600; color: #444; }
-        tr:hover { background-color: #fcfcfc; }
-        
-        .btn { padding: 6px 12px; text-decoration: none; color: white; border-radius: 4px; font-size: 0.85rem; font-weight: 600; display: inline-block; }
-        .btn-green { background-color: #28a745; }
-        .btn-green:hover { background-color: #218838; }
-        .btn-red { background-color: #dc3545; }
-        .btn-red:hover { background-color: #c82333; }
-        .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; color: white; text-transform: uppercase; }
-        .bg-success { background-color: #28a745; }
-        .bg-secondary { background-color: #6c757d; }
-        .product-img { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; background: #eee; }
-        .product-name { text-decoration: none; color: #007bff; font-weight: 600; }
-        .product-name:hover { text-decoration: underline; }
+        :root {
+            --primary: #1a3325;
+            --primary-container: #2a5038;
+            --primary-light: rgba(26, 51, 37, 0.05);
+            --secondary: #9d7c39;
+            --secondary-light: rgba(157, 124, 57, 0.1);
+            --tertiary: #7e000a;
+            --bg-body: #faf7f2;
+            --surface: #ffffff;
+            --on-surface: #201b09;
+            --on-surface-variant: #6b6355;
+            --outline: rgba(74, 69, 56, 0.12);
+            --outline-strong: rgba(74, 69, 56, 0.25);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --font-headline: 'Manrope', sans-serif;
+            --font-body: 'Public Sans', sans-serif;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: var(--font-body);
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-body);
+            color: var(--on-surface);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            padding: 1.5rem 3rem;
+            max-width: calc(100vw - 240px);
+        }
+
+        @media (max-width: 992px) { .main-content { padding: 1.25rem 2rem; } }
+
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            .admin-sidebar { width: 100% !important; min-height: auto !important; flex-direction: row !important; overflow-x: auto; }
+            .sidebar-menu { display: flex; padding: 0.5rem !important; gap: 4px; flex-grow: 1; }
+            .sidebar-menu li a { white-space: nowrap; flex-shrink: 0; padding: 8px 12px !important; font-size: 0.75rem !important; }
+            .sidebar-menu li a .badge-count, .sidebar-menu li a svg { display: none; }
+            .sidebar-brand, .sidebar-footer { display: none; }
+            .main-content { max-width: 100%; padding: 1rem; }
+        }
+
+        /* Page Header */
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .page-header h1 {
+            font-family: var(--font-headline);
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin: 0;
+        }
+
+        .page-header .count-badge {
+            font-size: 0.8rem;
+            color: var(--on-surface-variant);
+            font-weight: 600;
+            background: var(--surface);
+            border: 1px solid var(--outline);
+            padding: 6px 14px;
+            border-radius: 20px;
+        }
+
+        /* Filter Bar */
+        .filter-bar {
+            background: var(--surface);
+            border: 1px solid var(--outline);
+            border-radius: var(--radius-md);
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.25rem;
+            display: flex;
+            gap: 0.75rem;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .filter-bar .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .filter-bar label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--on-surface-variant);
+        }
+
+        .filter-bar input,
+        .filter-bar select {
+            padding: 8px 10px;
+            border: 1.5px solid var(--outline);
+            border-radius: var(--radius-sm);
+            font-size: 0.825rem;
+            font-family: var(--font-body);
+            color: var(--on-surface);
+            background: var(--bg-body);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .filter-bar input:focus,
+        .filter-bar select:focus {
+            border-color: var(--primary);
+        }
+
+        .btn-filter {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 18px;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-weight: 700;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-filter:hover { background: var(--primary-container); }
+
+        .btn-reset {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 16px;
+            background: transparent;
+            color: var(--on-surface-variant);
+            border: 1.5px solid var(--outline-strong);
+            border-radius: var(--radius-sm);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            transition: all 0.2s;
+        }
+
+        .btn-reset:hover { border-color: var(--on-surface-variant); color: var(--on-surface); }
+
+        /* Table Card */
+        .table-card {
+            background: var(--surface);
+            border: 1px solid var(--outline);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+        }
+
+        .table-responsive { overflow-x: auto; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            padding: 12px 16px;
+            text-align: left;
+            background: var(--bg-body);
+            font-weight: 700;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--on-surface-variant);
+            border-bottom: 1px solid var(--outline);
+        }
+
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--outline);
+            font-size: 0.85rem;
+            vertical-align: middle;
+        }
+
+        tr:last-child td { border-bottom: none; }
+        tr:hover { background: var(--primary-light); }
+
+        .product-img {
+            width: 44px;
+            height: 44px;
+            object-fit: cover;
+            border-radius: var(--radius-sm);
+            background: var(--bg-body);
+        }
+
+        .product-name {
+            text-decoration: none;
+            color: var(--on-surface);
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+
+        .product-name:hover { color: var(--primary); }
+
+        .badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .badge-visible { background: rgba(40, 167, 69, 0.12); color: #28a745; }
+        .badge-hidden { background: rgba(108, 117, 125, 0.12); color: #6c757d; }
+
+        .action-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.75rem;
+            transition: all 0.2s;
+        }
+
+        .btn-show { background: rgba(40, 167, 69, 0.12); color: #28a745; }
+        .btn-show:hover { background: rgba(40, 167, 69, 0.2); }
+        .btn-hide { background: rgba(220, 53, 69, 0.12); color: #dc3545; }
+        .btn-hide:hover { background: rgba(220, 53, 69, 0.2); }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--on-surface-variant);
+        }
+
+        .empty-state svg {
+            width: 48px;
+            height: 48px;
+            opacity: 0.3;
+            margin-bottom: 0.75rem;
+        }
+
+        .empty-state p {
+            margin: 0;
+            font-size: 0.875rem;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            padding: 10px 18px;
+            border-radius: var(--radius-sm);
+            color: #fff;
+            font-weight: 600;
+            font-size: 0.825rem;
+            z-index: 9999;
+            animation: toastIn 0.3s ease, toastOut 0.3s ease 2.7s forwards;
+        }
+
+        .toast-success { background: var(--primary); }
+        .toast-error { background: var(--tertiary); }
+
+        @keyframes toastIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes toastOut { from { opacity: 1; } to { opacity: 0; transform: translateY(10px); } }
     </style>
 </head>
 <body>
     <?php include './assets/admin_sidebar.php'; ?>
-    
-    <div class="main-content">
-        <div class="header">
-            <h1>Product Management</h1>
-            <span>Total: <?php echo count($products); ?> Products</span>
-        </div>
-        
-        <?php if (isset($_GET['success'])): ?>
-            <div style="background: #d4edda; color: #155724; padding: 12px; border-radius: 4px; margin-bottom: 20px; border: 1px solid #c3e6cb;">
-                <?php echo htmlspecialchars($_GET['success']); ?>
-            </div>
-        <?php endif; ?>
-        <?php if (isset($_GET['error'])): ?>
-            <div style="background: #f8d7da; color: #721c24; padding: 12px; border-radius: 4px; margin-bottom: 20px; border: 1px solid #f5c6cb;">
-                <?php echo htmlspecialchars($_GET['error']); ?>
-            </div>
-        <?php endif; ?>
 
-        <div class="filter-card">
-            <form action="" method="GET" class="filter-form">
-                <div class="form-group">
-                    <label>Product Name</label>
-                    <input type="text" name="name" placeholder="Search name..." value="<?php echo htmlspecialchars($_GET['name'] ?? ''); ?>">
-                </div>
-                <div class="form-group">
-                    <label>Seller</label>
-                    <input type="text" name="seller" placeholder="Seller name..." value="<?php echo htmlspecialchars($_GET['seller'] ?? ''); ?>">
-                </div>
-                <div class="form-group">
-                    <label>Status</label>
-                    <select name="status">
-                        <option value="">All Status</option>
-                        <option value="1" <?php echo (isset($_GET['status']) && $_GET['status'] === '1') ? 'selected' : ''; ?>>Visible</option>
-                        <option value="0" <?php echo (isset($_GET['status']) && $_GET['status'] === '0') ? 'selected' : ''; ?>>Hidden</option>
-                    </select>
-                </div>
-                <button type="submit" class="btn-filter">Filter</button>
+    <div class="main-content">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1>Product Management</h1>
+            <span class="count-badge"><?php echo count($products); ?> product<?php echo count($products) !== 1 ? 's' : ''; ?></span>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+            <div class="filter-group">
+                <label>Product Name</label>
+                <input type="text" name="name" placeholder="Search name..." value="<?php echo htmlspecialchars($_GET['name'] ?? ''); ?>" form="filterForm">
+            </div>
+            <div class="filter-group">
+                <label>Seller</label>
+                <input type="text" name="seller" placeholder="Seller name..." value="<?php echo htmlspecialchars($_GET['seller'] ?? ''); ?>" form="filterForm">
+            </div>
+            <div class="filter-group">
+                <label>Status</label>
+                <select name="status" form="filterForm">
+                    <option value="">All Status</option>
+                    <option value="1" <?php echo (isset($_GET['status']) && $_GET['status'] === '1') ? 'selected' : ''; ?>>Visible</option>
+                    <option value="0" <?php echo (isset($_GET['status']) && $_GET['status'] === '0') ? 'selected' : ''; ?>>Hidden</option>
+                </select>
+            </div>
+            <form id="filterForm" action="" method="GET" style="display:contents;">
+                <button type="submit" class="btn-filter">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+                    Filter
+                </button>
                 <a href="admin_product.php" class="btn-reset">Reset</a>
             </form>
         </div>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Image</th>
-                    <th>Name</th>
-                    <th>Owner</th>
-                    <th>Price</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php if (empty($products)): ?>
-                    <tr>
-                        <td colspan="6" style="text-align: center; color: #999; padding: 30px;">No products found matching your filters.</td>
-                    </tr>
-                <?php else: ?>
-                    <?php foreach ($products as $product): ?>
-                    <tr>
-                        <td>
-                            <a href="product_detail.php?id=<?php echo $product['id']; ?>">
-                                <img src="../uploads/products/<?php echo htmlspecialchars($product['main_image'] ?? 'default.png'); ?>" class="product-img">
-                            </a>
-                        </td>
-                        <td>
-                            <a href="product_detail.php?id=<?php echo $product['id']; ?>" class="product-name">
-                                <?php echo htmlspecialchars($product['name']); ?>
-                            </a>
-                        </td>
-                        <td><?php echo htmlspecialchars($product['owner_name']); ?></td>
-                        <td>$<?php echo number_format($product['prices'], 2); ?></td>
-                        <td>
-                            <?php if ($product['showed']): ?>
-                                <span class="badge bg-success">Visible</span>
-                            <?php else: ?>
-                                <span class="badge bg-secondary">Hidden</span>
-                            <?php endif; ?>
-                        </td>
-                        <td>
-                            <div style="display: flex; gap: 5px;">
-                                <a href="../controllers/product.php?action=toggle_visibility&id=<?php echo $product['id']; ?>&status=<?php echo $product['showed'] ? '0' : '1'; ?>" 
-                                class="btn <?php echo $product['showed'] ? 'btn-red' : 'btn-green'; ?>">
-                                    <?php echo $product['showed'] ? 'Hide' : 'Show'; ?>
-                                </a>
-                                <a href="../controllers/product.php?action=delete&id=<?php echo $product['id']; ?>" 
-                                class="btn btn-red" 
-                                onclick="return confirm('Are you sure you want to delete this product permanently?')">
-                                    Delete
-                                </a>
-                            </div>
-                        </td>
-                    </tr>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-            </tbody>
-        </table>
+        <!-- Table -->
+        <div class="table-card">
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Image</th>
+                            <th>Name</th>
+                            <th>Owner</th>
+                            <th>Price</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (empty($products)): ?>
+                            <tr>
+                                <td colspan="6">
+                                    <div class="empty-state">
+                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                                        <p>No products found matching your filters.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php else: ?>
+                            <?php foreach ($products as $product): ?>
+                            <tr>
+                                <td>
+                                    <a href="product_detail.php?id=<?php echo $product['id']; ?>">
+                                        <img src="../uploads/products/<?php echo htmlspecialchars($product['main_image'] ?? 'default.png'); ?>" class="product-img">
+                                    </a>
+                                </td>
+                                <td>
+                                    <a href="product_detail.php?id=<?php echo $product['id']; ?>" class="product-name">
+                                        <?php echo htmlspecialchars($product['name']); ?>
+                                    </a>
+                                </td>
+                                <td><?php echo htmlspecialchars($product['owner_name']); ?></td>
+                                <td>$<?php echo number_format($product['prices'], 2); ?></td>
+                                <td>
+                                    <?php if ($product['showed']): ?>
+                                        <span class="badge badge-visible">Visible</span>
+                                    <?php else: ?>
+                                        <span class="badge badge-hidden">Hidden</span>
+                                    <?php endif; ?>
+                                </td>
+                                <td>
+                                    <div style="display: flex; gap: 6px;">
+                                        <a href="../controllers/product.php?action=toggle_visibility&id=<?php echo $product['id']; ?>&status=<?php echo $product['showed'] ? '0' : '1'; ?>"
+                                        class="action-btn <?php echo $product['showed'] ? 'btn-hide' : 'btn-show'; ?>">
+                                            <?php echo $product['showed'] ? 'Hide' : 'Show'; ?>
+                                        </a>
+                                        <a href="../controllers/product.php?action=delete&id=<?php echo $product['id']; ?>"
+                                        class="action-btn btn-hide"
+                                        onclick="return confirm('Are you sure you want to delete this product permanently?')">
+                                            Delete
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
+
+    <!-- Toast Notification -->
+    <?php if (isset($_GET['success']) || isset($_GET['error'])): ?>
+        <div class="toast <?php echo isset($_GET['success']) ? 'toast-success' : 'toast-error'; ?>">
+            <?php echo htmlspecialchars($_GET['success'] ?? $_GET['error'] ?? ''); ?>
+        </div>
+    <?php endif; ?>
 </body>
 </html>

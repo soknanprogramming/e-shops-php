@@ -16,6 +16,11 @@ if (isset($_GET['filter']) && $_GET['filter'] === 'requesting') {
 }
 $stmt->execute();
 $users = $stmt->fetchAll();
+
+// Pending count for sidebar badge
+$stmtPending = $conn->prepare("SELECT COUNT(*) as total FROM User WHERE request_post_permission = 1 AND (can_post = 0 OR can_post IS NULL)");
+$stmtPending->execute();
+$pendingCount = $stmtPending->fetch()['total'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -23,80 +28,331 @@ $users = $stmt->fetchAll();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Users</title>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: sans-serif; display: flex; }
-        .main-content { flex-grow: 1; padding: 20px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
-        th { background-color: #f4f4f4; }
-        .btn { padding: 5px 10px; text-decoration: none; color: white; border-radius: 4px; font-size: 0.9rem; }
-        .btn-green { background-color: #28a745; }
-        .btn-red { background-color: #dc3545; }
-        .btn-blue { background-color: #007bff; }
-        .badge { padding: 3px 8px; border-radius: 10px; font-size: 0.8rem; color: white; }
-        .bg-success { background-color: #28a745; }
-        .bg-secondary { background-color: #6c757d; }
-        .filter-links { margin-bottom: 15px; }
-        .filter-links a { margin-right: 15px; text-decoration: none; color: #007bff; }
-        .filter-links a.active { font-weight: bold; color: black; }
+        :root {
+            --primary: #1a3325;
+            --primary-container: #2a5038;
+            --primary-light: rgba(26, 51, 37, 0.05);
+            --secondary: #9d7c39;
+            --secondary-light: rgba(157, 124, 57, 0.1);
+            --tertiary: #7e000a;
+            --bg-body: #faf7f2;
+            --surface: #ffffff;
+            --on-surface: #201b09;
+            --on-surface-variant: #6b6355;
+            --outline: rgba(74, 69, 56, 0.12);
+            --outline-strong: rgba(74, 69, 56, 0.25);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --font-headline: 'Manrope', sans-serif;
+            --font-body: 'Public Sans', sans-serif;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: var(--font-body);
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-body);
+            color: var(--on-surface);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            padding: 1.5rem 3rem;
+            max-width: calc(100vw - 240px);
+        }
+
+        @media (max-width: 992px) { .main-content { padding: 1.25rem 2rem; } }
+
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            .admin-sidebar { width: 100% !important; min-height: auto !important; flex-direction: row !important; overflow-x: auto; }
+            .sidebar-menu { display: flex; padding: 0.5rem !important; gap: 4px; flex-grow: 1; }
+            .sidebar-menu li a { white-space: nowrap; flex-shrink: 0; padding: 8px 12px !important; font-size: 0.75rem !important; }
+            .sidebar-menu li a .badge-count, .sidebar-menu li a svg { display: none; }
+            .sidebar-brand, .sidebar-footer { display: none; }
+            .main-content { max-width: 100%; padding: 1rem; }
+        }
+
+        /* Page Header */
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .page-header h1 {
+            font-family: var(--font-headline);
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin: 0;
+        }
+
+        .page-header .count-badge {
+            font-size: 0.8rem;
+            color: var(--on-surface-variant);
+            font-weight: 600;
+            background: var(--surface);
+            border: 1px solid var(--outline);
+            padding: 6px 14px;
+            border-radius: 20px;
+        }
+
+        /* Filter Tabs */
+        .filter-tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 1.25rem;
+            background: var(--surface);
+            border: 1px solid var(--outline);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            width: fit-content;
+        }
+
+        .filter-tab {
+            padding: 8px 18px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: var(--on-surface-variant);
+            transition: all 0.2s;
+            border-right: 1px solid var(--outline);
+        }
+
+        .filter-tab:last-child { border-right: none; }
+
+        .filter-tab:hover { background: var(--primary-light); color: var(--primary); }
+
+        .filter-tab.active {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        /* Table Card */
+        .table-card {
+            background: var(--surface);
+            border: 1px solid var(--outline);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+        }
+
+        .table-responsive { overflow-x: auto; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            padding: 12px 16px;
+            text-align: left;
+            background: var(--bg-body);
+            font-weight: 700;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--on-surface-variant);
+            border-bottom: 1px solid var(--outline);
+        }
+
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--outline);
+            font-size: 0.85rem;
+            vertical-align: middle;
+        }
+
+        tr:last-child td { border-bottom: none; }
+        tr:hover { background: var(--primary-light); }
+
+        .user-name {
+            font-weight: 600;
+            color: var(--on-surface);
+        }
+
+        .user-email {
+            font-size: 0.8rem;
+            color: var(--on-surface-variant);
+        }
+
+        .badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            display: inline-block;
+        }
+
+        .badge-admin { background: rgba(157, 124, 57, 0.12); color: var(--secondary); }
+        .badge-user { background: rgba(108, 117, 125, 0.12); color: #6c757d; }
+        .badge-allowed { background: rgba(40, 167, 69, 0.12); color: #28a745; }
+        .badge-restricted { background: rgba(108, 117, 125, 0.12); color: #6c757d; }
+        .badge-requesting { background: rgba(255, 193, 7, 0.15); color: #856404; margin-left: 6px; }
+
+        .action-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.75rem;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .btn-allow { background: rgba(40, 167, 69, 0.12); color: #28a745; }
+        .btn-allow:hover { background: rgba(40, 167, 69, 0.2); }
+        .btn-revoke { background: rgba(220, 53, 69, 0.12); color: #dc3545; }
+        .btn-revoke:hover { background: rgba(220, 53, 69, 0.2); }
+        .btn-role { background: rgba(26, 51, 37, 0.08); color: var(--primary); }
+        .btn-role:hover { background: rgba(26, 51, 37, 0.15); }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--on-surface-variant);
+        }
+
+        .empty-state svg {
+            width: 48px;
+            height: 48px;
+            opacity: 0.3;
+            margin-bottom: 0.75rem;
+        }
+
+        .empty-state p { margin: 0; font-size: 0.875rem; }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            padding: 10px 18px;
+            border-radius: var(--radius-sm);
+            color: #fff;
+            font-weight: 600;
+            font-size: 0.825rem;
+            z-index: 9999;
+            animation: toastIn 0.3s ease, toastOut 0.3s ease 2.7s forwards;
+        }
+
+        .toast-success { background: var(--primary); }
+        .toast-error { background: var(--tertiary); }
+
+        @keyframes toastIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes toastOut { from { opacity: 1; } to { opacity: 0; transform: translateY(10px); } }
     </style>
 </head>
 <body>
     <?php include './assets/admin_sidebar.php'; ?>
-    
-    <div class="main-content">
-        <h1>User Management</h1>
-        
-        <div class="filter-links">
-            <a href="admin_user.php" class="<?php echo !isset($_GET['filter']) ? 'active' : ''; ?>">All Users</a>
-            <a href="admin_user.php?filter=requesting" class="<?php echo (isset($_GET['filter']) && $_GET['filter'] === 'requesting') ? 'active' : ''; ?>">Pending Requests</a>
-        </div>
-        
-        <?php if (isset($_GET['success'])): ?>
-            <p style="color: green;"><?php echo htmlspecialchars($_GET['success']); ?></p>
-        <?php endif; ?>
-        <?php if (isset($_GET['error'])): ?>
-            <p style="color: red;"><?php echo htmlspecialchars($_GET['error']); ?></p>
-        <?php endif; ?>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Role</th>
-                    <th>Posting Permission</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($users as $user): ?>
-                <tr>
-                    <td><?php echo $user['id']; ?></td>
-                    <td><?php echo htmlspecialchars($user['name']); ?></td>
-                    <td><?php echo htmlspecialchars($user['email']); ?></td>
-                    <td><?php echo $user['is_admin'] ? 'Admin' : 'User'; ?></td>
-                    <td>
-                        <?php if ($user['can_post']): ?>
-                            <span class="badge bg-success">Allowed</span>
+    <div class="main-content">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1>User Management</h1>
+            <span class="count-badge"><?php echo count($users); ?> user<?php echo count($users) !== 1 ? 's' : ''; ?></span>
+        </div>
+
+        <!-- Filter Tabs -->
+        <div class="filter-tabs">
+            <a href="admin_user.php" class="filter-tab <?php echo !isset($_GET['filter']) ? 'active' : ''; ?>">All Users</a>
+            <a href="admin_user.php?filter=requesting" class="filter-tab <?php echo (isset($_GET['filter']) && $_GET['filter'] === 'requesting') ? 'active' : ''; ?>">
+                Pending Requests
+                <?php if ($pendingCount > 0): ?>
+                    <span style="margin-left: 4px; opacity: 0.7;">(<?php echo $pendingCount; ?>)</span>
+                <?php endif; ?>
+            </a>
+        </div>
+
+        <!-- Table -->
+        <div class="table-card">
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Role</th>
+                            <th>Posting Permission</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (empty($users)): ?>
+                            <tr>
+                                <td colspan="5">
+                                    <div class="empty-state">
+                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                                        <p>No users found.</p>
+                                    </div>
+                                </td>
+                            </tr>
                         <?php else: ?>
-                            <span class="badge bg-secondary">Restricted</span>
-                            <?php if (isset($user['request_post_permission']) && $user['request_post_permission'] == 1): ?>
-                                <span class="badge" style="background-color: #ffc107; color: black; margin-left: 5px;">Requesting</span>
-                            <?php endif; ?>
+                            <?php foreach ($users as $user): ?>
+                            <tr>
+                                <td><?php echo $user['id']; ?></td>
+                                <td>
+                                    <div>
+                                        <div class="user-name"><?php echo htmlspecialchars($user['name']); ?></div>
+                                        <div class="user-email"><?php echo htmlspecialchars($user['email']); ?></div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <?php if ($user['is_admin']): ?>
+                                        <span class="badge badge-admin">Admin</span>
+                                    <?php else: ?>
+                                        <span class="badge badge-user">User</span>
+                                    <?php endif; ?>
+                                </td>
+                                <td>
+                                    <?php if ($user['can_post']): ?>
+                                        <span class="badge badge-allowed">Allowed</span>
+                                    <?php else: ?>
+                                        <span class="badge badge-restricted">Restricted</span>
+                                        <?php if (isset($user['request_post_permission']) && $user['request_post_permission'] == 1): ?>
+                                            <span class="badge badge-requesting">Requesting</span>
+                                        <?php endif; ?>
+                                    <?php endif; ?>
+                                </td>
+                                <td>
+                                    <div style="display: flex; gap: 6px;">
+                                        <a href="../controllers/user.php?action=toggle_permission&id=<?php echo $user['id']; ?>" class="action-btn <?php echo $user['can_post'] ? 'btn-revoke' : 'btn-allow'; ?>">
+                                            <?php echo $user['can_post'] ? 'Revoke' : 'Allow'; ?>
+                                        </a>
+                                        <a href="../controllers/user.php?action=toggle_role&id=<?php echo $user['id']; ?>" class="action-btn btn-role">
+                                            Toggle Role
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
                         <?php endif; ?>
-                    </td>
-                    <td>
-                        <a href="../controllers/user.php?action=toggle_permission&id=<?php echo $user['id']; ?>" class="btn <?php echo $user['can_post'] ? 'btn-red' : 'btn-green'; ?>">
-                            <?php echo $user['can_post'] ? 'Revoke Post' : 'Allow Post'; ?>
-                        </a>
-                        <a href="../controllers/user.php?action=toggle_role&id=<?php echo $user['id']; ?>" class="btn btn-blue">Toggle Role</a>
-                    </td>
-                </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
+
+    <!-- Toast Notification -->
+    <?php if (isset($_GET['success']) || isset($_GET['error'])): ?>
+        <div class="toast <?php echo isset($_GET['success']) ? 'toast-success' : 'toast-error'; ?>">
+            <?php echo htmlspecialchars($_GET['success'] ?? $_GET['error'] ?? ''); ?>
+        </div>
+    <?php endif; ?>
 </body>
 </html>
