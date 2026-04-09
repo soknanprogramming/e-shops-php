@@ -485,7 +485,7 @@ $categories = $catRepo->getAll();
                                 </div>
                                 <div class="form-group">
                                     <label for="description">Description <span class="required">*</span></label>
-                                    <textarea id="description" name="description" class="form-control" rows="5" placeholder="Describe your product condition, features, and any other details..." required></textarea>
+                                    <textarea id="description" name="description" class="form-control" rows="10" placeholder="Describe your product condition, features, and any other details..." required></textarea>
                                 </div>
                             </div>
                         </div>
