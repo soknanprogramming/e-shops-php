@@ -11,7 +11,7 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 // 2. Fetch fresh user permissions
-$stmtUser = $conn->prepare("SELECT can_post FROM User WHERE id = ?");
+$stmtUser = $conn->prepare("SELECT can_post, name FROM User WHERE id = ?");
 $stmtUser->execute([$_SESSION['user_id']]);
 $user = $stmtUser->fetch();
 $canPost = ($user && $user['can_post'] == 1);
@@ -35,108 +35,558 @@ $categories = $catRepo->getAll();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Post Product</title>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { margin: 0; font-family: sans-serif; display: flex; min-height: 100vh; background-color: #f0f2f5; }
-        .main-content { flex-grow: 1; padding: 20px; display: flex; justify-content: center; align-items: flex-start; }
-        .form-container { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); width: 100%; max-width: 500px; margin-top: 20px; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; }
-        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-family: inherit; }
-        button { width: 100%; padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 1rem; }
-        button:hover { background-color: #0056b3; }
-        .btn-secondary { display: block; width: 100%; padding: 10px; background-color: #6c757d; color: white; text-align: center; border-radius: 4px; text-decoration: none; box-sizing: border-box; margin-top: 10px; }
-        .btn-secondary:hover { background-color: #5a6268; }
-        .alert { padding: 15px; background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; border-radius: 4px; margin-bottom: 20px; text-align: center; }
+        :root {
+            --primary: #1a3325;
+            --primary-container: #2a5038;
+            --primary-light: rgba(26, 51, 37, 0.05);
+            --secondary: #9d7c39;
+            --secondary-light: rgba(157, 124, 57, 0.1);
+            --tertiary: #7e000a;
+            --bg-body: #faf7f2;
+            --surface: #ffffff;
+            --surface-low: #fef9f3;
+            --on-surface: #201b09;
+            --on-surface-variant: #6b6355;
+            --outline: rgba(74, 69, 56, 0.12);
+            --outline-strong: rgba(74, 69, 56, 0.25);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --font-headline: 'Manrope', sans-serif;
+            --font-body: 'Public Sans', sans-serif;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: var(--font-body);
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-body);
+            color: var(--on-surface);
+            -webkit-font-smoothing: antialiased;
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            padding: 1.5rem 3rem;
+            max-width: calc(100vw - 240px);
+        }
+
+        @media (max-width: 992px) { .main-content { padding: 1.25rem 2rem; } }
+
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            .sidebar {
+                width: 100% !important;
+                height: auto !important;
+                position: relative !important;
+                border-right: none !important;
+                border-bottom: 1px solid var(--outline) !important;
+            }
+            .sidebar-menu { display: flex; overflow-x: auto; padding: 0.5rem !important; gap: 4px; }
+            .sidebar-link { white-space: nowrap; flex-shrink: 0; padding: 8px 12px !important; font-size: 0.75rem !important; }
+            .sidebar-link span { display: none; }
+            .sidebar-brand { display: none; }
+            .sidebar-footer { display: none; }
+            .main-content { max-width: 100%; padding: 1rem; }
+        }
+
+        /* Page Header */
+        .page-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .page-header h1 {
+            font-family: var(--font-headline);
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin: 0 0 0.25rem;
+        }
+
+        .page-header p {
+            font-size: 0.875rem;
+            color: var(--on-surface-variant);
+            margin: 0;
+        }
+
+        /* Form Container */
+        .form-wrapper {
+            max-width: 100%;
+        }
+
+        .form-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.25rem;
+            align-items: start;
+        }
+
+        @media (max-width: 992px) { .form-layout { grid-template-columns: 1fr; } }
+
+        /* Section */
+        .form-section {
+            background: var(--surface);
+            border: 1px solid var(--outline);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            margin-bottom: 0;
+        }
+
+        .form-section + .form-section {
+            margin-bottom: 1.25rem;
+        }
+
+        .section-title {
+            font-family: var(--font-headline);
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--on-surface);
+            margin: 0 0 1.25rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--outline);
+        }
+
+        /* Form Fields */
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 576px) { .form-row { grid-template-columns: 1fr; } }
+
+        .form-row:last-child { margin-bottom: 0; }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group:last-child { margin-bottom: 0; }
+
+        .form-group label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--on-surface-variant);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-group label .required {
+            color: var(--tertiary);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            background: var(--bg-body);
+            border: 1.5px solid var(--outline);
+            border-radius: var(--radius-sm);
+            font-size: 0.875rem;
+            font-family: var(--font-body);
+            color: var(--on-surface);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+        }
+
+        .form-control::placeholder {
+            color: rgba(107, 99, 85, 0.5);
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        select.form-control {
+            cursor: pointer;
+        }
+
+        /* Image Upload */
+        .upload-main {
+            margin-bottom: 1.25rem;
+        }
+
+        .upload-zone {
+            border: 2px dashed var(--outline-strong);
+            border-radius: var(--radius-md);
+            padding: 3rem 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: var(--bg-body);
+            position: relative;
+        }
+
+        .upload-zone:hover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .upload-zone.has-image {
+            padding: 0;
+            border-style: solid;
+            border-color: var(--outline);
+            overflow: hidden;
+        }
+
+        .upload-zone svg {
+            width: 36px;
+            height: 36px;
+            color: var(--on-surface-variant);
+            opacity: 0.4;
+            margin-bottom: 0.75rem;
+        }
+
+        .upload-zone p {
+            margin: 0 0 0.25rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: var(--on-surface-variant);
+        }
+
+        .upload-zone .hint {
+            font-size: 0.75rem;
+            color: var(--on-surface-variant);
+            opacity: 0.6;
+        }
+
+        .upload-zone input[type="file"] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .upload-zone .preview-img {
+            width: 100%;
+            max-height: 280px;
+            object-fit: cover;
+            display: none;
+            border-radius: var(--radius-sm);
+        }
+
+        .upload-zone.has-image .upload-placeholder { display: none; }
+        .upload-zone.has-image .preview-img { display: block; }
+
+        /* Additional Images Grid */
+        .additional-images-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.75rem;
+        }
+
+        @media (max-width: 480px) { .additional-images-grid { grid-template-columns: repeat(2, 1fr); } }
+
+        .upload-thumb {
+            aspect-ratio: 1;
+            border: 2px dashed var(--outline);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: var(--bg-body);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-thumb:hover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .upload-thumb.has-image {
+            border-style: solid;
+            border-color: var(--outline);
+        }
+
+        .upload-thumb svg {
+            width: 24px;
+            height: 24px;
+            color: var(--on-surface-variant);
+            opacity: 0.3;
+        }
+
+        .upload-thumb input[type="file"] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .upload-thumb .preview-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+
+        .upload-thumb.has-image .upload-placeholder { display: none; }
+        .upload-thumb.has-image .preview-img { display: block; }
+
+        .upload-thumb .remove-btn {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--tertiary);
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            line-height: 1;
+            z-index: 2;
+        }
+
+        .upload-thumb.has-image .remove-btn { display: flex; }
+
+        /* Submit Button */
+        .form-actions {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+        }
+
+        .btn-submit {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 28px;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-weight: 700;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-submit:hover {
+            background: var(--primary-container);
+        }
+
+        .btn-cancel {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 12px 20px;
+            background: transparent;
+            color: var(--on-surface-variant);
+            border: 1.5px solid var(--outline-strong);
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .btn-cancel:hover {
+            border-color: var(--on-surface-variant);
+            color: var(--on-surface);
+        }
+
+        /* No Permission Alert */
+        .alert-block {
+            padding: 1rem 1.25rem;
+            border-radius: var(--radius-md);
+            background: #fff8e1;
+            color: #856404;
+            border: 1px solid #ffe082;
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+        }
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            background: var(--surface);
+            color: var(--on-surface);
+            border: 1px solid var(--outline);
+            border-radius: var(--radius-sm);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+        }
+        .btn-back:hover { border-color: var(--outline-strong); }
     </style>
 </head>
 <body>
     <?php include './assets/user_sidebar.php'; ?>
+
     <div class="main-content">
-    <div class="form-container">
-        <h2>Post New Product</h2>
+        <div class="page-header">
+            <h1>Post New Product</h1>
+            <p>Fill in the details below to list your product</p>
+        </div>
 
         <?php if ($canPost): ?>
-            <form action="../controllers/product.php" method="POST" enctype="multipart/form-data">
-                <div class="form-group">
-                    <label for="name">Product Name</label>
-                    <input type="text" name="name" required>
-                </div>
-                <div class="form-group">
-                    <label for="prices">Price ($)</label>
-                    <input type="number" name="prices" step="0.01" required>
-                </div>
-                <div class="form-group">
-                    <label for="discounts">Discount ($) (Optional)</label>
-                    <input type="number" name="discounts" step="0.01" placeholder="0.00">
-                </div>
-                <div class="form-group">
-                    <label for="category_id">Category</label>
-                    <select name="category_id" required>
-                        <?php foreach ($categories as $cat): ?>
-                            <option value="<?php echo $cat['id']; ?>"><?php echo htmlspecialchars($cat['name']); ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="location">Location</label>
-                    <input type="text" name="location" placeholder="e.g. Phnom Penh" required>
-                </div>
-                <div class="form-group">
-                    <label for="description">Description</label>
-                    <textarea name="description" rows="5" placeholder="Describe your product..." required></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="image">Main Image (Required)</label>
-                    <input type="file" name="image" accept="image/*" required onchange="previewImage(this, 'main_preview')">
-                    <img id="main_preview" style="display:none; width: 100%; max-width: 300px; margin-top: 10px; border-radius: 4px; border: 1px solid #ddd;">
-                </div>
-                <div class="form-group">
-                    <label>Additional Images (Optional)</label>
-                    <div style="margin-bottom: 10px;">
-                        <input type="file" name="image1" accept="image/*" onchange="previewImage(this, 'preview1')">
-                        <img id="preview1" style="display:none; width: 80px; height: 80px; object-fit: cover; margin-top: 5px; border-radius: 4px;">
+            <div class="form-wrapper">
+                <form action="../controllers/product.php" method="POST" enctype="multipart/form-data">
+                    <div class="form-layout">
+                        <!-- Left: Basic Info -->
+                        <div>
+                            <div class="form-section">
+                                <h3 class="section-title">Basic Information</h3>
+                                <div class="form-group">
+                                    <label for="name">Product Name <span class="required">*</span></label>
+                                    <input type="text" id="name" name="name" class="form-control" placeholder="e.g. iPhone 15 Pro Max" required>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="prices">Price ($) <span class="required">*</span></label>
+                                        <input type="number" id="prices" name="prices" class="form-control" step="0.01" placeholder="0.00" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="discounts">Discount ($)</label>
+                                        <input type="number" id="discounts" name="discounts" class="form-control" step="0.01" placeholder="Optional">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="category_id">Category <span class="required">*</span></label>
+                                        <select id="category_id" name="category_id" class="form-control" required>
+                                            <option value="">Select a category</option>
+                                            <?php foreach ($categories as $cat): ?>
+                                                <option value="<?php echo $cat['id']; ?>"><?php echo htmlspecialchars($cat['name']); ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="location">Location <span class="required">*</span></label>
+                                        <input type="text" id="location" name="location" class="form-control" placeholder="e.g. Phnom Penh" required>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="description">Description <span class="required">*</span></label>
+                                    <textarea id="description" name="description" class="form-control" rows="5" placeholder="Describe your product condition, features, and any other details..." required></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right: Images -->
+                        <div>
+                            <div class="form-section">
+                                <h3 class="section-title">Product Images</h3>
+
+                                <!-- Main Image -->
+                                <div class="upload-main">
+                                    <label>Main Image <span class="required">*</span></label>
+                                    <div class="upload-zone" id="mainZone">
+                                        <div class="upload-placeholder">
+                                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                            <p>Click to upload main image</p>
+                                            <span class="hint">PNG, JPG up to 5MB</span>
+                                        </div>
+                                        <img id="mainPreview" class="preview-img" alt="Preview">
+                                        <input type="file" id="mainImage" name="image" accept="image/*" required>
+                                    </div>
+                                </div>
+
+                                <!-- Additional Images -->
+                                <label>Additional Images (Optional)</label>
+                                <div class="additional-images-grid">
+                                    <?php for ($i = 1; $i <= 5; $i++): ?>
+                                    <div class="upload-thumb" id="thumbZone<?php echo $i; ?>">
+                                        <div class="upload-placeholder">
+                                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                                        </div>
+                                        <img id="thumbPreview<?php echo $i; ?>" class="preview-img" alt="Preview">
+                                        <button type="button" class="remove-btn" onclick="removeImage(<?php echo $i; ?>)" title="Remove">&times;</button>
+                                        <input type="file" id="thumbInput<?php echo $i; ?>" name="image<?php echo $i; ?>" accept="image/*">
+                                    </div>
+                                    <?php endfor; ?>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div style="margin-bottom: 10px;">
-                        <input type="file" name="image2" accept="image/*" onchange="previewImage(this, 'preview2')">
-                        <img id="preview2" style="display:none; width: 80px; height: 80px; object-fit: cover; margin-top: 5px; border-radius: 4px;">
+
+                    <!-- Actions -->
+                    <div class="form-actions" style="margin-top: 1.25rem;">
+                        <button type="submit" name="create_product" class="btn-submit">
+                            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            Post Product
+                        </button>
+                        <a href="user_dashboard.php" class="btn-cancel">Cancel</a>
                     </div>
-                    <div style="margin-bottom: 10px;">
-                        <input type="file" name="image3" accept="image/*" onchange="previewImage(this, 'preview3')">
-                        <img id="preview3" style="display:none; width: 80px; height: 80px; object-fit: cover; margin-top: 5px; border-radius: 4px;">
-                    </div>
-                    <div style="margin-bottom: 10px;">
-                        <input type="file" name="image4" accept="image/*" onchange="previewImage(this, 'preview4')">
-                        <img id="preview4" style="display:none; width: 80px; height: 80px; object-fit: cover; margin-top: 5px; border-radius: 4px;">
-                    </div>
-                    <div style="margin-bottom: 10px;">
-                        <input type="file" name="image5" accept="image/*" onchange="previewImage(this, 'preview5')">
-                        <img id="preview5" style="display:none; width: 80px; height: 80px; object-fit: cover; margin-top: 5px; border-radius: 4px;">
-                    </div>
-                </div>
-                <button type="submit" name="create_product">Post Product</button>
-            </form>
-        <?php else: ?>
-            <div class="alert">
-                You currently do not have permission to post products. Please contact an administrator for approval.
+                </form>
             </div>
-            <a href="user_dashboard.php" class="btn-secondary">Back to Dashboard</a>
+        <?php else: ?>
+            <div class="alert-block">
+                <strong>Permission Required:</strong> You currently do not have permission to post products. Please contact an administrator for approval.
+            </div>
+            <a href="user_dashboard.php" class="btn-back">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                Back to Dashboard
+            </a>
         <?php endif; ?>
     </div>
-    </div>
+
     <script>
-        function previewImage(input, previewId) {
-            const preview = document.getElementById(previewId);
-            if (input.files && input.files[0]) {
+        // Main image preview
+        document.getElementById('mainImage').addEventListener('change', function() {
+            const zone = document.getElementById('mainZone');
+            const preview = document.getElementById('mainPreview');
+            if (this.files && this.files[0]) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     preview.src = e.target.result;
-                    preview.style.display = 'block';
-                }
-                reader.readAsDataURL(input.files[0]);
-            } else {
-                preview.src = '#';
-                preview.style.display = 'none';
+                    zone.classList.add('has-image');
+                };
+                reader.readAsDataURL(this.files[0]);
             }
+        });
+
+        // Additional image previews
+        for (let i = 1; i <= 5; i++) {
+            const input = document.getElementById('thumbInput' + i);
+            const zone = document.getElementById('thumbZone' + i);
+            input.addEventListener('change', function() {
+                if (this.files && this.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        document.getElementById('thumbPreview' + i).src = e.target.result;
+                        zone.classList.add('has-image');
+                    };
+                    reader.readAsDataURL(this.files[0]);
+                }
+            });
+        }
+
+        // Remove image
+        function removeImage(index) {
+            const zone = document.getElementById('thumbZone' + index);
+            const input = document.getElementById('thumbInput' + index);
+            const preview = document.getElementById('thumbPreview' + index);
+            zone.classList.remove('has-image');
+            preview.src = '';
+            input.value = '';
         }
     </script>
 </body>
