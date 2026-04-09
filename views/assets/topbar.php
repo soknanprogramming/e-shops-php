@@ -26,6 +26,9 @@
                 <button class="mobile-menu-btn" id="mobileMenuBtn">
                     <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
                 </button>
+                <button class="mobile-more-btn" id="mobileMoreBtn">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path></svg>
+                </button>
 
                 <div class="links" id="navLinks">
                     <?php if (isset($_SESSION['user_id'])): ?>
@@ -43,6 +46,21 @@
             </div>
         </div>
     </div>
+</div>
+
+<div class="mobile-nav-overlay" id="mobileNavOverlay"></div>
+<div class="mobile-nav-drawer" id="mobileNavDrawer">
+    <?php if (isset($_SESSION['user_id'])): ?>
+        <a href="user_dashboard.php">Dashboard</a>
+        <?php if (isset($_SESSION['is_admin']) && $_SESSION['is_admin']): ?>
+            <a href="admin.php">Admin</a>
+        <?php endif; ?>
+        <a href="product_create.php" class="btn-post">Post Product</a>
+        <a href="logout.php" class="btn-logout">Logout</a>
+    <?php else: ?>
+        <a href="login.php">Login</a>
+        <a href="register.php" class="btn-register">Register</a>
+    <?php endif; ?>
 </div>
 
 <style>
@@ -186,41 +204,156 @@
         padding: 4px;
     }
 
+    .mobile-more-btn {
+        display: none;
+        background: transparent;
+        border: none;
+        color: rgba(255,255,255,0.7);
+        cursor: pointer;
+        padding: 4px;
+        align-items: center;
+    }
+    .mobile-more-btn svg { width: 20px; height: 20px; }
+
+    .mobile-nav-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 1002;
+    }
+    .mobile-nav-overlay.active { display: block; }
+
+    .mobile-nav-drawer {
+        display: none;
+        position: fixed;
+        top: 60px;
+        right: 0;
+        width: 220px;
+        height: calc(100vh - 60px);
+        background: #1a3325;
+        z-index: 1003;
+        padding: 1rem;
+        flex-direction: column;
+        gap: 4px;
+        box-shadow: -4px 0 16px rgba(0,0,0,0.3);
+    }
+    .mobile-nav-drawer.active { display: flex; }
+    .mobile-nav-drawer a {
+        display: none;
+        color: rgba(255,255,255,0.8);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.85rem;
+        padding: 12px 14px;
+        border-radius: 8px;
+        transition: background 0.2s;
+    }
+    .mobile-nav-drawer.active a { display: block; }
+    .mobile-nav-drawer a:hover { background: rgba(255,255,255,0.08); }
+    .mobile-nav-drawer .btn-post {
+        background: #9d7c39 !important;
+        color: #fff !important;
+        text-align: center;
+        margin-top: 8px;
+    }
+    .mobile-nav-drawer .btn-logout {
+        color: rgba(255,255,255,0.5) !important;
+        margin-top: auto;
+        border-top: 1px solid rgba(255,255,255,0.1);
+        padding-top: 16px;
+    }
+
     /* Responsive */
     @media (max-width: 1200px) {
         .container-nav { padding: 0 2rem; }
     }
 
     @media (max-width: 768px) {
-        body { padding-top: 70px !important; }
-        .navbar-main { height: auto; padding: 10px 0; }
-        .navbar-content { flex-wrap: wrap; gap: 10px; }
-        .header-search { order: 3; width: 100%; max-width: 100%; }
-        .logo { order: 1; }
-        .mobile-menu-btn { display: block; order: 2; }
+        body { padding-top: 60px !important; }
+        .navbar-main { height: 60px; }
+        .container-nav { padding: 0 12px; }
+        .navbar-content { flex-wrap: nowrap; gap: 8px; }
+
+        .logo a { font-size: 1.2rem; }
+
+        .header-search {
+            order: 2;
+            flex-grow: 1;
+            max-width: none;
+        }
+        .header-search button { padding: 6px 14px; font-size: 0.7rem; }
+        .search-input-wrapper { padding: 0 10px; }
+
+        .mobile-menu-btn { display: none !important; }
+
         .links {
-            display: none;
-            width: 100%;
-            order: 4;
-            flex-direction: column;
-            gap: 8px;
-            padding: 12px 0 4px;
-            border-top: 1px solid rgba(255,255,255,0.1);
+            order: 3;
+            flex-direction: row;
+            gap: 6px;
+            padding: 0;
+            border: none;
         }
-        .links.active { display: flex; }
+
         .links a {
-            padding: 10px 12px;
-            border-radius: 8px;
+            font-size: 0.7rem;
+            padding: 0;
         }
-        .links a:hover { background: rgba(255,255,255,0.05); }
+
+        .links a:not(.btn-post):not(.btn-register) {
+            display: none;
+        }
+
+        .links a:not(.btn-post):not(.btn-register):last-of-type {
+            display: none;
+        }
+
         .btn-post, .btn-register {
-            text-align: center;
+            padding: 6px 12px !important;
+            font-size: 0.7rem !important;
+            border-radius: 6px !important;
         }
+
+        .mobile-more-btn {
+            display: flex !important;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .header-search button span { display: none; }
+        .header-search button { padding: 6px 10px; }
+    }
+
+    @media (max-width: 425px) {
+        .links .btn-post { display: none !important; }
     }
 </style>
 
 <script>
-    document.getElementById('mobileMenuBtn').addEventListener('click', function() {
-        document.getElementById('navLinks').classList.toggle('active');
-    });
+    // Mobile hamburger menu (for >768px fallback)
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    if (mobileMenuBtn) {
+        mobileMenuBtn.addEventListener('click', function() {
+            document.getElementById('navLinks').classList.toggle('active');
+        });
+    }
+
+    // Mobile drawer on small screens
+    const mobileMoreBtn = document.getElementById('mobileMoreBtn');
+    const overlay = document.getElementById('mobileNavOverlay');
+    const drawer = document.getElementById('mobileNavDrawer');
+
+    if (mobileMoreBtn) {
+        mobileMoreBtn.addEventListener('click', function() {
+            overlay.classList.add('active');
+            drawer.classList.add('active');
+        });
+    }
+
+    if (overlay) {
+        overlay.addEventListener('click', function() {
+            overlay.classList.remove('active');
+            drawer.classList.remove('active');
+        });
+    }
 </script>
