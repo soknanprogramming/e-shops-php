@@ -1,1 +1,9 @@
-backup
+backups/
+QWEN.md
+README.md
+GEMINI.md
+markdown/
+.gemini/
+.qwen/
+ai/
+.vscode/
