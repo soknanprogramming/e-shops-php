@@ -99,12 +99,29 @@ $comments = $commentRepo->getAllByProductId($product['id']);
         .product-layout {
             display: grid;
             grid-template-columns: 1fr 380px;
-            gap: 3rem;
+            grid-template-areas:
+                "gallery info"
+                "desc info"
+                "comments info";
+            gap: 2rem 3rem;
             align-items: start;
         }
 
+        .gallery-area { grid-area: gallery; }
+        .info-panel { grid-area: info; }
+        .desc-block { grid-area: desc; }
+        .comments-area { grid-area: comments; }
+
         @media (max-width: 992px) {
-            .product-layout { grid-template-columns: 1fr; gap: 2rem; }
+            .product-layout {
+                grid-template-columns: 1fr;
+                grid-template-areas:
+                    "gallery"
+                    "info"
+                    "desc"
+                    "comments";
+                gap: 1.5rem;
+            }
         }
 
         /* Gallery */
@@ -484,7 +501,7 @@ $comments = $commentRepo->getAllByProductId($product['id']);
 
         <!-- Product Layout -->
         <div class="product-layout">
-            <!-- Left: Gallery -->
+            <!-- Gallery -->
             <div class="gallery-area">
                 <?php
                 $images = [];
@@ -515,47 +532,9 @@ $comments = $commentRepo->getAllByProductId($product['id']);
                         <?php endforeach; ?>
                     </div>
                 <?php endif; ?>
-
-                <!-- Description (below gallery on desktop) -->
-                <div class="desc-block" style="margin-top: 2rem;">
-                    <h4 class="section-label">Description</h4>
-                    <p class="desc-text"><?php echo nl2br(htmlspecialchars($product['description'])); ?></p>
-                </div>
-
-                <!-- Comments -->
-                <div class="comments-area">
-                    <h3>Comments (<?php echo count($comments); ?>)</h3>
-
-                    <?php if (empty($comments)): ?>
-                        <div class="no-comments">No comments yet. Be the first to share your thoughts!</div>
-                    <?php else: ?>
-                        <?php foreach ($comments as $cmt): ?>
-                            <div class="comment-item">
-                                <div class="comment-avatar">
-                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                                </div>
-                                <div class="comment-body">
-                                    <div class="comment-top">
-                                        <span class="comment-user"><?php echo htmlspecialchars($cmt['user_name']); ?></span>
-                                        <span class="comment-date"><?php echo date('d M Y, H:i', strtotime($cmt['created_at'])); ?></span>
-                                    </div>
-                                    <p class="comment-text"><?php echo nl2br(htmlspecialchars($cmt['comment'])); ?></p>
-                                </div>
-                            </div>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
-
-                    <?php if (isset($_SESSION['user_id'])): ?>
-                        <form action="../controllers/comment.php" method="POST" class="comment-form">
-                            <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
-                            <textarea name="comment" rows="3" placeholder="Write a comment..." required></textarea>
-                            <button type="submit" name="add_comment">Post</button>
-                        </form>
-                    <?php endif; ?>
-                </div>
             </div>
 
-            <!-- Right: Info Panel -->
+            <!-- Info Panel (sidebar) -->
             <div class="info-panel">
                 <?php if (isset($_SESSION['is_admin']) && $_SESSION['is_admin']): ?>
                     <div class="admin-badge">
@@ -628,6 +607,44 @@ $comments = $commentRepo->getAllByProductId($product['id']);
                        style="display: block; text-align: center; padding: 10px; background: <?php echo $product['showed'] ? 'var(--tertiary)' : 'var(--primary)'; ?>; color: #fff; text-decoration: none; border-radius: 6px; font-weight: 700; font-size: 0.8rem; text-transform: uppercase; margin-top: 1rem;">
                         <?php echo $product['showed'] ? 'Hide Product' : 'Show Product'; ?>
                     </a>
+                <?php endif; ?>
+            </div>
+
+            <!-- Description -->
+            <div class="desc-block">
+                <h4 class="section-label">Description</h4>
+                <p class="desc-text"><?php echo nl2br(htmlspecialchars($product['description'])); ?></p>
+            </div>
+
+            <!-- Comments -->
+            <div class="comments-area">
+                <h3>Comments (<?php echo count($comments); ?>)</h3>
+
+                <?php if (empty($comments)): ?>
+                    <div class="no-comments">No comments yet. Be the first to share your thoughts!</div>
+                <?php else: ?>
+                    <?php foreach ($comments as $cmt): ?>
+                        <div class="comment-item">
+                            <div class="comment-avatar">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                            </div>
+                            <div class="comment-body">
+                                <div class="comment-top">
+                                    <span class="comment-user"><?php echo htmlspecialchars($cmt['user_name']); ?></span>
+                                    <span class="comment-date"><?php echo date('d M Y, H:i', strtotime($cmt['created_at'])); ?></span>
+                                </div>
+                                <p class="comment-text"><?php echo nl2br(htmlspecialchars($cmt['comment'])); ?></p>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+
+                <?php if (isset($_SESSION['user_id'])): ?>
+                    <form action="../controllers/comment.php" method="POST" class="comment-form">
+                        <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
+                        <textarea name="comment" rows="3" placeholder="Write a comment..." required></textarea>
+                        <button type="submit" name="add_comment">Post</button>
+                    </form>
                 <?php endif; ?>
             </div>
         </div>
