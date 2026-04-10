@@ -21,12 +21,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // 1. Validate Passwords Match
         if ($password !== $confirm_password) {
+            $_SESSION['register_input'] = compact('name', 'first_name', 'last_name', 'email');
+            session_write_close();
             header("Location: ../views/register.php?error=Passwords do not match");
             exit();
         }
 
         // 2. Check if Email Exists
         if ($userRepo->findByEmail($email)) {
+            $_SESSION['register_input'] = compact('name', 'first_name', 'last_name', 'email');
+            session_write_close();
             header("Location: ../views/register.php?error=Email already registered");
             exit();
         }
@@ -67,6 +71,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             header("Location: ../views/home.php");
             exit();
         } else {
+            $_SESSION['login_email'] = $email;
+            session_write_close();
             header("Location: ../views/login.php?error=Invalid email or password");
             exit();
         }
