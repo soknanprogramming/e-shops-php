@@ -28,6 +28,7 @@ $pendingCount = $stmtPending->fetch()['total'];
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Users</title>
+    <link rel="icon" href="../icon/e-commerce-logo.png" sizes="any" type="image/png">
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
