@@ -7,3 +7,7 @@ markdown/
 .qwen/
 prompts/
 .vscode/
+node_modules/
+.env
+.env.*
+dist/
