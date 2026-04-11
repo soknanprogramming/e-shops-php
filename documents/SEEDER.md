@@ -16,6 +16,67 @@ npm install
 
 ---
 
+## Seed Users
+
+### Basic
+
+```bash
+npm run seed:users
+```
+
+Creates 10 fake users with default password `password`.
+
+### With count
+
+```bash
+npm run seed:users -- --count=20
+```
+
+### With custom password
+
+```bash
+npm run seed:users -- --password=mysecret
+```
+
+### Options
+
+| Flag | Description | Default |
+|------|-------------|---------|
+| `--count` | Number of users to create | `10` |
+| `--password` | Default password for all users | `password` |
+
+### What Gets Created
+
+Each user includes:
+- Random Khmer name (first + last)
+- Unique email address
+- Hashed password (bcrypt)
+- Random Cambodian phone number
+- Random bio (Khmer/English)
+- `can_post` set to `1` (approved to post)
+
+### Output Example
+
+```
+Starting user seeder...
+Users to create: 5
+Default password: password
+
+Found 6 existing users
+
+Creating users...
+
+  [1] Sreypich Seng Sreypich.Seng12@gmail.com 083638162
+  [2] Sophal Hong Sophal_Hong88@hotmail.com 095011166
+
+User seeding complete
+Created: 5
+Skipped: 0
+Password: password
+```
+
+---
+
 ## Seed Categories
 
 ### All categories
@@ -164,7 +225,8 @@ DB_PORT=3307
 ```
 seeders/
 ├── seed-categories.ts      # Category seeder
-└── seed-products.ts        # Product seeder
+├── seed-products.ts        # Product seeder
+└── seed-users.ts           # User seeder
 
 uploads/
 ├── categories/
