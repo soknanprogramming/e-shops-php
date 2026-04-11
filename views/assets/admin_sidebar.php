@@ -27,7 +27,10 @@
         flex-shrink: 0;
         display: flex;
         flex-direction: column;
-        min-height: 100vh;
+        height: 100vh;
+        position: sticky;
+        top: 0;
+        overflow-y: auto;
         font-family: var(--font-body);
     }
 
