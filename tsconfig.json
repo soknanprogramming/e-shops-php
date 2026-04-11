@@ -12,6 +12,6 @@
     "resolveJsonModule": true,
     // "moduleResolution": "node"
   },
-  "include": ["seeders/**/*.ts"],
+  "include": ["seeders/**/*.ts", "tools/**/*.ts"],
   "exclude": ["node_modules", "dist"]
 }
