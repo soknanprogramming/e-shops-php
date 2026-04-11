@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once '../configs/connect.php';
+require_once '../repos/UserRepository.php';
 
 // 1. Auth Check
 if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] != 1) {
@@ -8,14 +9,14 @@ if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] != 1) {
     exit();
 }
 
-// 2. Fetch Users
-if (isset($_GET['filter']) && $_GET['filter'] === 'requesting') {
-    $stmt = $conn->prepare("SELECT * FROM User WHERE request_post_permission = 1 AND (can_post = 0 OR can_post IS NULL) ORDER BY created_at DESC");
-} else {
-    $stmt = $conn->prepare("SELECT * FROM User ORDER BY created_at DESC");
-}
-$stmt->execute();
-$users = $stmt->fetchAll();
+// 2. Handle Search and Ordering parameters
+$search = isset($_GET['search']) ? trim($_GET['search']) : '';
+$filter = isset($_GET['filter']) ? $_GET['filter'] : null;
+$orderBy = isset($_GET['order']) ? $_GET['order'] : 'id_desc';
+
+// 3. Fetch Users using Repository
+$userRepo = new UserRepository($conn);
+$users = $userRepo->getAllWithFilters($filter, $search, $orderBy);
 
 // Pending count for sidebar badge
 $stmtPending = $conn->prepare("SELECT COUNT(*) as total FROM User WHERE request_post_permission = 1 AND (can_post = 0 OR can_post IS NULL)");
@@ -138,6 +139,73 @@ $pendingCount = $stmtPending->fetch()['total'];
         .filter-tab.active {
             background: var(--primary);
             color: #fff;
+        }
+
+        /* Search and Order Controls */
+        .search-order-bar {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.25rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 16px 10px 42px;
+            border: 1px solid var(--outline);
+            border-radius: var(--radius-sm);
+            background: var(--surface);
+            font-family: var(--font-body);
+            font-size: 0.85rem;
+            color: var(--on-surface);
+            transition: all 0.2s;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        .search-box input::placeholder {
+            color: var(--on-surface-variant);
+        }
+
+        .search-box svg {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 18px;
+            color: var(--on-surface-variant);
+            pointer-events: none;
+        }
+
+        .order-select {
+            padding: 10px 16px;
+            border: 1px solid var(--outline);
+            border-radius: var(--radius-sm);
+            background: var(--surface);
+            font-family: var(--font-body);
+            font-size: 0.85rem;
+            color: var(--on-surface);
+            cursor: pointer;
+            transition: all 0.2s;
+            min-width: 180px;
+        }
+
+        .order-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
         }
 
         /* Table Card */
@@ -280,16 +348,73 @@ $pendingCount = $stmtPending->fetch()['total'];
             </a>
         </div>
 
+        <!-- Search and Order Controls -->
+        <form method="GET" class="search-order-bar" id="userFilterForm">
+            <?php if (isset($_GET['filter'])): ?>
+                <input type="hidden" name="filter" value="<?php echo htmlspecialchars($_GET['filter']); ?>">
+            <?php endif; ?>
+            
+            <div class="search-box">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+                <input type="text" name="search" placeholder="Search users by name or email..." value="<?php echo htmlspecialchars($search); ?>">
+            </div>
+            
+            <select name="order" class="order-select" id="orderSelect">
+                <option value="id_desc" <?php echo $orderBy === 'id_desc' ? 'selected' : ''; ?>>Newest First</option>
+                <option value="id_asc" <?php echo $orderBy === 'id_asc' ? 'selected' : ''; ?>>Oldest First</option>
+                <option value="name_asc" <?php echo $orderBy === 'name_asc' ? 'selected' : ''; ?>>Name (A-Z)</option>
+                <option value="name_desc" <?php echo $orderBy === 'name_desc' ? 'selected' : ''; ?>>Name (Z-A)</option>
+                <option value="role_asc" <?php echo $orderBy === 'role_asc' ? 'selected' : ''; ?>>Role (User → Admin)</option>
+                <option value="role_desc" <?php echo $orderBy === 'role_desc' ? 'selected' : ''; ?>>Role (Admin → User)</option>
+                <option value="permission_asc" <?php echo $orderBy === 'permission_asc' ? 'selected' : ''; ?>>Permission (Restricted → Allowed)</option>
+                <option value="permission_desc" <?php echo $orderBy === 'permission_desc' ? 'selected' : ''; ?>>Permission (Allowed → Restricted)</option>
+            </select>
+        </form>
+
         <!-- Table -->
         <div class="table-card">
             <div class="table-responsive">
                 <table>
                     <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>Role</th>
-                            <th>Posting Permission</th>
+                            <th>
+                                <a href="?order=<?php echo ($orderBy === 'id_asc') ? 'id_desc' : 'id_asc'; ?><?php echo !empty($search) ? '&search=' . urlencode($search) : ''; ?><?php echo isset($_GET['filter']) ? '&filter=' . htmlspecialchars($_GET['filter']) : ''; ?>" 
+                                   style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 4px;">
+                                    ID
+                                    <?php if (strpos($orderBy, 'id') !== false): ?>
+                                        <span><?php echo $orderBy === 'id_asc' ? '↑' : '↓'; ?></span>
+                                    <?php endif; ?>
+                                </a>
+                            </th>
+                            <th>
+                                <a href="?order=<?php echo ($orderBy === 'name_asc') ? 'name_desc' : 'name_asc'; ?><?php echo !empty($search) ? '&search=' . urlencode($search) : ''; ?><?php echo isset($_GET['filter']) ? '&filter=' . htmlspecialchars($_GET['filter']) : ''; ?>" 
+                                   style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 4px;">
+                                    Name
+                                    <?php if (strpos($orderBy, 'name') !== false): ?>
+                                        <span><?php echo $orderBy === 'name_asc' ? '↑' : '↓'; ?></span>
+                                    <?php endif; ?>
+                                </a>
+                            </th>
+                            <th>
+                                <a href="?order=<?php echo ($orderBy === 'role_asc') ? 'role_desc' : 'role_asc'; ?><?php echo !empty($search) ? '&search=' . urlencode($search) : ''; ?><?php echo isset($_GET['filter']) ? '&filter=' . htmlspecialchars($_GET['filter']) : ''; ?>" 
+                                   style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 4px;">
+                                    Role
+                                    <?php if (strpos($orderBy, 'role') !== false): ?>
+                                        <span><?php echo $orderBy === 'role_asc' ? '↑' : '↓'; ?></span>
+                                    <?php endif; ?>
+                                </a>
+                            </th>
+                            <th>
+                                <a href="?order=<?php echo ($orderBy === 'permission_asc') ? 'permission_desc' : 'permission_asc'; ?><?php echo !empty($search) ? '&search=' . urlencode($search) : ''; ?><?php echo isset($_GET['filter']) ? '&filter=' . htmlspecialchars($_GET['filter']) : ''; ?>" 
+                                   style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 4px;">
+                                    Posting Permission
+                                    <?php if (strpos($orderBy, 'permission') !== false): ?>
+                                        <span><?php echo $orderBy === 'permission_asc' ? '↑' : '↓'; ?></span>
+                                    <?php endif; ?>
+                                </a>
+                            </th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -355,5 +480,33 @@ $pendingCount = $stmtPending->fetch()['total'];
             <?php echo htmlspecialchars($_GET['success'] ?? $_GET['error'] ?? ''); ?>
         </div>
     <?php endif; ?>
+
+    <script>
+        // Auto-submit form when order selection changes
+        document.getElementById('orderSelect').addEventListener('change', function() {
+            document.getElementById('userFilterForm').submit();
+        });
+
+        // Add debounce utility for search input
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Auto-submit search after 500ms delay
+        const searchInput = document.querySelector('.search-box input');
+        if (searchInput) {
+            searchInput.addEventListener('input', debounce(function() {
+                document.getElementById('userFilterForm').submit();
+            }, 500));
+        }
+    </script>
 </body>
 </html>

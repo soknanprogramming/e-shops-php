@@ -90,4 +90,44 @@ class UserRepository {
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function getAllWithFilters($filter = null, $search = null, $orderBy = null) {
+        $sql = "SELECT * FROM `User`";
+        $params = [];
+        $conditions = [];
+
+        // Apply pending requests filter
+        if ($filter === 'requesting') {
+            $conditions[] = "request_post_permission = 1 AND (can_post = 0 OR can_post IS NULL)";
+        }
+
+        // Apply search filter
+        if (!empty($search)) {
+            $conditions[] = "(name LIKE :search OR email LIKE :search)";
+            $params[':search'] = "%$search%";
+        }
+
+        // Add WHERE clause if there are conditions
+        if (!empty($conditions)) {
+            $sql .= " WHERE " . implode(" AND ", $conditions);
+        }
+
+        // Apply ordering
+        $orderClause = match($orderBy) {
+            'name_asc' => 'ORDER BY name ASC',
+            'name_desc' => 'ORDER BY name DESC',
+            'id_asc' => 'ORDER BY id ASC',
+            'id_desc' => 'ORDER BY id DESC',
+            'role_asc' => 'ORDER BY is_admin ASC, name ASC',
+            'role_desc' => 'ORDER BY is_admin DESC, name ASC',
+            'permission_asc' => 'ORDER BY can_post ASC, name ASC',
+            'permission_desc' => 'ORDER BY can_post DESC, name ASC',
+            default => 'ORDER BY id DESC'
+        };
+        $sql .= " " . $orderClause;
+
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }
