@@ -5,5 +5,5 @@ GEMINI.md
 markdown/
 .gemini/
 .qwen/
-ai/
+prompts/
 .vscode/

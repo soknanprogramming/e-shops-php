@@ -22,7 +22,7 @@ repos/             → Data access layer (Repository pattern with PDO)
 views/             → Frontend pages and shared UI components
 uploads/           → User-uploaded media (products, categories, profiles)
 backups/           → SQL schema and migration scripts
-ai/                → Design system specification
+prompts/                → Design system specification
 ```
 
 ---
@@ -88,7 +88,7 @@ $products = $productRepo->getAll();
 - **When modifying the schema:** Add ALTER/UPDATE statements to `backups/sql_update.sql` with a comment at the top describing the change.
 
 ### Styling & Design System
-The project follows a design system documented in `ai/DESIGN.md` — "The Scholarly Forest Editorial" theme:
+The project follows a design system documented in `prompts/DESIGN.md` — "The Scholarly Forest Editorial" theme:
 
 | Token     | Color                  | Usage                           |
 |-----------|------------------------|---------------------------------|
