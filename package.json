@@ -6,7 +6,8 @@
     "seed": "ts-node seeders/seed-products.ts",
     "seed:categories": "ts-node seeders/seed-categories.ts",
     "seed:users": "ts-node seeders/seed-users.ts",
-    "restore:categories": "ts-node tools/restore-categories.ts"
+    "restore:categories": "ts-node tools/restore-categories.ts",
+    "restore:products": "ts-node tools/restore-products.ts"
   },
   "dependencies": {
     "mysql2": "^3.9.0",
