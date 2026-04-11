@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "Database seeder for khmer24-php platform",
   "scripts": {
-    "seed": "ts-node seeders/seed-products.ts"
+    "seed": "ts-node seeders/seed-products.ts",
+    "seed:categories": "ts-node seeders/seed-categories.ts"
   },
   "dependencies": {
     "mysql2": "^3.9.0",
