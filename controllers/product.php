@@ -177,11 +177,23 @@ if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])
     }
 
     $productRepo = new ProductRepository($conn);
-    
+
     // If admin, they can delete any product. If regular user, only their own.
     $ownerId = (isset($_SESSION['is_admin']) && $_SESSION['is_admin'] == 1) ? null : $_SESSION['user_id'];
-    
+
     $deletedImages = $productRepo->delete($_GET['id'], $ownerId);
+
+    // Determine redirect destination based on HTTP_REFERER
+    $referer = $_SERVER['HTTP_REFERER'] ?? '';
+    $redirect = "../views/user_dashboard.php"; // default
+    
+    if (strpos($referer, 'admin_product.php') !== false) {
+        $redirect = "../views/admin_product.php";
+    } elseif (strpos($referer, 'product_detail.php') !== false) {
+        $redirect = "../views/product_detail.php";
+    } elseif (strpos($referer, 'home.php') !== false) {
+        $redirect = "../views/home.php";
+    }
 
     if ($deletedImages) {
         // Delete physical files
@@ -195,11 +207,9 @@ if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])
                 }
             }
         }
-        
-        $redirect = (isset($_SESSION['is_admin']) && $_SESSION['is_admin'] == 1) ? "../views/admin_product.php" : "../views/user_dashboard.php";
+
         header("Location: " . $redirect . "?success=Product deleted successfully");
     } else {
-        $redirect = (isset($_SESSION['is_admin']) && $_SESSION['is_admin'] == 1) ? "../views/admin_product.php" : "../views/user_dashboard.php";
         header("Location: " . $redirect . "?error=Failed to delete product");
     }
     exit();
