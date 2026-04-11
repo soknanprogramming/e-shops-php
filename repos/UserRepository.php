@@ -42,6 +42,13 @@ class UserRepository {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    public function findByName($name) {
+        $sql = "SELECT * FROM `User` WHERE name = :name";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute([':name' => $name]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
     public function update($id, array $data) {
         $fields = [];
         $params = [':id' => $id];

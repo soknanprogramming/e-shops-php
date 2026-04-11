@@ -27,7 +27,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit();
         }
 
-        // 2. Check if Email Exists
+        // 2. Check if Username Exists
+        if ($userRepo->findByName($name)) {
+            $_SESSION['register_input'] = compact('name', 'first_name', 'last_name', 'email');
+            session_write_close();
+            header("Location: ../views/register.php?error=Username already taken");
+            exit();
+        }
+
+        // 3. Check if Email Exists
         if ($userRepo->findByEmail($email)) {
             $_SESSION['register_input'] = compact('name', 'first_name', 'last_name', 'email');
             session_write_close();
@@ -35,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit();
         }
 
-        // 3. Hash Password
+        // 4. Hash Password
         // Note: Ensure your DB 'password' column is at least 60 characters to hold the hash.
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
@@ -50,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'can_post' => 0
         ];
 
-        // 4. Create User
+        // 5. Create User
         $userRepo->create($data);
         header("Location: ../views/login.php?success=Registration successful. Please login.");
         exit();
