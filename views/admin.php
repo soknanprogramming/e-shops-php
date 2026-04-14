@@ -40,6 +40,19 @@ $totalCategories = $stmtTotalCategories->fetch()['total'];
 $stmtActiveProducts = $conn->prepare("SELECT COUNT(*) as total FROM Product WHERE showed = 1");
 $stmtActiveProducts->execute();
 $activeProducts = $stmtActiveProducts->fetch()['total'];
+
+// Fetch recent data
+$stmtRecentProducts = $conn->prepare("SELECT p.*, u.name as owner_name, pi.main_image FROM Product p LEFT JOIN User u ON p.owner_id = u.id LEFT JOIN product_image pi ON p.product_image_id = pi.id ORDER BY p.created_at DESC LIMIT 5");
+$stmtRecentProducts->execute();
+$recentProducts = $stmtRecentProducts->fetchAll();
+
+$stmtRecentUsers = $conn->prepare("SELECT name, email, created_at FROM User ORDER BY created_at DESC LIMIT 5");
+$stmtRecentUsers->execute();
+$recentUsers = $stmtRecentUsers->fetchAll();
+
+$stmtHiddenProducts = $conn->prepare("SELECT COUNT(*) as total FROM Product WHERE showed = 0");
+$stmtHiddenProducts->execute();
+$hiddenProducts = $stmtHiddenProducts->fetch()['total'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -259,6 +272,161 @@ $activeProducts = $stmtActiveProducts->fetch()['total'];
 
         .btn-review:hover { opacity: 0.85; }
         .btn-review svg { width: 16px; height: 16px; }
+
+        /* Quick Actions */
+        .section-title {
+            font-family: var(--font-headline);
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--on-surface);
+            margin: 0 0 1rem;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 768px) { .quick-actions { grid-template-columns: 1fr; } }
+
+        .quick-action-card {
+            background: var(--surface);
+            border: 1px solid var(--outline);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            text-decoration: none;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .quick-action-card:hover {
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary);
+        }
+
+        .quick-action-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .quick-action-icon svg { width: 22px; height: 22px; }
+
+        .quick-action-icon.users-icon { background: rgba(26, 51, 37, 0.1); color: var(--primary); }
+        .quick-action-icon.products-icon { background: rgba(157, 124, 57, 0.1); color: var(--secondary); }
+        .quick-action-icon.categories-icon { background: rgba(126, 0, 10, 0.1); color: var(--tertiary); }
+
+        .quick-action-text h3 {
+            font-family: var(--font-headline);
+            font-size: 0.9rem;
+            font-weight: 700;
+            margin: 0 0 0.25rem;
+            color: var(--on-surface);
+        }
+
+        .quick-action-text p {
+            margin: 0;
+            font-size: 0.75rem;
+            color: var(--on-surface-variant);
+        }
+
+        /* Recent Activity Grid */
+        .recent-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 992px) { .recent-grid { grid-template-columns: 1fr; } }
+
+        .recent-card {
+            background: var(--surface);
+            border: 1px solid var(--outline);
+            border-radius: var(--radius-md);
+            padding: 1.25rem 1.5rem;
+        }
+
+        .recent-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--outline);
+        }
+
+        .recent-item:last-child { border-bottom: none; }
+
+        .recent-item-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .recent-item-img {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-sm);
+            object-fit: cover;
+            background: var(--bg-body);
+            flex-shrink: 0;
+        }
+
+        .recent-item-name {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--on-surface);
+            margin: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .recent-item-meta {
+            font-size: 0.75rem;
+            color: var(--on-surface-variant);
+            margin: 0.125rem 0 0;
+        }
+
+        .recent-item-badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            flex-shrink: 0;
+        }
+
+        .badge-visible { background: rgba(40, 167, 69, 0.12); color: #28a745; }
+        .badge-hidden { background: rgba(108, 117, 125, 0.12); color: #6c757d; }
+
+        .view-all-link {
+            display: block;
+            text-align: center;
+            padding: 0.75rem;
+            text-decoration: none;
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 0.8rem;
+            border-top: 1px solid var(--outline);
+            margin-top: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .view-all-link:hover {
+            background: var(--primary-light);
+        }
     </style>
 </head>
 <body>
@@ -333,6 +501,80 @@ $activeProducts = $stmtActiveProducts->fetch()['total'];
                 </a>
             </div>
         <?php endif; ?>
+
+        <!-- Quick Actions -->
+        <h2 class="section-title" style="margin-top: 2rem;">Quick Actions</h2>
+        <div class="quick-actions">
+            <a href="admin_user.php" class="quick-action-card">
+                <div class="quick-action-icon users-icon">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                </div>
+                <div class="quick-action-text">
+                    <h3>Manage Users</h3>
+                    <p>View and manage user accounts</p>
+                </div>
+            </a>
+            <a href="admin_product.php" class="quick-action-card">
+                <div class="quick-action-icon products-icon">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                </div>
+                <div class="quick-action-text">
+                    <h3>Manage Products</h3>
+                    <p>Review and moderate product listings</p>
+                </div>
+            </a>
+            <a href="admin_category.php" class="quick-action-card">
+                <div class="quick-action-icon categories-icon">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
+                </div>
+                <div class="quick-action-text">
+                    <h3>Manage Categories</h3>
+                    <p>Add, edit, or remove categories</p>
+                </div>
+            </a>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="recent-grid">
+            <!-- Recent Products -->
+            <div class="recent-card">
+                <h2 class="section-title">Recent Products</h2>
+                <?php foreach ($recentProducts as $rp): ?>
+                    <div class="recent-item">
+                        <div class="recent-item-info">
+                            <img src="../uploads/products/<?php echo htmlspecialchars($rp['main_image'] ?? 'default.png'); ?>" class="recent-item-img">
+                            <div>
+                                <p class="recent-item-name"><?php echo htmlspecialchars($rp['name']); ?></p>
+                                <p class="recent-item-meta">by <?php echo htmlspecialchars($rp['owner_name']); ?> · $<?php echo number_format($rp['prices'], 2); ?></p>
+                            </div>
+                        </div>
+                        <span class="recent-item-badge <?php echo $rp['showed'] ? 'badge-visible' : 'badge-hidden'; ?>">
+                            <?php echo $rp['showed'] ? 'Active' : 'Hidden'; ?>
+                        </span>
+                    </div>
+                <?php endforeach; ?>
+                <a href="admin_product.php" class="view-all-link">View All Products →</a>
+            </div>
+
+            <!-- Recent Users -->
+            <div class="recent-card">
+                <h2 class="section-title">Recent Users</h2>
+                <?php foreach ($recentUsers as $ru): ?>
+                    <div class="recent-item">
+                        <div class="recent-item-info">
+                            <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--primary-light); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: var(--primary);"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                            </div>
+                            <div>
+                                <p class="recent-item-name"><?php echo htmlspecialchars($ru['name']); ?></p>
+                                <p class="recent-item-meta"><?php echo htmlspecialchars($ru['email']); ?></p>
+                            </div>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+                <a href="admin_user.php" class="view-all-link">View All Users →</a>
+            </div>
+        </div>
     </div>
 </body>
 </html>
