@@ -19,7 +19,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $password = $_POST['password'] ?? '';
         $confirm_password = $_POST['confirm_password'] ?? '';
 
-        // 1. Validate Passwords Match
+        // 1. Validate Password Length
+        if (strlen($password) < 6) {
+            $_SESSION['register_input'] = compact('name', 'first_name', 'last_name', 'email');
+            session_write_close();
+            header("Location: ../views/register.php?error=Password must be at least 6 characters");
+            exit();
+        }
+
+        // 2. Validate Passwords Match
         if ($password !== $confirm_password) {
             $_SESSION['register_input'] = compact('name', 'first_name', 'last_name', 'email');
             session_write_close();
