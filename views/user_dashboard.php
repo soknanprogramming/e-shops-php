@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once '../configs/connect.php';
+require_once '../repos/ProductRepository.php';
 
 // 1. Auth Check
 if (!isset($_SESSION['user_id'])) {
@@ -18,10 +19,17 @@ $stmtProfile = $conn->prepare("SELECT phone1 FROM user_profile WHERE user_id = ?
 $stmtProfile->execute([$_SESSION['user_id']]);
 $userProfile = $stmtProfile->fetch();
 
-// 2. Fetch My Products
-$stmt = $conn->prepare("SELECT p.*, pi.main_image, c.name as category_name FROM Product p LEFT JOIN product_image pi ON p.product_image_id = pi.id LEFT JOIN category c ON p.category_id = c.id WHERE p.owner_id = ? ORDER BY p.created_at DESC");
-$stmt->execute([$_SESSION['user_id']]);
-$myProducts = $stmt->fetchAll();
+// 2. Fetch My Products (with search)
+$search = $_GET['search'] ?? '';
+$productRepo = new ProductRepository($conn);
+
+if (!empty($search)) {
+    $myProducts = $productRepo->getByOwnerIdWithSearch($_SESSION['user_id'], $search);
+} else {
+    $stmt = $conn->prepare("SELECT p.*, pi.main_image, c.name as category_name FROM Product p LEFT JOIN product_image pi ON p.product_image_id = pi.id LEFT JOIN category c ON p.category_id = c.id WHERE p.owner_id = ? ORDER BY p.created_at DESC");
+    $stmt->execute([$_SESSION['user_id']]);
+    $myProducts = $stmt->fetchAll();
+}
 
 $approvedCount = array_reduce($myProducts, fn($carry, $p) => $carry + ($p['showed'] ? 1 : 0), 0);
 $hiddenCount = count($myProducts) - $approvedCount;
@@ -314,6 +322,99 @@ $hiddenCount = count($myProducts) - $approvedCount;
             margin: 0;
         }
 
+        /* Search Bar */
+        .search-bar {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .search-input-wrapper {
+            flex: 1;
+            position: relative;
+        }
+
+        .search-input-wrapper svg.search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 18px;
+            color: var(--on-surface-variant);
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 11px 14px 11px 44px;
+            background: var(--surface);
+            border: 1.5px solid var(--outline);
+            border-radius: var(--radius-sm);
+            font-size: 0.875rem;
+            font-family: var(--font-body);
+            color: var(--on-surface);
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .search-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        .search-input:focus ~ svg.search-icon {
+            opacity: 1;
+            color: var(--primary);
+        }
+
+        .search-input::placeholder {
+            color: rgba(107, 99, 85, 0.4);
+        }
+
+        .btn-search-clear {
+            padding: 11px 18px;
+            background: var(--surface);
+            border: 1.5px solid var(--outline);
+            border-radius: var(--radius-sm);
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--on-surface-variant);
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-search-clear:hover {
+            background: var(--primary-light);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-search-clear svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .search-results-info {
+            padding: 10px 14px;
+            background: var(--primary-light);
+            border: 1px solid var(--outline);
+            border-radius: var(--radius-sm);
+            margin-bottom: 1rem;
+            font-size: 0.825rem;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .search-results-info strong {
+            font-weight: 700;
+        }
+
         /* Product Grid */
         .product-grid {
             display: grid;
@@ -360,6 +461,27 @@ $hiddenCount = count($myProducts) - $approvedCount;
         .product-card.hidden-item .product-card-image img {
             filter: grayscale(1);
             opacity: 0.5;
+        }
+
+        /* Product Card Link */
+        .product-card-link {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .product-card-link:hover .product-card-image {
+            opacity: 0.92;
+        }
+
+        .product-name-link {
+            text-decoration: none;
+            color: var(--on-surface);
+            transition: color 0.2s;
+        }
+
+        .product-name-link:hover {
+            color: var(--primary);
         }
 
         .badge {
@@ -415,7 +537,7 @@ $hiddenCount = count($myProducts) - $approvedCount;
 
         .product-card-actions {
             display: flex;
-            gap: 0.5rem;
+            gap: 0.375rem;
             margin-top: 0.75rem;
             padding-top: 0.625rem;
             border-top: 1px solid var(--outline);
@@ -432,6 +554,16 @@ $hiddenCount = count($myProducts) - $approvedCount;
             text-transform: uppercase;
             letter-spacing: 0.03em;
             transition: all 0.2s;
+        }
+
+        .btn-card-view {
+            background: var(--secondary-light);
+            color: var(--secondary);
+            border: 1px solid rgba(157, 124, 57, 0.2);
+        }
+        .btn-card-view:hover {
+            background: var(--secondary);
+            color: #fff;
         }
 
         .btn-card-edit {
@@ -597,20 +729,46 @@ $hiddenCount = count($myProducts) - $approvedCount;
             <h2>My Products</h2>
         </div>
 
+        <!-- Search Bar -->
+        <form method="GET" action="" class="search-bar">
+            <div class="search-input-wrapper">
+                <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+                <input type="text" name="search" class="search-input" placeholder="Search my products..." value="<?php echo htmlspecialchars($search); ?>">
+            </div>
+            <?php if (!empty($search)): ?>
+                <a href="user_dashboard.php" class="btn-search-clear">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                    Clear
+                </a>
+            <?php endif; ?>
+        </form>
+
+        <?php if (!empty($search)): ?>
+            <div class="search-results-info">
+                Found <strong><?php echo count($myProducts); ?></strong> product<?php echo count($myProducts) !== 1 ? 's' : ''; ?> matching "<strong><?php echo htmlspecialchars($search); ?></strong>"
+            </div>
+        <?php endif; ?>
+
         <?php if (count($myProducts) > 0): ?>
             <div class="product-grid">
                 <?php foreach ($myProducts as $product): ?>
                     <div class="product-card <?php echo !$product['showed'] ? 'hidden-item' : ''; ?>">
-                        <div class="product-card-image">
-                            <img src="../uploads/products/<?php echo htmlspecialchars($product['main_image'] ?? 'default.png'); ?>" alt="Product Image">
-                            <?php if (!$product['showed']): ?>
-                                <span class="badge badge-hidden">Hidden</span>
-                            <?php else: ?>
-                                <span class="badge badge-active">Active</span>
-                            <?php endif; ?>
-                        </div>
+                        <a href="product_detail.php?id=<?php echo $product['id']; ?>" class="product-card-link">
+                            <div class="product-card-image">
+                                <img src="../uploads/products/<?php echo htmlspecialchars($product['main_image'] ?? 'default.png'); ?>" alt="Product Image">
+                                <?php if (!$product['showed']): ?>
+                                    <span class="badge badge-hidden">Hidden</span>
+                                <?php else: ?>
+                                    <span class="badge badge-active">Active</span>
+                                <?php endif; ?>
+                            </div>
+                        </a>
                         <div class="product-card-body">
-                            <h3><?php echo htmlspecialchars($product['name']); ?></h3>
+                            <h3><a href="product_detail.php?id=<?php echo $product['id']; ?>" class="product-name-link"><?php echo htmlspecialchars($product['name']); ?></a></h3>
                             <div class="product-meta">
                                 <span class="product-price">$<?php echo number_format($product['prices'], 2); ?></span>
                                 <?php if (!empty($product['category_name'])): ?>
@@ -618,6 +776,7 @@ $hiddenCount = count($myProducts) - $approvedCount;
                                 <?php endif; ?>
                             </div>
                             <div class="product-card-actions">
+                                <a href="product_detail.php?id=<?php echo $product['id']; ?>" class="btn-card btn-card-view">View</a>
                                 <a href="product_edit.php?id=<?php echo $product['id']; ?>" class="btn-card btn-card-edit">Edit</a>
                                 <a href="../controllers/product.php?action=delete&id=<?php echo $product['id']; ?>" class="btn-card btn-card-delete" onclick="return confirm('Are you sure you want to delete this product?')">Delete</a>
                             </div>

@@ -587,7 +587,10 @@ $products = $productRepo->search($filters);
     <div class="main-content">
         <!-- Page Header -->
         <header class="page-header">
-            <h1><?php echo isset($_GET['category_id']) ? 'Browse Products' : 'Discover Products'; ?></h1>
+            <h1><?php echo isset($_GET['seller']) ? 'Products by ' . htmlspecialchars($_GET['seller']) : (isset($_GET['category_id']) ? 'Browse Products' : 'Discover Products'); ?></h1>
+            <?php if (isset($_GET['seller'])): ?>
+                <p>Viewing all products posted by <strong><?php echo htmlspecialchars($_GET['seller']); ?></strong></p>
+            <?php endif; ?>
         </header>
 
         <!-- Categories -->
@@ -618,6 +621,14 @@ $products = $productRepo->search($filters);
         <div class="toolbar">
             <div class="toolbar-left">
                 <span class="results-count"><?php echo $totalProducts; ?> results</span>
+                <?php if (isset($_GET['seller'])): ?>
+                    <a href="home.php" class="btn-reset-filters" style="display: inline-flex; align-items: center; gap: 4px;">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                        Clear seller filter
+                    </a>
+                <?php endif; ?>
                 <button class="filter-toggle-btn" id="filterToggle">
                     <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>

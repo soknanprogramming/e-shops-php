@@ -285,6 +285,26 @@ $comments = $commentRepo->getAllByProductId($product['id']);
             margin: 0 0 8px;
             padding-bottom: 8px;
             border-bottom: 1px solid var(--outline);
+            color: var(--primary);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            transition: all 0.2s;
+        }
+
+        .seller-block .seller-name:hover {
+            color: var(--primary-container);
+        }
+
+        .seller-block .seller-name svg {
+            opacity: 0;
+            transform: translateX(-4px);
+            transition: all 0.2s;
+        }
+
+        .seller-block .seller-name:hover svg {
+            opacity: 1;
+            transform: translateX(0);
         }
 
         .seller-phones {
@@ -588,7 +608,12 @@ $comments = $commentRepo->getAllByProductId($product['id']);
                 <!-- Seller Contact -->
                 <h4 class="section-label">Seller Contact</h4>
                 <div class="seller-block">
-                    <p class="seller-name"><?php echo htmlspecialchars($product['owner_name']); ?></p>
+                    <a href="home.php?seller=<?php echo urlencode($product['owner_name']); ?>" class="seller-name" title="View all products by <?php echo htmlspecialchars($product['owner_name']); ?>">
+                        <?php echo htmlspecialchars($product['owner_name']); ?>
+                        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-left: 4px; vertical-align: middle;">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                        </svg>
+                    </a>
                     <div class="seller-phones">
                         <a href="tel:<?php echo htmlspecialchars($product['phone1']); ?>" class="phone-link">
                             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>

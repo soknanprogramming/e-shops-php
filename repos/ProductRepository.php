@@ -171,14 +171,35 @@ class ProductRepository {
     }
 
     public function getByOwnerId($ownerId) {
-        $sql = "SELECT p.*, pi.main_image, c.name as category_name 
-                FROM Product p 
-                LEFT JOIN product_image pi ON p.product_image_id = pi.id 
+        $sql = "SELECT p.*, pi.main_image, c.name as category_name
+                FROM Product p
+                LEFT JOIN product_image pi ON p.product_image_id = pi.id
                 LEFT JOIN category c ON p.category_id = c.id
                 WHERE p.owner_id = :owner_id
                 ORDER BY p.id DESC";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute([':owner_id' => $ownerId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getByOwnerIdWithSearch($ownerId, $search = '') {
+        $sql = "SELECT p.*, pi.main_image, c.name as category_name
+                FROM Product p
+                LEFT JOIN product_image pi ON p.product_image_id = pi.id
+                LEFT JOIN category c ON p.category_id = c.id
+                WHERE p.owner_id = :owner_id";
+        
+        $params = [':owner_id' => $ownerId];
+        
+        if (!empty($search)) {
+            $sql .= " AND (p.name LIKE :search OR p.description LIKE :search OR c.name LIKE :search OR p.location LIKE :search)";
+            $params[':search'] = '%' . $search . '%';
+        }
+        
+        $sql .= " ORDER BY p.created_at DESC";
+        
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute($params);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
