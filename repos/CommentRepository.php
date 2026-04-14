@@ -19,14 +19,20 @@ class CommentRepository {
     }
 
     public function getAllByProductId($productId) {
-        $sql = "SELECT c.*, u.name as user_name 
+        $sql = "SELECT c.*, u.name as user_name
                 FROM product_comments c
                 JOIN User u ON c.user_id = u.id
                 WHERE c.product_id = :pid
-                ORDER BY c.created_at DESC";
+                ORDER BY c.created_at ASC";
 
         $stmt = $this->conn->prepare($sql);
         $stmt->execute([':pid' => $productId]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function delete($commentId, $userId) {
+        $sql = "DELETE FROM product_comments WHERE id = :id AND user_id = :uid";
+        $stmt = $this->conn->prepare($sql);
+        return $stmt->execute([':id' => $commentId, ':uid' => $userId]);
     }
 }

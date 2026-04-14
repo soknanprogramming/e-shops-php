@@ -409,11 +409,44 @@ $comments = $commentRepo->getAllByProductId($product['id']);
         .comment-item {
             display: flex;
             gap: 12px;
-            padding: 12px 0;
+            padding: 12px 40px 12px 0;
             border-bottom: 1px solid var(--outline);
+            position: relative;
         }
 
         .comment-item:last-of-type { border-bottom: none; }
+
+        .comment-actions {
+            position: absolute;
+            top: 12px;
+            right: 0;
+        }
+
+        .btn-delete-comment {
+            background: none;
+            border: 1px solid transparent;
+            cursor: pointer;
+            padding: 4px 6px;
+            color: var(--on-surface-variant);
+            opacity: 0.5;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+        }
+
+        .btn-delete-comment:hover {
+            opacity: 1;
+            color: var(--tertiary);
+            background: rgba(126, 0, 10, 0.08);
+            border-color: rgba(126, 0, 10, 0.15);
+        }
+
+        .btn-delete-comment svg {
+            width: 14px;
+            height: 14px;
+        }
 
         .comment-avatar {
             width: 32px;
@@ -661,6 +694,19 @@ $comments = $commentRepo->getAllByProductId($product['id']);
                                 </div>
                                 <p class="comment-text"><?php echo nl2br(htmlspecialchars($cmt['comment'])); ?></p>
                             </div>
+                            <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $cmt['user_id']): ?>
+                                <div class="comment-actions">
+                                    <form action="../controllers/comment.php" method="POST" onsubmit="return confirm('Are you sure you want to delete this comment?');">
+                                        <input type="hidden" name="comment_id" value="<?php echo $cmt['id']; ?>">
+                                        <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
+                                        <button type="submit" name="delete_comment" class="btn-delete-comment" title="Delete comment">
+                                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                            </svg>
+                                        </button>
+                                    </form>
+                                </div>
+                            <?php endif; ?>
                         </div>
                     <?php endforeach; ?>
                 <?php endif; ?>
