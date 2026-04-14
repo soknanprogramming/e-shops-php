@@ -76,6 +76,24 @@ class ProductRepository {
 
         if (isset($params['sort']) && $params['sort'] === 'oldest') {
             $sql .= " ORDER BY p.id ASC";
+        } elseif (isset($params['sort']) && $params['sort'] === 'newest') {
+            $sql .= " ORDER BY p.id DESC";
+        } elseif (isset($params['sort']) && $params['sort'] === 'name_asc') {
+            $sql .= " ORDER BY p.name ASC";
+        } elseif (isset($params['sort']) && $params['sort'] === 'name_desc') {
+            $sql .= " ORDER BY p.name DESC";
+        } elseif (isset($params['sort']) && $params['sort'] === 'price_asc') {
+            $sql .= " ORDER BY p.prices ASC";
+        } elseif (isset($params['sort']) && $params['sort'] === 'price_desc') {
+            $sql .= " ORDER BY p.prices DESC";
+        } elseif (isset($params['sort']) && $params['sort'] === 'owner_asc') {
+            $sql .= " ORDER BY u.name ASC";
+        } elseif (isset($params['sort']) && $params['sort'] === 'owner_desc') {
+            $sql .= " ORDER BY u.name DESC";
+        } elseif (isset($params['sort']) && $params['sort'] === 'status_asc') {
+            $sql .= " ORDER BY p.showed ASC";
+        } elseif (isset($params['sort']) && $params['sort'] === 'status_desc') {
+            $sql .= " ORDER BY p.showed DESC";
         } else {
             $sql .= " ORDER BY p.id DESC";
         }

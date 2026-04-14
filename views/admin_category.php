@@ -15,11 +15,14 @@ if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] != 1) {
     exit();
 }
 
+// 2. Handle Ordering parameters
+$orderBy = isset($_GET['order']) ? $_GET['order'] : 'id_desc';
+
 // 3. Fetch Categories
 $categories = [];
 try {
     $categoryRepo = new CategoryRepository($conn);
-    $categories = $categoryRepo->getAll();
+    $categories = $categoryRepo->getAllWithFilters('', $orderBy);
 } catch (PDOException $e) {
     echo "Error: " . $e->getMessage();
 }
@@ -250,8 +253,24 @@ try {
                 <table>
                     <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Name</th>
+                            <th>
+                                <a href="?order=<?php echo ($orderBy === 'id_asc') ? 'id_desc' : 'id_asc'; ?>"
+                                   style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 4px;">
+                                    ID
+                                    <?php if (strpos($orderBy, 'id') !== false): ?>
+                                        <span><?php echo $orderBy === 'id_asc' ? '↑' : '↓'; ?></span>
+                                    <?php endif; ?>
+                                </a>
+                            </th>
+                            <th>
+                                <a href="?order=<?php echo ($orderBy === 'name_asc') ? 'name_desc' : 'name_asc'; ?>"
+                                   style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 4px;">
+                                    Name
+                                    <?php if (strpos($orderBy, 'name') !== false): ?>
+                                        <span><?php echo $orderBy === 'name_asc' ? '↑' : '↓'; ?></span>
+                                    <?php endif; ?>
+                                </a>
+                            </th>
                             <th>Image</th>
                             <th>Actions</th>
                         </tr>

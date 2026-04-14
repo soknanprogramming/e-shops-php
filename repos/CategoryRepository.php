@@ -13,6 +13,37 @@ class CategoryRepository {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function getAllWithFilters($search = '', $orderBy = 'id_desc') {
+        $sql = "SELECT * FROM category WHERE 1=1";
+        $params = [];
+
+        if (!empty($search)) {
+            $sql .= " AND name LIKE :search";
+            $params[':search'] = '%' . $search . '%';
+        }
+
+        switch ($orderBy) {
+            case 'id_asc':
+                $sql .= " ORDER BY id ASC";
+                break;
+            case 'id_desc':
+                $sql .= " ORDER BY id DESC";
+                break;
+            case 'name_asc':
+                $sql .= " ORDER BY name ASC";
+                break;
+            case 'name_desc':
+                $sql .= " ORDER BY name DESC";
+                break;
+            default:
+                $sql .= " ORDER BY id DESC";
+        }
+
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function findById($id) {
         $stmt = $this->conn->prepare("SELECT * FROM category WHERE id = :id");
         $stmt->execute([':id' => $id]);

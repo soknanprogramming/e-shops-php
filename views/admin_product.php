@@ -12,10 +12,26 @@ if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] != 1) {
 $productRepo = new ProductRepository($conn);
 
 // Filters
+$orderBy = isset($_GET['order']) ? $_GET['order'] : 'id_desc';
+
+$sortMap = [
+    'id_desc' => 'newest',
+    'id_asc' => 'oldest',
+    'name_asc' => 'name_asc',
+    'name_desc' => 'name_desc',
+    'price_asc' => 'price_asc',
+    'price_desc' => 'price_desc',
+    'owner_asc' => 'owner_asc',
+    'owner_desc' => 'owner_desc',
+    'status_asc' => 'status_asc',
+    'status_desc' => 'status_desc',
+];
+
 $filters = [
     'include_hidden' => true,
     'name' => $_GET['name'] ?? null,
     'seller' => $_GET['seller'] ?? null,
+    'sort' => $sortMap[$orderBy] ?? 'newest',
 ];
 
 $products = $productRepo->search($filters);
@@ -363,18 +379,59 @@ if (isset($_GET['status']) && $_GET['status'] !== '') {
                 <table>
                     <thead>
                         <tr>
+                            <th>
+                                <a href="?order=<?php echo ($orderBy === 'id_asc') ? 'id_desc' : 'id_asc'; ?><?php echo !empty($_GET['name']) ? '&name=' . urlencode($_GET['name']) : ''; ?><?php echo !empty($_GET['seller']) ? '&seller=' . urlencode($_GET['seller']) : ''; ?><?php echo !empty($_GET['status']) ? '&status=' . urlencode($_GET['status']) : ''; ?>"
+                                   style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 4px;">
+                                    ID
+                                    <?php if (strpos($orderBy, 'id') !== false): ?>
+                                        <span><?php echo $orderBy === 'id_asc' ? '↑' : '↓'; ?></span>
+                                    <?php endif; ?>
+                                </a>
+                            </th>
                             <th>Image</th>
-                            <th>Name</th>
-                            <th>Owner</th>
-                            <th>Price</th>
-                            <th>Status</th>
+                            <th>
+                                <a href="?order=<?php echo ($orderBy === 'name_asc') ? 'name_desc' : 'name_asc'; ?><?php echo !empty($_GET['name']) ? '&name=' . urlencode($_GET['name']) : ''; ?><?php echo !empty($_GET['seller']) ? '&seller=' . urlencode($_GET['seller']) : ''; ?><?php echo !empty($_GET['status']) ? '&status=' . urlencode($_GET['status']) : ''; ?>"
+                                   style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 4px;">
+                                    Name
+                                    <?php if (strpos($orderBy, 'name') !== false): ?>
+                                        <span><?php echo $orderBy === 'name_asc' ? '↑' : '↓'; ?></span>
+                                    <?php endif; ?>
+                                </a>
+                            </th>
+                            <th>
+                                <a href="?order=<?php echo ($orderBy === 'owner_asc') ? 'owner_desc' : 'owner_asc'; ?><?php echo !empty($_GET['name']) ? '&name=' . urlencode($_GET['name']) : ''; ?><?php echo !empty($_GET['seller']) ? '&seller=' . urlencode($_GET['seller']) : ''; ?><?php echo !empty($_GET['status']) ? '&status=' . urlencode($_GET['status']) : ''; ?>"
+                                   style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 4px;">
+                                    Owner
+                                    <?php if (strpos($orderBy, 'owner') !== false): ?>
+                                        <span><?php echo $orderBy === 'owner_asc' ? '↑' : '↓'; ?></span>
+                                    <?php endif; ?>
+                                </a>
+                            </th>
+                            <th>
+                                <a href="?order=<?php echo ($orderBy === 'price_asc') ? 'price_desc' : 'price_asc'; ?><?php echo !empty($_GET['name']) ? '&name=' . urlencode($_GET['name']) : ''; ?><?php echo !empty($_GET['seller']) ? '&seller=' . urlencode($_GET['seller']) : ''; ?><?php echo !empty($_GET['status']) ? '&status=' . urlencode($_GET['status']) : ''; ?>"
+                                   style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 4px;">
+                                    Price
+                                    <?php if (strpos($orderBy, 'price') !== false): ?>
+                                        <span><?php echo $orderBy === 'price_asc' ? '↑' : '↓'; ?></span>
+                                    <?php endif; ?>
+                                </a>
+                            </th>
+                            <th>
+                                <a href="?order=<?php echo ($orderBy === 'status_asc') ? 'status_desc' : 'status_asc'; ?><?php echo !empty($_GET['name']) ? '&name=' . urlencode($_GET['name']) : ''; ?><?php echo !empty($_GET['seller']) ? '&seller=' . urlencode($_GET['seller']) : ''; ?><?php echo !empty($_GET['status']) ? '&status=' . urlencode($_GET['status']) : ''; ?>"
+                                   style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 4px;">
+                                    Status
+                                    <?php if (strpos($orderBy, 'status') !== false): ?>
+                                        <span><?php echo $orderBy === 'status_asc' ? '↑' : '↓'; ?></span>
+                                    <?php endif; ?>
+                                </a>
+                            </th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php if (empty($products)): ?>
                             <tr>
-                                <td colspan="6">
+                                <td colspan="7">
                                     <div class="empty-state">
                                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
                                         <p>No products found matching your filters.</p>
@@ -384,6 +441,7 @@ if (isset($_GET['status']) && $_GET['status'] !== '') {
                         <?php else: ?>
                             <?php foreach ($products as $product): ?>
                             <tr>
+                                <td><?php echo $product['id']; ?></td>
                                 <td>
                                     <a href="product_detail.php?id=<?php echo $product['id']; ?>">
                                         <img src="../uploads/products/<?php echo htmlspecialchars($product['main_image'] ?? 'default.png'); ?>" class="product-img">
