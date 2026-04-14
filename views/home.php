@@ -243,6 +243,16 @@ if (isset($_GET['seller']) && !empty($_GET['seller'])) {
             font-weight: 500;
         }
 
+        .results-count .results-text {
+            display: inline;
+        }
+
+        @media (max-width: 340px) {
+            .results-count .results-text {
+                display: none;
+            }
+        }
+
         .filter-toggle-btn {
             display: flex;
             align-items: center;
@@ -258,6 +268,19 @@ if (isset($_GET['seller']) && !empty($_GET['seller'])) {
             transition: all 0.2s;
         }
 
+        .filter-toggle-btn .btn-text {
+            display: inline;
+        }
+
+        @media (max-width: 576px) {
+            .filter-toggle-btn {
+                padding: 8px 12px;
+            }
+            .filter-toggle-btn .btn-text {
+                display: none;
+            }
+        }
+
         .filter-toggle-btn:hover {
             border-color: var(--primary);
             background: var(--primary-light);
@@ -267,6 +290,19 @@ if (isset($_GET['seller']) && !empty($_GET['seller'])) {
             background: var(--primary);
             color: #fff;
             border-color: var(--primary);
+        }
+
+        .btn-reset-filters .btn-text {
+            display: inline;
+        }
+
+        @media (max-width: 576px) {
+            .btn-reset-filters {
+                padding: 8px 12px;
+            }
+            .btn-reset-filters .btn-text {
+                display: none;
+            }
         }
 
         /* Advanced Filters Panel */
@@ -963,27 +999,27 @@ if (isset($_GET['seller']) && !empty($_GET['seller'])) {
         <!-- Toolbar -->
         <div class="toolbar">
             <div class="toolbar-left">
-                <span class="results-count"><?php echo $totalProducts; ?> results</span>
+                <span class="results-count"><?php echo $totalProducts; ?> <span class="results-text">results</span></span>
                 <?php if (isset($_GET['seller'])): ?>
                     <a href="home.php" class="btn-reset-filters" style="display: inline-flex; align-items: center; gap: 4px;">
                         <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
-                        Clear seller filter
+                        <span class="btn-text">Clear seller filter</span>
                     </a>
                 <?php endif; ?>
                 <button class="filter-toggle-btn" id="filterToggle">
                     <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
                     </svg>
-                    Filters
+                    <span class="btn-text">Filters</span>
                 </button>
                 <?php if (isset($_SESSION['user_id'])): ?>
                     <button class="filter-toggle-btn <?php echo isset($_GET['liked_only']) ? 'active' : ''; ?>" id="likedBtn">
                         <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                         </svg>
-                        Saved
+                        <span class="btn-text">Saved</span>
                     </button>
                 <?php endif; ?>
             </div>
@@ -992,7 +1028,7 @@ if (isset($_GET['seller']) && !empty($_GET['seller'])) {
                     <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12"></path>
                     </svg>
-                    <span id="sortLabel"><?php echo (isset($_GET['sort']) && $_GET['sort'] == 'oldest') ? 'Oldest' : 'Newest'; ?></span>
+                    <span class="btn-text" id="sortLabel"><?php echo (isset($_GET['sort']) && $_GET['sort'] == 'oldest') ? 'Oldest' : 'Newest'; ?></span>
                 </button>
             </div>
         </div>
