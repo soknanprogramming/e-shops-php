@@ -3,11 +3,15 @@ session_start();
 require_once '../configs/connect.php';
 require_once '../repos/ProductRepository.php';
 require_once '../repos/CategoryRepository.php';
+require_once '../repos/UserRepository.php';
+require_once '../repos/ProfileRepository.php';
 
 $categoryRepo = new CategoryRepository($conn);
 $categories = $categoryRepo->getAll();
 
 $productRepo = new ProductRepository($conn);
+$userRepo = new UserRepository($conn);
+$profileRepo = new ProfileRepository($conn);
 
 // Pagination Logic
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
@@ -33,6 +37,40 @@ if ($filters['liked_only'] && isset($_SESSION['user_id'])) {
 $totalProducts = $productRepo->countSearch($filters);
 $totalPages = ceil($totalProducts / $limit);
 $products = $productRepo->search($filters);
+
+// Fetch seller info if seller parameter is present
+$sellerInfo = null;
+if (isset($_GET['seller']) && !empty($_GET['seller'])) {
+    $sellerName = $_GET['seller'];
+    // Find user by name (exact match)
+    $sellerInfo = $userRepo->findByName($sellerName);
+    
+    if ($sellerInfo) {
+        // Fetch seller's profile
+        $sellerProfile = $profileRepo->getByUserId($sellerInfo['id']);
+        $sellerInfo['phone1'] = $sellerProfile['phone1'] ?? '';
+        $sellerInfo['phone2'] = $sellerProfile['phone2'] ?? '';
+        $sellerInfo['bio'] = $sellerProfile['bio'] ?? '';
+        $sellerInfo['user_image'] = $sellerProfile['user_image'] ?? '';
+        $sellerInfo['background_image'] = $sellerProfile['background_image'] ?? '';
+        
+        // Get seller stats
+        $sellerId = $sellerInfo['id'];
+        
+        // Total listings
+        $stmtTotal = $conn->prepare("SELECT COUNT(*) as total FROM Product WHERE owner_id = :owner_id");
+        $stmtTotal->execute([':owner_id' => $sellerId]);
+        $sellerInfo['total_listings'] = $stmtTotal->fetch(PDO::FETCH_ASSOC)['total'];
+        
+        // Active listings (showed = 1)
+        $stmtActive = $conn->prepare("SELECT COUNT(*) as active FROM Product WHERE owner_id = :owner_id AND showed = 1");
+        $stmtActive->execute([':owner_id' => $sellerId]);
+        $sellerInfo['active_listings'] = $stmtActive->fetch(PDO::FETCH_ASSOC)['active'];
+        
+        // Member since (from created_at)
+        $sellerInfo['member_since'] = isset($sellerInfo['created_at']) ? date('M Y', strtotime($sellerInfo['created_at'])) : null;
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -345,6 +383,239 @@ $products = $productRepo->search($filters);
             height: 16px;
         }
 
+        /* Seller Info Card */
+        .seller-card {
+            background: var(--surface);
+            border: 1.5px solid var(--outline);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+        }
+
+        .seller-banner {
+            position: relative;
+            height: 200px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-container) 100%);
+            overflow: hidden;
+        }
+
+        .seller-banner-bg {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .seller-banner-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(26, 51, 37, 0.95) 0%, rgba(26, 51, 37, 0.6) 50%, rgba(26, 51, 37, 0.2) 100%);
+        }
+
+        .seller-banner-content {
+            position: relative;
+            padding: 1.5rem 2rem;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 2rem;
+            height: 100%;
+        }
+
+        .seller-left {
+            display: flex;
+            align-items: flex-end;
+            gap: 1.25rem;
+            flex: 1;
+        }
+
+        .seller-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 0.625rem;
+            flex-shrink: 0;
+        }
+
+        .seller-stats-badge {
+            display: flex;
+            gap: 1.5rem;
+            padding: 0.625rem 1rem;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px);
+            border-radius: var(--radius-md);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.125rem;
+            text-align: right;
+        }
+
+        .stat-item:first-child {
+            border-right: 1px solid rgba(255, 255, 255, 0.2);
+            padding-right: 1.5rem;
+        }
+
+        .stat-value {
+            font-family: var(--font-headline);
+            font-size: 1.375rem;
+            font-weight: 800;
+            color: #fff;
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 0.65rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .seller-member {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 0.5rem 0.875rem;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px);
+            border-radius: var(--radius-sm);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .seller-member svg {
+            width: 14px;
+            height: 14px;
+            flex-shrink: 0;
+            color: var(--secondary);
+        }
+
+        .seller-avatar {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #fff;
+            background: rgba(255,255,255,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            flex-shrink: 0;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .seller-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .seller-avatar svg {
+            width: 40px;
+            height: 40px;
+            color: #fff;
+            opacity: 0.6;
+        }
+
+        .seller-info {
+            padding-bottom: 0.375rem;
+        }
+
+        .seller-name {
+            font-family: var(--font-headline);
+            font-size: 1.625rem;
+            font-weight: 800;
+            color: #fff;
+            margin: 0 0 0.375rem;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .seller-details {
+            font-size: 0.825rem;
+            color: rgba(255,255,255,0.85);
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        .seller-details-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-right: 14px;
+        }
+
+        .seller-details-item svg {
+            width: 14px;
+            height: 14px;
+            flex-shrink: 0;
+        }
+
+        .seller-bio {
+            padding: 1.25rem 2rem;
+            border-top: 1px solid var(--outline);
+            font-size: 0.875rem;
+            color: var(--on-surface-variant);
+            line-height: 1.7;
+        }
+
+        .seller-bio-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--on-surface-variant);
+            margin-bottom: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .seller-banner {
+                height: auto;
+            }
+            .seller-banner-content {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1.25rem;
+                padding: 1.25rem 1.5rem;
+            }
+            .seller-left {
+                width: 100%;
+            }
+            .seller-right {
+                width: 100%;
+                flex-direction: row;
+                align-items: stretch;
+                justify-content: space-between;
+            }
+            .seller-avatar {
+                width: 70px;
+                height: 70px;
+                border-width: 3px;
+            }
+            .seller-name {
+                font-size: 1.25rem;
+            }
+            .seller-stats-badge {
+                gap: 1rem;
+                padding: 0.5rem 0.75rem;
+            }
+            .stat-value {
+                font-size: 1.125rem;
+            }
+            .stat-item:first-child {
+                padding-right: 1rem;
+            }
+        }
+
         /* Product Grid */
         .product-grid {
             display: grid;
@@ -592,6 +863,78 @@ $products = $productRepo->search($filters);
                 <p>Viewing all products posted by <strong><?php echo htmlspecialchars($_GET['seller']); ?></strong></p>
             <?php endif; ?>
         </header>
+
+        <!-- Seller Info Card -->
+        <?php if ($sellerInfo): ?>
+            <div class="seller-card">
+                <div class="seller-banner">
+                    <?php if (!empty($sellerInfo['background_image'])): ?>
+                        <img src="../uploads/profiles/<?php echo htmlspecialchars($sellerInfo['background_image']); ?>" class="seller-banner-bg" alt="Background">
+                    <?php endif; ?>
+                    <div class="seller-banner-overlay"></div>
+                    <div class="seller-banner-content">
+                        <div class="seller-left">
+                            <div class="seller-avatar">
+                                <?php if (!empty($sellerInfo['user_image'])): ?>
+                                    <img src="../uploads/profiles/<?php echo htmlspecialchars($sellerInfo['user_image']); ?>" alt="Avatar">
+                                <?php else: ?>
+                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                                <?php endif; ?>
+                            </div>
+                            <div class="seller-info">
+                                <h2 class="seller-name"><?php echo htmlspecialchars($sellerInfo['first_name'] . ' ' . $sellerInfo['last_name']); ?></h2>
+                                <p class="seller-details">
+                                    <?php if (!empty($sellerInfo['phone1'])): ?>
+                                        <span class="seller-details-item">
+                                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+                                            <?php echo htmlspecialchars($sellerInfo['phone1']); ?>
+                                        </span>
+                                    <?php endif; ?>
+                                    <?php if (!empty($sellerInfo['phone2'])): ?>
+                                        <span class="seller-details-item">
+                                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+                                            <?php echo htmlspecialchars($sellerInfo['phone2']); ?>
+                                        </span>
+                                    <?php endif; ?>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="seller-right">
+                            <?php if ($sellerInfo['active_listings'] !== null || $sellerInfo['total_listings'] !== null): ?>
+                                <div class="seller-stats-badge">
+                                    <?php if ($sellerInfo['active_listings'] !== null): ?>
+                                        <div class="stat-item">
+                                            <span class="stat-value"><?php echo number_format($sellerInfo['active_listings']); ?></span>
+                                            <span class="stat-label">Active</span>
+                                        </div>
+                                    <?php endif; ?>
+                                    <?php if ($sellerInfo['total_listings'] !== null): ?>
+                                        <div class="stat-item">
+                                            <span class="stat-value"><?php echo number_format($sellerInfo['total_listings']); ?></span>
+                                            <span class="stat-label">Total</span>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                            <?php endif; ?>
+                            <?php if ($sellerInfo['member_since']): ?>
+                                <div class="seller-member">
+                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                    </svg>
+                                    <span>Member since <?php echo htmlspecialchars($sellerInfo['member_since']); ?></span>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+                <?php if (!empty($sellerInfo['bio'])): ?>
+                    <div class="seller-bio">
+                        <div class="seller-bio-label">About the Seller</div>
+                        <p><?php echo nl2br(htmlspecialchars($sellerInfo['bio'])); ?></p>
+                    </div>
+                <?php endif; ?>
+            </div>
+        <?php endif; ?>
 
         <!-- Categories -->
         <nav class="categories-section">
