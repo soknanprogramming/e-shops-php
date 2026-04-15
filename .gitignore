@@ -23,3 +23,6 @@ uploads/
 # Logs
 *.log
 npm-debug.log*
+
+# Me edit
+desktop-admin.png
