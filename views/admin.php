@@ -98,26 +98,18 @@ $hiddenProducts = $stmtHiddenProducts->fetch()['total'];
         .main-content {
             flex-grow: 1;
             padding: 1.5rem 3rem;
-            max-width: calc(100vw - 240px);
+            width: 100%;
         }
 
         @media (max-width: 992px) { .main-content { padding: 1.25rem 2rem; } }
 
         @media (max-width: 768px) {
             body { flex-direction: column; }
-            .admin-sidebar {
-                width: 100% !important;
-                min-height: auto !important;
-                flex-direction: row !important;
-                overflow-x: auto;
-            }
-            .sidebar-menu { display: flex; padding: 0.5rem !important; gap: 4px; flex-grow: 1; }
-            .sidebar-menu li a { white-space: nowrap; flex-shrink: 0; padding: 8px 12px !important; font-size: 0.75rem !important; }
-            .sidebar-menu li a .badge-count { display: none; }
-            .sidebar-menu li a svg { display: none; }
-            .sidebar-brand { display: none; }
-            .sidebar-footer { display: none; }
-            .main-content { max-width: 100%; padding: 1rem; }
+            .main-content { padding: 1rem; }
+        }
+
+        @media (max-width: 480px) {
+            .main-content { padding: 0.75rem; }
         }
 
         /* Page Header */
@@ -137,6 +129,16 @@ $hiddenProducts = $stmtHiddenProducts->fetch()['total'];
             font-size: 0.875rem;
             color: var(--on-surface-variant);
             margin: 0;
+        }
+
+        @media (max-width: 768px) {
+            .page-header h1 { font-size: 1.25rem; }
+            .page-header p { font-size: 0.8rem; }
+        }
+
+        @media (max-width: 480px) {
+            .page-header h1 { font-size: 1.125rem; }
+            .page-header p { font-size: 0.75rem; }
         }
 
         /* Welcome Card */
@@ -159,6 +161,18 @@ $hiddenProducts = $stmtHiddenProducts->fetch()['total'];
             margin: 0;
             opacity: 0.8;
             font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .welcome-card { padding: 1.5rem; }
+            .welcome-card h2 { font-size: 1.125rem; }
+            .welcome-card p { font-size: 0.85rem; }
+        }
+
+        @media (max-width: 480px) {
+            .welcome-card { padding: 1.25rem; }
+            .welcome-card h2 { font-size: 1rem; }
+            .welcome-card p { font-size: 0.8rem; }
         }
 
         /* Stats Grid */
@@ -214,6 +228,22 @@ $hiddenProducts = $stmtHiddenProducts->fetch()['total'];
             margin: 0.25rem 0 0;
         }
 
+        @media (max-width: 768px) {
+            .stat-card { padding: 1rem 1.25rem; }
+            .stat-icon { width: 40px; height: 40px; }
+            .stat-icon svg { width: 20px; height: 20px; }
+            .stat-info .stat-value { font-size: 1.25rem; }
+        }
+
+        @media (max-width: 480px) {
+            .stat-card {
+                flex-direction: column;
+                text-align: center;
+                padding: 1rem;
+            }
+            .stat-info .stat-value { font-size: 1.5rem; }
+        }
+
         /* Pending Alert */
         .pending-alert {
             background: var(--secondary-light);
@@ -224,12 +254,15 @@ $hiddenProducts = $stmtHiddenProducts->fetch()['total'];
             align-items: center;
             justify-content: space-between;
             gap: 1rem;
+            flex-wrap: wrap;
         }
 
         .pending-alert-left {
             display: flex;
             align-items: center;
             gap: 1rem;
+            flex: 1;
+            min-width: 0;
         }
 
         .pending-alert svg {
@@ -272,6 +305,30 @@ $hiddenProducts = $stmtHiddenProducts->fetch()['total'];
 
         .btn-review:hover { opacity: 0.85; }
         .btn-review svg { width: 16px; height: 16px; }
+
+        @media (max-width: 768px) {
+            .pending-alert {
+                padding: 1rem;
+            }
+            .pending-alert h3 { font-size: 0.9rem; }
+            .pending-alert p { font-size: 0.775rem; }
+            .btn-review { padding: 8px 16px; font-size: 0.75rem; }
+        }
+
+        @media (max-width: 480px) {
+            .pending-alert {
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+            }
+            .pending-alert-left {
+                flex-direction: column;
+                justify-content: center;
+            }
+            .btn-review {
+                justify-content: center;
+            }
+        }
 
         /* Quick Actions */
         .section-title {
@@ -338,6 +395,21 @@ $hiddenProducts = $stmtHiddenProducts->fetch()['total'];
             color: var(--on-surface-variant);
         }
 
+        @media (max-width: 768px) {
+            .quick-action-card { padding: 1.25rem; }
+            .quick-action-icon { width: 40px; height: 40px; }
+            .quick-action-icon svg { width: 20px; height: 20px; }
+            .quick-action-text h3 { font-size: 0.85rem; }
+        }
+
+        @media (max-width: 480px) {
+            .quick-action-card {
+                flex-direction: column;
+                text-align: center;
+                padding: 1rem;
+            }
+        }
+
         /* Recent Activity Grid */
         .recent-grid {
             display: grid;
@@ -361,6 +433,8 @@ $hiddenProducts = $stmtHiddenProducts->fetch()['total'];
             justify-content: space-between;
             padding: 0.75rem 0;
             border-bottom: 1px solid var(--outline);
+            gap: 0.75rem;
+            flex-wrap: wrap;
         }
 
         .recent-item:last-child { border-bottom: none; }
@@ -410,6 +484,23 @@ $hiddenProducts = $stmtHiddenProducts->fetch()['total'];
 
         .badge-visible { background: rgba(40, 167, 69, 0.12); color: #28a745; }
         .badge-hidden { background: rgba(108, 117, 125, 0.12); color: #6c757d; }
+
+        @media (max-width: 768px) {
+            .recent-item-img { width: 36px; height: 36px; }
+            .recent-item-name { font-size: 0.8rem; }
+            .recent-item-meta { font-size: 0.7rem; }
+            .recent-item-badge { font-size: 0.6rem; padding: 3px 8px; }
+        }
+
+        @media (max-width: 480px) {
+            .recent-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .recent-item-badge {
+                align-self: flex-start;
+            }
+        }
 
         .view-all-link {
             display: block;

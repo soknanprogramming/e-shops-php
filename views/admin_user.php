@@ -67,19 +67,18 @@ $pendingCount = $stmtPending->fetch()['total'];
         .main-content {
             flex-grow: 1;
             padding: 1.5rem 3rem;
-            max-width: calc(100vw - 240px);
+            width: 100%;
         }
 
         @media (max-width: 992px) { .main-content { padding: 1.25rem 2rem; } }
 
         @media (max-width: 768px) {
             body { flex-direction: column; }
-            .admin-sidebar { width: 100% !important; min-height: auto !important; flex-direction: row !important; overflow-x: auto; }
-            .sidebar-menu { display: flex; padding: 0.5rem !important; gap: 4px; flex-grow: 1; }
-            .sidebar-menu li a { white-space: nowrap; flex-shrink: 0; padding: 8px 12px !important; font-size: 0.75rem !important; }
-            .sidebar-menu li a .badge-count, .sidebar-menu li a svg { display: none; }
-            .sidebar-brand, .sidebar-footer { display: none; }
-            .main-content { max-width: 100%; padding: 1rem; }
+            .main-content { padding: 1rem; }
+        }
+
+        @media (max-width: 480px) {
+            .main-content { padding: 0.75rem; }
         }
 
         /* Page Header */
@@ -110,6 +109,22 @@ $pendingCount = $stmtPending->fetch()['total'];
             border-radius: 20px;
         }
 
+        @media (max-width: 768px) {
+            .page-header h1 { font-size: 1.25rem; }
+            .page-header .count-badge { font-size: 0.75rem; padding: 5px 12px; }
+        }
+
+        @media (max-width: 480px) {
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.75rem;
+            }
+            .page-header .count-badge {
+                align-self: flex-start;
+            }
+        }
+
         /* Filter Tabs */
         .filter-tabs {
             display: flex;
@@ -120,6 +135,7 @@ $pendingCount = $stmtPending->fetch()['total'];
             border-radius: var(--radius-sm);
             overflow: hidden;
             width: fit-content;
+            max-width: 100%;
         }
 
         .filter-tab {
@@ -130,6 +146,7 @@ $pendingCount = $stmtPending->fetch()['total'];
             color: var(--on-surface-variant);
             transition: all 0.2s;
             border-right: 1px solid var(--outline);
+            white-space: nowrap;
         }
 
         .filter-tab:last-child { border-right: none; }
@@ -139,6 +156,18 @@ $pendingCount = $stmtPending->fetch()['total'];
         .filter-tab.active {
             background: var(--primary);
             color: #fff;
+        }
+
+        @media (max-width: 768px) {
+            .filter-tabs {
+                width: 100%;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            .filter-tab {
+                padding: 8px 14px;
+                font-size: 0.75rem;
+            }
         }
 
         /* Search and Order Controls */
@@ -206,6 +235,30 @@ $pendingCount = $stmtPending->fetch()['total'];
             outline: none;
             border-color: var(--primary);
             box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        @media (max-width: 768px) {
+            .search-box {
+                min-width: 200px;
+            }
+            .order-select {
+                min-width: 150px;
+                font-size: 0.8rem;
+                padding: 8px 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .search-order-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .search-box {
+                min-width: 100%;
+            }
+            .order-select {
+                min-width: 100%;
+            }
         }
 
         /* Table Card */
@@ -290,6 +343,21 @@ $pendingCount = $stmtPending->fetch()['total'];
         .btn-revoke:hover { background: rgba(220, 53, 69, 0.2); }
         .btn-role { background: rgba(26, 51, 37, 0.08); color: var(--primary); }
         .btn-role:hover { background: rgba(26, 51, 37, 0.15); }
+
+        @media (max-width: 768px) {
+            .action-btn {
+                padding: 5px 10px;
+                font-size: 0.7rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .action-btn {
+                padding: 4px 8px;
+                font-size: 0.65rem;
+                gap: 3px;
+            }
+        }
 
         .empty-state {
             text-align: center;

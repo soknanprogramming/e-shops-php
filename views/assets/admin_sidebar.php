@@ -137,6 +137,86 @@
 
     .sidebar-footer a:hover { opacity: 0.8; }
     .sidebar-footer a svg { width: 18px; height: 18px; }
+
+    /* Mobile responsive sidebar */
+    @media (max-width: 768px) {
+        .admin-sidebar {
+            width: 100%;
+            height: auto;
+            position: relative;
+            border-right: none;
+            border-bottom: 1px solid var(--outline);
+        }
+
+        .sidebar-brand {
+            padding: 1rem 1.25rem;
+        }
+
+        .sidebar-menu {
+            display: flex;
+            overflow-x: auto;
+            padding: 0.5rem;
+            gap: 4px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .sidebar-menu li {
+            flex-shrink: 0;
+        }
+
+        .sidebar-menu li a {
+            padding: 8px 12px;
+            font-size: 0.75rem;
+            border-left: none;
+            border-bottom: 3px solid transparent;
+            white-space: nowrap;
+            flex-direction: column;
+            gap: 4px;
+            text-align: center;
+        }
+
+        .sidebar-menu li a.active {
+            border-left: none;
+            border-bottom-color: var(--primary);
+        }
+
+        .sidebar-menu li a svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .sidebar-menu li a .badge-count {
+            display: none;
+        }
+
+        .sidebar-footer {
+            padding: 0.75rem 1.25rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .sidebar-menu li a {
+            padding: 6px 10px;
+            font-size: 0.7rem;
+        }
+
+        .sidebar-menu li a svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .sidebar-brand {
+            padding: 0.75rem 1rem;
+        }
+
+        .sidebar-brand-text {
+            font-size: 1rem;
+        }
+
+        .sidebar-brand-sub {
+            font-size: 0.6rem;
+        }
+    }
 </style>
 
 <div class="admin-sidebar">

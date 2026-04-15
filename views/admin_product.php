@@ -88,19 +88,18 @@ if (isset($_GET['status']) && $_GET['status'] !== '') {
         .main-content {
             flex-grow: 1;
             padding: 1.5rem 3rem;
-            max-width: calc(100vw - 240px);
+            width: 100%;
         }
 
         @media (max-width: 992px) { .main-content { padding: 1.25rem 2rem; } }
 
         @media (max-width: 768px) {
             body { flex-direction: column; }
-            .admin-sidebar { width: 100% !important; min-height: auto !important; flex-direction: row !important; overflow-x: auto; }
-            .sidebar-menu { display: flex; padding: 0.5rem !important; gap: 4px; flex-grow: 1; }
-            .sidebar-menu li a { white-space: nowrap; flex-shrink: 0; padding: 8px 12px !important; font-size: 0.75rem !important; }
-            .sidebar-menu li a .badge-count, .sidebar-menu li a svg { display: none; }
-            .sidebar-brand, .sidebar-footer { display: none; }
-            .main-content { max-width: 100%; padding: 1rem; }
+            .main-content { padding: 1rem; }
+        }
+
+        @media (max-width: 480px) {
+            .main-content { padding: 0.75rem; }
         }
 
         /* Page Header */
@@ -129,6 +128,22 @@ if (isset($_GET['status']) && $_GET['status'] !== '') {
             border: 1px solid var(--outline);
             padding: 6px 14px;
             border-radius: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .page-header h1 { font-size: 1.25rem; }
+            .page-header .count-badge { font-size: 0.75rem; padding: 5px 12px; }
+        }
+
+        @media (max-width: 480px) {
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.75rem;
+            }
+            .page-header .count-badge {
+                align-self: flex-start;
+            }
         }
 
         /* Filter Bar */
@@ -171,6 +186,7 @@ if (isset($_GET['status']) && $_GET['status'] !== '') {
             background: var(--bg-body);
             outline: none;
             transition: border-color 0.2s;
+            width: 100%;
         }
 
         .filter-bar input:focus,
@@ -193,6 +209,7 @@ if (isset($_GET['status']) && $_GET['status'] !== '') {
             letter-spacing: 0.03em;
             cursor: pointer;
             transition: background 0.2s;
+            white-space: nowrap;
         }
 
         .btn-filter:hover { background: var(--primary-container); }
@@ -210,9 +227,44 @@ if (isset($_GET['status']) && $_GET['status'] !== '') {
             font-size: 0.75rem;
             text-transform: uppercase;
             transition: all 0.2s;
+            white-space: nowrap;
         }
 
         .btn-reset:hover { border-color: var(--on-surface-variant); color: var(--on-surface); }
+
+        @media (max-width: 768px) {
+            .filter-bar {
+                padding: 0.75rem 1rem;
+            }
+            .filter-bar .filter-group {
+                min-width: 120px;
+            }
+            .filter-bar input,
+            .filter-bar select {
+                font-size: 0.775rem;
+                padding: 6px 8px;
+            }
+            .btn-filter,
+            .btn-reset {
+                font-size: 0.7rem;
+                padding: 6px 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .filter-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .filter-bar .filter-group {
+                min-width: 100%;
+            }
+            .filter-bar > div:last-child {
+                display: flex;
+                gap: 0.5rem;
+                margin-top: 0.5rem;
+            }
+        }
 
         /* Table Card */
         .table-card {
@@ -290,12 +342,28 @@ if (isset($_GET['status']) && $_GET['status'] !== '') {
             font-weight: 600;
             font-size: 0.75rem;
             transition: all 0.2s;
+            white-space: nowrap;
         }
 
         .btn-show { background: rgba(40, 167, 69, 0.12); color: #28a745; }
         .btn-show:hover { background: rgba(40, 167, 69, 0.2); }
         .btn-hide { background: rgba(220, 53, 69, 0.12); color: #dc3545; }
         .btn-hide:hover { background: rgba(220, 53, 69, 0.2); }
+
+        @media (max-width: 768px) {
+            .action-btn {
+                padding: 5px 10px;
+                font-size: 0.7rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .action-btn {
+                padding: 4px 8px;
+                font-size: 0.65rem;
+                gap: 3px;
+            }
+        }
 
         .empty-state {
             text-align: center;
@@ -313,6 +381,29 @@ if (isset($_GET['status']) && $_GET['status'] !== '') {
         .empty-state p {
             margin: 0;
             font-size: 0.875rem;
+        }
+
+        /* Table responsive */
+        @media (max-width: 768px) {
+            th, td {
+                padding: 10px 12px;
+                font-size: 0.8rem;
+            }
+            .product-img {
+                width: 40px;
+                height: 40px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            th, td {
+                padding: 8px 10px;
+                font-size: 0.75rem;
+            }
+            .product-img {
+                width: 36px;
+                height: 36px;
+            }
         }
 
         /* Toast */

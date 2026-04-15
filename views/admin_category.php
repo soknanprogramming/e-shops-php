@@ -71,19 +71,18 @@ try {
         .main-content {
             flex-grow: 1;
             padding: 1.5rem 3rem;
-            max-width: calc(100vw - 240px);
+            width: 100%;
         }
 
         @media (max-width: 992px) { .main-content { padding: 1.25rem 2rem; } }
 
         @media (max-width: 768px) {
             body { flex-direction: column; }
-            .admin-sidebar { width: 100% !important; min-height: auto !important; flex-direction: row !important; overflow-x: auto; }
-            .sidebar-menu { display: flex; padding: 0.5rem !important; gap: 4px; flex-grow: 1; }
-            .sidebar-menu li a { white-space: nowrap; flex-shrink: 0; padding: 8px 12px !important; font-size: 0.75rem !important; }
-            .sidebar-menu li a .badge-count, .sidebar-menu li a svg { display: none; }
-            .sidebar-brand, .sidebar-footer { display: none; }
-            .main-content { max-width: 100%; padding: 1rem; }
+            .main-content { padding: 1rem; }
+        }
+
+        @media (max-width: 480px) {
+            .main-content { padding: 0.75rem; }
         }
 
         /* Page Header */
@@ -128,10 +127,27 @@ try {
             text-transform: uppercase;
             letter-spacing: 0.03em;
             transition: background 0.2s;
+            white-space: nowrap;
         }
 
         .btn-add:hover { background: var(--primary-container); }
         .btn-add svg { width: 16px; height: 16px; }
+
+        @media (max-width: 768px) {
+            .page-header h1 { font-size: 1.25rem; }
+            .btn-add { padding: 8px 16px; font-size: 0.75rem; }
+        }
+
+        @media (max-width: 480px) {
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.75rem;
+            }
+            .page-header .count-badge {
+                align-self: flex-start;
+            }
+        }
 
         /* Table Card */
         .table-card {
@@ -188,11 +204,40 @@ try {
             font-weight: 600;
             font-size: 0.8rem;
             transition: opacity 0.2s;
+            white-space: nowrap;
         }
 
         .action-link.edit { color: var(--primary); }
         .action-link.delete { color: var(--tertiary); }
         .action-link:hover { opacity: 0.75; }
+
+        @media (max-width: 768px) {
+            .action-link {
+                font-size: 0.75rem;
+            }
+            .cat-img {
+                width: 40px;
+                height: 40px;
+            }
+            th, td {
+                padding: 10px 12px;
+                font-size: 0.8rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .action-link {
+                font-size: 0.7rem;
+            }
+            .cat-img {
+                width: 36px;
+                height: 36px;
+            }
+            th, td {
+                padding: 8px 10px;
+                font-size: 0.75rem;
+            }
+        }
 
         .empty-state {
             text-align: center;

@@ -68,19 +68,18 @@ if (!$category) {
         .main-content {
             flex-grow: 1;
             padding: 1.5rem 3rem;
-            max-width: calc(100vw - 240px);
+            width: 100%;
         }
 
         @media (max-width: 992px) { .main-content { padding: 1.25rem 2rem; } }
 
         @media (max-width: 768px) {
             body { flex-direction: column; }
-            .admin-sidebar { width: 100% !important; min-height: auto !important; flex-direction: row !important; overflow-x: auto; }
-            .sidebar-menu { display: flex; padding: 0.5rem !important; gap: 4px; flex-grow: 1; }
-            .sidebar-menu li a { white-space: nowrap; flex-shrink: 0; padding: 8px 12px !important; font-size: 0.75rem !important; }
-            .sidebar-menu li a .badge-count, .sidebar-menu li a svg { display: none; }
-            .sidebar-brand, .sidebar-footer { display: none; }
-            .main-content { max-width: 100%; padding: 1rem; }
+            .main-content { padding: 1rem; }
+        }
+
+        @media (max-width: 480px) {
+            .main-content { padding: 0.75rem; }
         }
 
         /* Page Header */
@@ -103,6 +102,7 @@ if (!$category) {
             color: var(--on-surface);
             text-decoration: none;
             transition: all 0.2s;
+            flex-shrink: 0;
         }
         .btn-back:hover { border-color: var(--outline-strong); background: var(--bg-body); }
         .btn-back svg { width: 18px; height: 18px; }
@@ -115,6 +115,10 @@ if (!$category) {
             margin: 0;
         }
 
+        @media (max-width: 768px) {
+            .page-header h1 { font-size: 1.25rem; }
+        }
+
         /* Form Card */
         .form-card {
             background: var(--surface);
@@ -122,6 +126,19 @@ if (!$category) {
             border-radius: var(--radius-md);
             padding: 1.5rem 2rem;
             max-width: 520px;
+        }
+
+        @media (max-width: 768px) {
+            .form-card {
+                padding: 1.25rem 1.5rem;
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .form-card {
+                padding: 1rem;
+            }
         }
 
         .form-section-title {
@@ -276,6 +293,7 @@ if (!$category) {
             gap: 0.75rem;
             align-items: center;
             margin-top: 1.5rem;
+            flex-wrap: wrap;
         }
 
         .btn-submit {
@@ -293,6 +311,7 @@ if (!$category) {
             letter-spacing: 0.03em;
             cursor: pointer;
             transition: all 0.2s;
+            white-space: nowrap;
         }
 
         .btn-submit:hover {
@@ -313,11 +332,31 @@ if (!$category) {
             text-transform: uppercase;
             text-decoration: none;
             transition: all 0.2s;
+            white-space: nowrap;
         }
 
         .btn-cancel:hover {
             border-color: var(--on-surface-variant);
             color: var(--on-surface);
+        }
+
+        @media (max-width: 768px) {
+            .btn-submit,
+            .btn-cancel {
+                padding: 10px 20px;
+                font-size: 0.8rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .form-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .btn-submit,
+            .btn-cancel {
+                justify-content: center;
+            }
         }
 
         /* Toast */
