@@ -123,20 +123,33 @@ if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])
     $id = $_GET['id'];
 
     try {
-        // Delete image file
+        // Fetch category first to get the image filename
         $category = $categoryRepo->findById($id);
-        if ($category && !empty($category['category_image'])) {
+        if (!$category) {
+            header("Location: ../views/admin_category.php?error=រកមិនឃើញប្រភេទឡើយ");
+            exit();
+        }
+
+        // 1. Try deleting from the Database FIRST
+        $categoryRepo->delete($id);
+
+        // 2. If DB deletion was successful, THEN delete the physical image file
+        if (!empty($category['category_image'])) {
             $image_path = "../uploads/categories/" . $category['category_image'];
             if (file_exists($image_path)) {
                 unlink($image_path);
             }
         }
 
-        $categoryRepo->delete($id);
         header("Location: ../views/admin_category.php?success=បានលុបប្រភេទដោយជោគជ័យ");
         exit();
     } catch (PDOException $e) {
-        header("Location: ../views/admin_category.php?error=" . $e->getMessage());
+        // Check for Foreign Key Constraint Violation (Error 1451)
+        if ($e->getCode() == "23000" || strpos($e->getMessage(), '1451') !== false) {
+            header("Location: ../views/admin_category.php?error=មិនអាចលុបប្រភេទនេះបានទេ ព្រោះមានទំនិញកំពុងប្រើប្រាស់ប្រភេទនេះ។");
+        } else {
+            header("Location: ../views/admin_category.php?error=កំហុស៖ " . $e->getMessage());
+        }
         exit();
     }
 }
