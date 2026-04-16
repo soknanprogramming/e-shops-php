@@ -123,20 +123,35 @@ if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])
     $id = $_GET['id'];
 
     try {
-        // Delete image file
-        $category = $categoryRepo->findById($id);
-        if ($category && !empty($category['category_image'])) {
-            $image_path = "../uploads/categories/" . $category['category_image'];
-            if (file_exists($image_path)) {
-                unlink($image_path);
-            }
+        // 1. Check if category has products
+        if ($categoryRepo->hasProducts($id)) {
+            header("Location: ../views/admin_category.php?error=Cannot delete category because it has products in it.");
+            exit();
         }
 
-        $categoryRepo->delete($id);
-        header("Location: ../views/admin_category.php?success=Category deleted successfully");
+        // 2. Get category to find image path
+        $category = $categoryRepo->findById($id);
+        
+        // 3. Delete from DB first
+        if ($categoryRepo->delete($id)) {
+            // 4. If DB delete successful, delete image file
+            if ($category && !empty($category['category_image'])) {
+                $image_path = "../uploads/categories/" . $category['category_image'];
+                if (file_exists($image_path)) {
+                    unlink($image_path);
+                }
+            }
+            header("Location: ../views/admin_category.php?success=Category deleted successfully");
+        } else {
+            header("Location: ../views/admin_category.php?error=Failed to delete category");
+        }
         exit();
     } catch (PDOException $e) {
-        header("Location: ../views/admin_category.php?error=" . $e->getMessage());
+        if ($e->getCode() == '23000') {
+            header("Location: ../views/admin_category.php?error=Cannot delete category because it is being used by other records.");
+        } else {
+            header("Location: ../views/admin_category.php?error=" . urlencode($e->getMessage()));
+        }
         exit();
     }
 }
