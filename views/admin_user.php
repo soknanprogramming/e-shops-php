@@ -24,13 +24,15 @@ $stmtPending->execute();
 $pendingCount = $stmtPending->fetch()['total'];
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="km">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Users</title>
+    <title>គ្រប់គ្រងអ្នកប្រើប្រាស់ - Sana</title>
     <link rel="icon" href="../icon/e-commerce-logo.png" sizes="any" type="image/png">
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Moul&family=Hanuman:wght@100;400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #1a3325;
@@ -48,8 +50,12 @@ $pendingCount = $stmtPending->fetch()['total'];
             --radius-sm: 8px;
             --radius-md: 12px;
             --radius-lg: 16px;
-            --font-headline: 'Manrope', sans-serif;
-            --font-body: 'Public Sans', sans-serif;
+            
+            /* Khmer Typographic Recalibration */
+            --font-headline: 'Moul', serif;
+            --font-body: 'Hanuman', serif;
+            --lh-body: 1.9;
+            --lh-headline: 1.5;
         }
 
         * { box-sizing: border-box; }
@@ -62,6 +68,8 @@ $pendingCount = $stmtPending->fetch()['total'];
             color: var(--on-surface);
             display: flex;
             min-height: 100vh;
+            font-size: 1.05rem;
+            line-height: var(--lh-body);
         }
 
         .main-content {
@@ -94,13 +102,14 @@ $pendingCount = $stmtPending->fetch()['total'];
         .page-header h1 {
             font-family: var(--font-headline);
             font-size: 1.5rem;
-            font-weight: 800;
+            font-weight: 400;
             color: var(--primary);
             margin: 0;
+            line-height: var(--lh-headline);
         }
 
         .page-header .count-badge {
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             color: var(--on-surface-variant);
             font-weight: 600;
             background: var(--surface);
@@ -142,7 +151,7 @@ $pendingCount = $stmtPending->fetch()['total'];
             padding: 8px 18px;
             text-decoration: none;
             font-weight: 600;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             color: var(--on-surface-variant);
             transition: all 0.2s;
             border-right: 1px solid var(--outline);
@@ -281,9 +290,7 @@ $pendingCount = $stmtPending->fetch()['total'];
             text-align: left;
             background: var(--bg-body);
             font-weight: 700;
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
+            font-size: 0.75rem;
             color: var(--on-surface-variant);
             border-bottom: 1px solid var(--outline);
         }
@@ -311,10 +318,8 @@ $pendingCount = $stmtPending->fetch()['total'];
         .badge {
             padding: 4px 10px;
             border-radius: 20px;
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.03em;
             display: inline-block;
         }
 
@@ -332,7 +337,7 @@ $pendingCount = $stmtPending->fetch()['total'];
             border-radius: var(--radius-sm);
             text-decoration: none;
             font-weight: 600;
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             transition: all 0.2s;
             white-space: nowrap;
         }
@@ -347,14 +352,14 @@ $pendingCount = $stmtPending->fetch()['total'];
         @media (max-width: 768px) {
             .action-btn {
                 padding: 5px 10px;
-                font-size: 0.7rem;
+                font-size: 0.75rem;
             }
         }
 
         @media (max-width: 480px) {
             .action-btn {
                 padding: 4px 8px;
-                font-size: 0.65rem;
+                font-size: 0.7rem;
                 gap: 3px;
             }
         }
@@ -401,15 +406,15 @@ $pendingCount = $stmtPending->fetch()['total'];
     <div class="main-content">
         <!-- Page Header -->
         <div class="page-header">
-            <h1>User Management</h1>
-            <span class="count-badge"><?php echo count($users); ?> user<?php echo count($users) !== 1 ? 's' : ''; ?></span>
+            <h1>គ្រប់គ្រងអ្នកប្រើប្រាស់</h1>
+            <span class="count-badge">អ្នកប្រើប្រាស់ចំនួន <?php echo count($users); ?> នាក់</span>
         </div>
 
         <!-- Filter Tabs -->
         <div class="filter-tabs">
-            <a href="admin_user.php" class="filter-tab <?php echo !isset($_GET['filter']) ? 'active' : ''; ?>">All Users</a>
+            <a href="admin_user.php" class="filter-tab <?php echo !isset($_GET['filter']) ? 'active' : ''; ?>">អ្នកប្រើប្រាស់ទាំងអស់</a>
             <a href="admin_user.php?filter=requesting" class="filter-tab <?php echo (isset($_GET['filter']) && $_GET['filter'] === 'requesting') ? 'active' : ''; ?>">
-                Pending Requests
+                ការស្នើសុំដែលកំពុងរង់ចាំ
                 <?php if ($pendingCount > 0): ?>
                     <span style="margin-left: 4px; opacity: 0.7;">(<?php echo $pendingCount; ?>)</span>
                 <?php endif; ?>
@@ -426,18 +431,18 @@ $pendingCount = $stmtPending->fetch()['total'];
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                 </svg>
-                <input type="text" name="search" placeholder="Search users by name or email..." value="<?php echo htmlspecialchars($search); ?>">
+                <input type="text" name="search" placeholder="ស្វែងរកតាមឈ្មោះ ឬអ៊ីមែល..." value="<?php echo htmlspecialchars($search); ?>">
             </div>
             
             <select name="order" class="order-select" id="orderSelect">
-                <option value="id_desc" <?php echo $orderBy === 'id_desc' ? 'selected' : ''; ?>>Newest First</option>
-                <option value="id_asc" <?php echo $orderBy === 'id_asc' ? 'selected' : ''; ?>>Oldest First</option>
-                <option value="name_asc" <?php echo $orderBy === 'name_asc' ? 'selected' : ''; ?>>Name (A-Z)</option>
-                <option value="name_desc" <?php echo $orderBy === 'name_desc' ? 'selected' : ''; ?>>Name (Z-A)</option>
-                <option value="role_asc" <?php echo $orderBy === 'role_asc' ? 'selected' : ''; ?>>Role (User → Admin)</option>
-                <option value="role_desc" <?php echo $orderBy === 'role_desc' ? 'selected' : ''; ?>>Role (Admin → User)</option>
-                <option value="permission_asc" <?php echo $orderBy === 'permission_asc' ? 'selected' : ''; ?>>Permission (Restricted → Allowed)</option>
-                <option value="permission_desc" <?php echo $orderBy === 'permission_desc' ? 'selected' : ''; ?>>Permission (Allowed → Restricted)</option>
+                <option value="id_desc" <?php echo $orderBy === 'id_desc' ? 'selected' : ''; ?>>ថ្មីបំផុតមុន</option>
+                <option value="id_asc" <?php echo $orderBy === 'id_asc' ? 'selected' : ''; ?>>ចាស់បំផុតមុន</option>
+                <option value="name_asc" <?php echo $orderBy === 'name_asc' ? 'selected' : ''; ?>>ឈ្មោះ (A-Z)</option>
+                <option value="name_desc" <?php echo $orderBy === 'name_desc' ? 'selected' : ''; ?>>ឈ្មោះ (Z-A)</option>
+                <option value="role_asc" <?php echo $orderBy === 'role_asc' ? 'selected' : ''; ?>>តួនាទី (អ្នកប្រើប្រាស់ → អ្នកគ្រប់គ្រង)</option>
+                <option value="role_desc" <?php echo $orderBy === 'role_desc' ? 'selected' : ''; ?>>តួនាទី (អ្នកគ្រប់គ្រង → អ្នកប្រើប្រាស់)</option>
+                <option value="permission_asc" <?php echo $orderBy === 'permission_asc' ? 'selected' : ''; ?>>ការអនុញ្ញាត (ត្រូវបានរឹតត្បិត → ត្រូវបានអនុញ្ញាត)</option>
+                <option value="permission_desc" <?php echo $orderBy === 'permission_desc' ? 'selected' : ''; ?>>ការអនុញ្ញាត (ត្រូវបានអនុញ្ញាត → ត្រូវបានរឹតត្បិត)</option>
             </select>
         </form>
 
@@ -450,7 +455,7 @@ $pendingCount = $stmtPending->fetch()['total'];
                             <th>
                                 <a href="?order=<?php echo ($orderBy === 'id_asc') ? 'id_desc' : 'id_asc'; ?><?php echo !empty($search) ? '&search=' . urlencode($search) : ''; ?><?php echo isset($_GET['filter']) ? '&filter=' . htmlspecialchars($_GET['filter']) : ''; ?>" 
                                    style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 4px;">
-                                    ID
+                                    លេខសម្គាល់
                                     <?php if (strpos($orderBy, 'id') !== false): ?>
                                         <span><?php echo $orderBy === 'id_asc' ? '↑' : '↓'; ?></span>
                                     <?php endif; ?>
@@ -459,7 +464,7 @@ $pendingCount = $stmtPending->fetch()['total'];
                             <th>
                                 <a href="?order=<?php echo ($orderBy === 'name_asc') ? 'name_desc' : 'name_asc'; ?><?php echo !empty($search) ? '&search=' . urlencode($search) : ''; ?><?php echo isset($_GET['filter']) ? '&filter=' . htmlspecialchars($_GET['filter']) : ''; ?>" 
                                    style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 4px;">
-                                    Name
+                                    ឈ្មោះ
                                     <?php if (strpos($orderBy, 'name') !== false): ?>
                                         <span><?php echo $orderBy === 'name_asc' ? '↑' : '↓'; ?></span>
                                     <?php endif; ?>
@@ -468,7 +473,7 @@ $pendingCount = $stmtPending->fetch()['total'];
                             <th>
                                 <a href="?order=<?php echo ($orderBy === 'role_asc') ? 'role_desc' : 'role_asc'; ?><?php echo !empty($search) ? '&search=' . urlencode($search) : ''; ?><?php echo isset($_GET['filter']) ? '&filter=' . htmlspecialchars($_GET['filter']) : ''; ?>" 
                                    style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 4px;">
-                                    Role
+                                    តួនាទី
                                     <?php if (strpos($orderBy, 'role') !== false): ?>
                                         <span><?php echo $orderBy === 'role_asc' ? '↑' : '↓'; ?></span>
                                     <?php endif; ?>
@@ -477,13 +482,13 @@ $pendingCount = $stmtPending->fetch()['total'];
                             <th>
                                 <a href="?order=<?php echo ($orderBy === 'permission_asc') ? 'permission_desc' : 'permission_asc'; ?><?php echo !empty($search) ? '&search=' . urlencode($search) : ''; ?><?php echo isset($_GET['filter']) ? '&filter=' . htmlspecialchars($_GET['filter']) : ''; ?>" 
                                    style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 4px;">
-                                    Posting Permission
+                                    ការអនុញ្ញាតបង្ហោះ
                                     <?php if (strpos($orderBy, 'permission') !== false): ?>
                                         <span><?php echo $orderBy === 'permission_asc' ? '↑' : '↓'; ?></span>
                                     <?php endif; ?>
                                 </a>
                             </th>
-                            <th>Actions</th>
+                            <th>សកម្មភាព</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -492,7 +497,7 @@ $pendingCount = $stmtPending->fetch()['total'];
                                 <td colspan="5">
                                     <div class="empty-state">
                                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                                        <p>No users found.</p>
+                                        <p>រកមិនឃើញអ្នកប្រើប្រាស់ទេ។</p>
                                     </div>
                                 </td>
                             </tr>
@@ -508,28 +513,28 @@ $pendingCount = $stmtPending->fetch()['total'];
                                 </td>
                                 <td>
                                     <?php if ($user['is_admin']): ?>
-                                        <span class="badge badge-admin">Admin</span>
+                                        <span class="badge badge-admin">អ្នកគ្រប់គ្រង</span>
                                     <?php else: ?>
-                                        <span class="badge badge-user">User</span>
+                                        <span class="badge badge-user">អ្នកប្រើប្រាស់</span>
                                     <?php endif; ?>
                                 </td>
                                 <td>
                                     <?php if ($user['can_post']): ?>
-                                        <span class="badge badge-allowed">Allowed</span>
+                                        <span class="badge badge-allowed">អនុញ្ញាត</span>
                                     <?php else: ?>
-                                        <span class="badge badge-restricted">Restricted</span>
+                                        <span class="badge badge-restricted">រឹតត្បិត</span>
                                         <?php if (isset($user['request_post_permission']) && $user['request_post_permission'] == 1): ?>
-                                            <span class="badge badge-requesting">Requesting</span>
+                                            <span class="badge badge-requesting">ស្នើសុំ</span>
                                         <?php endif; ?>
                                     <?php endif; ?>
                                 </td>
                                 <td>
                                     <div style="display: flex; gap: 6px;">
                                         <a href="../controllers/user.php?action=toggle_permission&id=<?php echo $user['id']; ?>" class="action-btn <?php echo $user['can_post'] ? 'btn-revoke' : 'btn-allow'; ?>">
-                                            <?php echo $user['can_post'] ? 'Revoke' : 'Allow'; ?>
+                                            <?php echo $user['can_post'] ? 'ដកហូត' : 'អនុញ្ញាត'; ?>
                                         </a>
                                         <a href="../controllers/user.php?action=toggle_role&id=<?php echo $user['id']; ?>" class="action-btn btn-role">
-                                            Toggle Role
+                                            ប្តូរតួនាទី
                                         </a>
                                     </div>
                                 </td>

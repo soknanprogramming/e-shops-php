@@ -1,4 +1,6 @@
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Moul&family=Hanuman:wght@100;400;700;900&display=swap" rel="stylesheet">
 <style>
     :root {
         --primary: #1a3325;
@@ -16,8 +18,12 @@
         --radius-sm: 8px;
         --radius-md: 12px;
         --radius-lg: 16px;
-        --font-headline: 'Manrope', sans-serif;
-        --font-body: 'Public Sans', sans-serif;
+        
+        /* Khmer Typographic Recalibration */
+        --font-headline: 'Moul', serif;
+        --font-body: 'Hanuman', serif;
+        --lh-body: 1.9;
+        --lh-headline: 1.5;
     }
 
     .admin-sidebar {
@@ -32,6 +38,7 @@
         top: 0;
         overflow-y: auto;
         font-family: var(--font-body);
+        font-size: 1.05rem;
     }
 
     .sidebar-brand {
@@ -51,7 +58,7 @@
         align-items: center;
         justify-content: center;
         color: #fff;
-        font-weight: 800;
+        font-weight: 400;
         font-size: 1.1rem;
         font-family: var(--font-headline);
     }
@@ -59,17 +66,16 @@
     .sidebar-brand-text {
         font-family: var(--font-headline);
         font-size: 1.1rem;
-        font-weight: 800;
+        font-weight: 400;
         color: var(--primary);
         margin: 0;
+        line-height: var(--lh-headline);
     }
 
     .sidebar-brand-sub {
-        font-size: 0.65rem;
+        font-size: 0.75rem;
         color: var(--on-surface-variant);
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-        font-weight: 600;
+        font-weight: 700;
     }
 
     .sidebar-menu {
@@ -87,9 +93,10 @@
         color: var(--on-surface-variant);
         text-decoration: none;
         font-weight: 600;
-        font-size: 0.85rem;
+        font-size: 0.95rem;
         transition: all 0.2s;
         border-left: 3px solid transparent;
+        line-height: var(--lh-body);
     }
 
     .sidebar-menu li a:hover {
@@ -222,39 +229,39 @@
 <div class="admin-sidebar">
     <div class="sidebar-brand">
         <div>
-            <p class="sidebar-brand-text">Sana</p>
-            <p class="sidebar-brand-sub">Admin Panel</p>
+            <p class="sidebar-brand-text">សាណា</p>
+            <p class="sidebar-brand-sub">ផ្ទាំងអ្នកគ្រប់គ្រង</p>
         </div>
     </div>
     <ul class="sidebar-menu">
         <li><a href="admin.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'admin.php' ? 'active' : ''; ?>">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
-            Dashboard
+            ផ្ទាំងគ្រប់គ្រង
         </a></li>
         <li><a href="admin_user.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'admin_user.php' ? 'active' : ''; ?>">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-            Users
+            អ្នកប្រើប្រាស់
             <?php if (isset($pendingCount) && $pendingCount > 0): ?>
                 <span class="badge-count"><?php echo $pendingCount; ?></span>
             <?php endif; ?>
         </a></li>
         <li><a href="admin_product.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'admin_product.php' ? 'active' : ''; ?>">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
-            Products
+            ទំនិញ
         </a></li>
         <li><a href="admin_category.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'admin_category.php' ? 'active' : ''; ?>">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
-            Categories
+            ប្រភេទ
         </a></li>
         <li><a href="home.php">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
-            View Website
+            មើលគេហទំព័រ
         </a></li>
     </ul>
     <div class="sidebar-footer">
         <a href="logout.php">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
-            Logout
+            ចាកចេញ
         </a>
     </div>
 </div>

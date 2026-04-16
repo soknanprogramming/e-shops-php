@@ -73,13 +73,15 @@ if (isset($_GET['seller']) && !empty($_GET['seller'])) {
 }
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="km">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home - Products</title>
+    <title>ទំព័រដើម - Sana</title>
     <link rel="icon" href="../icon/e-commerce-logo.png" sizes="any" type="image/png">
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Moul&family=Hanuman:wght@100;400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
             /* Scholarly Forest Editorial Palette */
@@ -108,8 +110,12 @@ if (isset($_GET['seller']) && !empty($_GET['seller'])) {
             --shadow-sm: 0 2px 8px rgba(32, 27, 9, 0.06);
             --shadow-md: 0 4px 16px rgba(32, 27, 9, 0.08);
             --shadow-lg: 0 8px 32px rgba(32, 27, 9, 0.12);
-            --font-headline: 'Manrope', sans-serif;
-            --font-body: 'Public Sans', sans-serif;
+            
+            /* Khmer Typographic Recalibration */
+            --font-headline: 'Moul', serif;
+            --font-body: 'Hanuman', serif;
+            --lh-body: 1.9;
+            --lh-headline: 1.5;
         }
 
         * { box-sizing: border-box; }
@@ -121,7 +127,8 @@ if (isset($_GET['seller']) && !empty($_GET['seller'])) {
             background-color: var(--bg-body);
             color: var(--on-surface);
             -webkit-font-smoothing: antialiased;
-            line-height: 1.6;
+            line-height: var(--lh-body);
+            font-size: 1.05rem; /* Scale up slightly for Khmer */
         }
 
         /* Main Content Container */
@@ -150,11 +157,12 @@ if (isset($_GET['seller']) && !empty($_GET['seller'])) {
 
         .page-header h1 {
             font-family: var(--font-headline);
-            font-size: 2rem;
-            font-weight: 800;
-            letter-spacing: -0.02em;
+            font-size: 1.85rem;
+            font-weight: 400; /* Moul is naturally bold */
+            letter-spacing: 0; /* Reset for Khmer */
             margin: 0 0 0.5rem;
             color: var(--primary);
+            line-height: var(--lh-headline);
         }
 
         .page-header p {
@@ -894,9 +902,9 @@ if (isset($_GET['seller']) && !empty($_GET['seller'])) {
     <div class="main-content">
         <!-- Page Header -->
         <header class="page-header">
-            <h1><?php echo isset($_GET['seller']) ? 'Products by ' . htmlspecialchars($_GET['seller']) : (isset($_GET['category_id']) ? 'Browse Products' : 'Discover Products'); ?></h1>
+            <h1><?php echo isset($_GET['seller']) ? 'ទំនិញលក់ដោយ ' . htmlspecialchars($_GET['seller']) : (isset($_GET['category_id']) ? 'ស្វែងរកទំនិញ' : 'ស្វែងរកទំនិញថ្មីៗ'); ?></h1>
             <?php if (isset($_GET['seller'])): ?>
-                <p>Viewing all products posted by <strong><?php echo htmlspecialchars($_GET['seller']); ?></strong></p>
+                <p>កំពុងបង្ហាញទំនិញទាំងអស់ដែលបានបង្ហោះដោយ <strong><?php echo htmlspecialchars($_GET['seller']); ?></strong></p>
             <?php endif; ?>
         </header>
 
@@ -941,13 +949,13 @@ if (isset($_GET['seller']) && !empty($_GET['seller'])) {
                                     <?php if ($sellerInfo['active_listings'] !== null): ?>
                                         <div class="stat-item">
                                             <span class="stat-value"><?php echo number_format($sellerInfo['active_listings']); ?></span>
-                                            <span class="stat-label">Active</span>
+                                            <span class="stat-label">កំពុងលក់</span>
                                         </div>
                                     <?php endif; ?>
                                     <?php if ($sellerInfo['total_listings'] !== null): ?>
                                         <div class="stat-item">
                                             <span class="stat-value"><?php echo number_format($sellerInfo['total_listings']); ?></span>
-                                            <span class="stat-label">Total</span>
+                                            <span class="stat-label">សរុប</span>
                                         </div>
                                     <?php endif; ?>
                                 </div>
@@ -957,7 +965,7 @@ if (isset($_GET['seller']) && !empty($_GET['seller'])) {
                                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                                     </svg>
-                                    <span>Member since <?php echo htmlspecialchars($sellerInfo['member_since']); ?></span>
+                                    <span>សមាជិកតាំងពី <?php echo htmlspecialchars($sellerInfo['member_since']); ?></span>
                                 </div>
                             <?php endif; ?>
                         </div>
@@ -965,7 +973,7 @@ if (isset($_GET['seller']) && !empty($_GET['seller'])) {
                 </div>
                 <?php if (!empty($sellerInfo['bio'])): ?>
                     <div class="seller-bio">
-                        <div class="seller-bio-label">About the Seller</div>
+                        <div class="seller-bio-label">អំពីអ្នកលក់</div>
                         <p><?php echo nl2br(htmlspecialchars($sellerInfo['bio'])); ?></p>
                     </div>
                 <?php endif; ?>
@@ -987,7 +995,7 @@ if (isset($_GET['seller']) && !empty($_GET['seller'])) {
                     return 'home.php?' . http_build_query($params);
                 }
                 ?>
-                <a href="<?php echo getCategoryUrl(); ?>" class="category-chip <?php echo !isset($_GET['category_id']) ? 'active' : ''; ?>">All</a>
+                <a href="<?php echo getCategoryUrl(); ?>" class="category-chip <?php echo !isset($_GET['category_id']) ? 'active' : ''; ?>">ទាំងអស់</a>
                 <?php foreach ($categories as $cat): ?>
                     <a href="<?php echo getCategoryUrl($cat['id']); ?>" class="category-chip <?php echo (isset($_GET['category_id']) && $_GET['category_id'] == $cat['id']) ? 'active' : ''; ?>">
                         <?php echo htmlspecialchars($cat['name']); ?>
@@ -999,27 +1007,27 @@ if (isset($_GET['seller']) && !empty($_GET['seller'])) {
         <!-- Toolbar -->
         <div class="toolbar">
             <div class="toolbar-left">
-                <span class="results-count"><?php echo $totalProducts; ?> <span class="results-text">results</span></span>
+                <span class="results-count"><?php echo $totalProducts; ?> <span class="results-text">លទ្ធផល</span></span>
                 <?php if (isset($_GET['seller'])): ?>
                     <a href="home.php" class="btn-reset-filters" style="display: inline-flex; align-items: center; gap: 4px;">
                         <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
-                        <span class="btn-text">Clear seller filter</span>
+                        <span class="btn-text">លុបតម្រងអ្នកលក់</span>
                     </a>
                 <?php endif; ?>
                 <button class="filter-toggle-btn" id="filterToggle">
                     <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
                     </svg>
-                    <span class="btn-text">Filters</span>
+                    <span class="btn-text">តម្រង</span>
                 </button>
                 <?php if (isset($_SESSION['user_id'])): ?>
                     <button class="filter-toggle-btn <?php echo isset($_GET['liked_only']) ? 'active' : ''; ?>" id="likedBtn">
                         <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                         </svg>
-                        <span class="btn-text">Saved</span>
+                        <span class="btn-text">បានរក្សាទុក</span>
                     </button>
                 <?php endif; ?>
             </div>
@@ -1028,7 +1036,7 @@ if (isset($_GET['seller']) && !empty($_GET['seller'])) {
                     <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12"></path>
                     </svg>
-                    <span class="btn-text" id="sortLabel"><?php echo (isset($_GET['sort']) && $_GET['sort'] == 'oldest') ? 'Oldest' : 'Newest'; ?></span>
+                    <span class="btn-text" id="sortLabel"><?php echo (isset($_GET['sort']) && $_GET['sort'] == 'oldest') ? 'ចាស់បំផុត' : 'ថ្មីបំផុត'; ?></span>
                 </button>
             </div>
         </div>
@@ -1042,17 +1050,17 @@ if (isset($_GET['seller']) && !empty($_GET['seller'])) {
                 ?>
                 <div class="filters-grid">
                     <div class="filter-group">
-                        <label>Min Price ($)</label>
+                        <label>តម្លៃទាបបំផុត ($)</label>
                         <input type="number" name="min_price" placeholder="0" step="0.01" value="<?php echo htmlspecialchars($_GET['min_price'] ?? ''); ?>">
                     </div>
                     <div class="filter-group">
-                        <label>Max Price ($)</label>
-                        <input type="number" name="max_price" placeholder="No limit" step="0.01" value="<?php echo htmlspecialchars($_GET['max_price'] ?? ''); ?>">
+                        <label>តម្លៃខ្ពស់បំផុត ($)</label>
+                        <input type="number" name="max_price" placeholder="គ្មានកំណត់" step="0.01" value="<?php echo htmlspecialchars($_GET['max_price'] ?? ''); ?>">
                     </div>
                 </div>
                 <div class="filter-actions">
-                    <button type="submit" class="btn-apply-filters">Apply Filters</button>
-                    <a href="home.php" class="btn-reset-filters">Reset All</a>
+                    <button type="submit" class="btn-apply-filters">អនុវត្តតម្រង</button>
+                    <a href="home.php" class="btn-reset-filters">កំណត់ឡើងវិញ</a>
                 </div>
             </form>
         </div>
@@ -1064,9 +1072,9 @@ if (isset($_GET['seller']) && !empty($_GET['seller'])) {
                     <svg class="empty-state-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
                     </svg>
-                    <h3>No products found</h3>
-                    <p>Try adjusting your filters or search terms to find what you're looking for.</p>
-                    <a href="home.php" class="btn-clear">Clear All Filters</a>
+                    <h3>រកមិនឃើញទំនិញទេ</h3>
+                    <p>ព្យាយាមកែតម្រង ឬពាក្យស្វែងរករបស់អ្នក ដើម្បីស្វែងរកអ្វីដែលអ្នកចង់បាន។</p>
+                    <a href="home.php" class="btn-clear">លុបតម្រងទាំងអស់</a>
                 </div>
             <?php else: ?>
                 <?php foreach ($products as $product): ?>
@@ -1115,7 +1123,7 @@ if (isset($_GET['seller']) && !empty($_GET['seller'])) {
                 ?>
 
                 <?php if ($page > 1): ?>
-                    <a href="<?php echo getUrl($page - 1); ?>">&laquo; Prev</a>
+                    <a href="<?php echo getUrl($page - 1); ?>">&laquo; មុន</a>
                 <?php endif; ?>
 
                 <?php
@@ -1144,7 +1152,7 @@ if (isset($_GET['seller']) && !empty($_GET['seller'])) {
                 <?php endif; ?>
 
                 <?php if ($page < $totalPages): ?>
-                    <a href="<?php echo getUrl($page + 1); ?>">Next &raquo;</a>
+                    <a href="<?php echo getUrl($page + 1); ?>">បន្ទាប់ &raquo;</a>
                 <?php endif; ?>
             </div>
         <?php endif; ?>

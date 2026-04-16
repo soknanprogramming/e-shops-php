@@ -20,18 +20,20 @@ $categoryRepo = new CategoryRepository($conn);
 $category = $categoryRepo->findById($id);
 
 if (!$category) {
-    header("Location: admin_category.php?error=Category not found");
+    header("Location: admin_category.php?error=រកមិនឃើញប្រភេទឡើយ");
     exit();
 }
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="km">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Category</title>
+    <title>កែប្រែប្រភេទ - Sana</title>
     <link rel="icon" href="../icon/e-commerce-logo.png" sizes="any" type="image/png">
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Moul&family=Hanuman:wght@100;400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #1a3325;
@@ -49,8 +51,12 @@ if (!$category) {
             --radius-sm: 8px;
             --radius-md: 12px;
             --radius-lg: 16px;
-            --font-headline: 'Manrope', sans-serif;
-            --font-body: 'Public Sans', sans-serif;
+            
+            /* Khmer Typographic Recalibration */
+            --font-headline: 'Moul', serif;
+            --font-body: 'Hanuman', serif;
+            --lh-body: 1.9;
+            --lh-headline: 1.5;
         }
 
         * { box-sizing: border-box; }
@@ -63,6 +69,8 @@ if (!$category) {
             color: var(--on-surface);
             display: flex;
             min-height: 100vh;
+            font-size: 1.05rem;
+            line-height: var(--lh-body);
         }
 
         .main-content {
@@ -110,9 +118,10 @@ if (!$category) {
         .page-header h1 {
             font-family: var(--font-headline);
             font-size: 1.5rem;
-            font-weight: 800;
+            font-weight: 400;
             color: var(--primary);
             margin: 0;
+            line-height: var(--lh-headline);
         }
 
         @media (max-width: 768px) {
@@ -148,6 +157,18 @@ if (!$category) {
             color: var(--on-surface);
             margin: 0 0 1.25rem;
             padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--outline);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-section-title svg {
+            width: 18px;
+            height: 18px;
+            color: var(--secondary);
+            opacity: 0.8;
+        }
             border-bottom: 1px solid var(--outline);
             display: flex;
             align-items: center;
@@ -389,7 +410,7 @@ if (!$category) {
             <a href="admin_category.php" class="btn-back">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
             </a>
-            <h1>Edit Category</h1>
+            <h1>កែប្រែប្រភេទ</h1>
         </div>
 
         <div class="form-card">
@@ -399,11 +420,11 @@ if (!$category) {
 
                 <h3 class="form-section-title">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
-                    Category Details
+                    ព័ត៌មានប្រភេទ
                 </h3>
 
                 <div class="form-group">
-                    <label for="name">Category Name</label>
+                    <label for="name">ឈ្មោះប្រភេទ <span class="required">*</span></label>
                     <input type="text" id="name" name="name" class="form-control" value="<?php echo htmlspecialchars($category['name']); ?>" required>
                 </div>
 
@@ -411,19 +432,19 @@ if (!$category) {
                 <div class="current-image-preview">
                     <img src="../uploads/categories/<?php echo htmlspecialchars($category['category_image']); ?>" alt="Current">
                     <div>
-                        <p class="label">Current Image</p>
+                        <p class="label">រូបភាពបច្ចុប្បន្ន</p>
                         <p class="filename"><?php echo htmlspecialchars($category['category_image']); ?></p>
                     </div>
                 </div>
 
                 <!-- Upload New Image -->
                 <div class="form-group">
-                    <label>Replace Image (Optional)</label>
+                    <label>ប្តូររូបភាព (មិនបង្ខំ)</label>
                     <div class="upload-zone" id="imageZone">
                         <div class="upload-placeholder">
                             <svg class="placeholder-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                            <p>Click to upload a new image</p>
-                            <span class="hint">PNG, JPG up to 5MB</span>
+                            <p>ចុចទីនេះដើម្បីបង្ហោះរូបភាពថ្មី</p>
+                            <span class="hint">ប្រភេទ PNG, JPG ទំហំត្រឹម 5MB</span>
                         </div>
                         <img id="imagePreview" class="preview-img" alt="Preview">
                         <input type="file" id="imageInput" name="image" accept="image/*">
@@ -434,9 +455,9 @@ if (!$category) {
                 <div class="form-actions">
                     <button type="submit" name="update_category" class="btn-submit">
                         <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                        Update Category
+                        រក្សាទុកការផ្លាស់ប្តូរ
                     </button>
-                    <a href="admin_category.php" class="btn-cancel">Cancel</a>
+                    <a href="admin_category.php" class="btn-cancel">បោះបង់</a>
                 </div>
             </form>
         </div>

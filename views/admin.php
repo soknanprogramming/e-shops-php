@@ -55,13 +55,15 @@ $stmtHiddenProducts->execute();
 $hiddenProducts = $stmtHiddenProducts->fetch()['total'];
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="km">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard</title>
+    <title>ផ្ទាំងគ្រប់គ្រងអ្នកគ្រប់គ្រង - Sana</title>
     <link rel="icon" href="../icon/e-commerce-logo.png" sizes="any" type="image/png">
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Moul&family=Hanuman:wght@100;400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #1a3325;
@@ -79,8 +81,12 @@ $hiddenProducts = $stmtHiddenProducts->fetch()['total'];
             --radius-sm: 8px;
             --radius-md: 12px;
             --radius-lg: 16px;
-            --font-headline: 'Manrope', sans-serif;
-            --font-body: 'Public Sans', sans-serif;
+            
+            /* Khmer Typographic Recalibration */
+            --font-headline: 'Moul', serif;
+            --font-body: 'Hanuman', serif;
+            --lh-body: 1.9;
+            --lh-headline: 1.5;
         }
 
         * { box-sizing: border-box; }
@@ -93,6 +99,8 @@ $hiddenProducts = $stmtHiddenProducts->fetch()['total'];
             color: var(--on-surface);
             display: flex;
             min-height: 100vh;
+            font-size: 1.05rem;
+            line-height: var(--lh-body);
         }
 
         .main-content {
@@ -120,13 +128,14 @@ $hiddenProducts = $stmtHiddenProducts->fetch()['total'];
         .page-header h1 {
             font-family: var(--font-headline);
             font-size: 1.5rem;
-            font-weight: 800;
+            font-weight: 400;
             color: var(--primary);
             margin: 0 0 0.25rem;
+            line-height: var(--lh-headline);
         }
 
         .page-header p {
-            font-size: 0.875rem;
+            font-size: 0.9rem;
             color: var(--on-surface-variant);
             margin: 0;
         }
@@ -526,14 +535,14 @@ $hiddenProducts = $stmtHiddenProducts->fetch()['total'];
     <div class="main-content">
         <!-- Page Header -->
         <div class="page-header">
-            <h1>Dashboard</h1>
-            <p>Welcome back, <?php echo htmlspecialchars($_SESSION['user_name']); ?></p>
+            <h1>ផ្ទាំងគ្រប់គ្រង</h1>
+            <p>សូមស្វាគមន៍ត្រឡប់មកវិញ, <?php echo htmlspecialchars($_SESSION['user_name']); ?></p>
         </div>
 
         <!-- Welcome Card -->
         <div class="welcome-card">
-            <h2>Admin Control Panel</h2>
-            <p>Manage users, products, and categories from this central dashboard.</p>
+            <h2>ផ្ទាំងបញ្ជាអ្នកគ្រប់គ្រង</h2>
+            <p>គ្រប់គ្រងអ្នកប្រើប្រាស់ ទំនិញ និងប្រភេទពីផ្ទាំងគ្រប់គ្រងកណ្តាលនេះ។</p>
         </div>
 
         <!-- Stats Grid -->
@@ -544,7 +553,7 @@ $hiddenProducts = $stmtHiddenProducts->fetch()['total'];
                 </div>
                 <div class="stat-info">
                     <p class="stat-value"><?php echo $totalUsers; ?></p>
-                    <p class="stat-label">Total Users</p>
+                    <p class="stat-label">អ្នកប្រើប្រាស់សរុប</p>
                 </div>
             </div>
             <div class="stat-card">
@@ -553,7 +562,7 @@ $hiddenProducts = $stmtHiddenProducts->fetch()['total'];
                 </div>
                 <div class="stat-info">
                     <p class="stat-value"><?php echo $totalProducts; ?></p>
-                    <p class="stat-label">Total Products</p>
+                    <p class="stat-label">ទំនិញសរុប</p>
                 </div>
             </div>
             <div class="stat-card">
@@ -562,7 +571,7 @@ $hiddenProducts = $stmtHiddenProducts->fetch()['total'];
                 </div>
                 <div class="stat-info">
                     <p class="stat-value"><?php echo $totalCategories; ?></p>
-                    <p class="stat-label">Categories</p>
+                    <p class="stat-label">ប្រភេទ</p>
                 </div>
             </div>
             <div class="stat-card">
@@ -571,7 +580,7 @@ $hiddenProducts = $stmtHiddenProducts->fetch()['total'];
                 </div>
                 <div class="stat-info">
                     <p class="stat-value"><?php echo $activeProducts; ?></p>
-                    <p class="stat-label">Active Products</p>
+                    <p class="stat-label">ទំនិញកំពុងបង្ហាញ</p>
                 </div>
             </div>
         </div>
@@ -582,27 +591,27 @@ $hiddenProducts = $stmtHiddenProducts->fetch()['total'];
                 <div class="pending-alert-left">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
                     <div>
-                        <h3><?php echo $pendingCount; ?> Pending Request<?php echo $pendingCount > 1 ? 's' : ''; ?></h3>
-                        <p>Users are waiting for posting permission approval.</p>
+                        <h3>ការស្នើសុំចំនួន <?php echo $pendingCount; ?> ដែលកំពុងរង់ចាំ</h3>
+                        <p>អ្នកប្រើប្រាស់កំពុងរង់ចាំការអនុម័តសម្រាប់ការបង្ហោះទំនិញ។</p>
                     </div>
                 </div>
                 <a href="admin_user.php?filter=requesting" class="btn-review">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                    Review
+                    ពិនិត្យឡើងវិញ
                 </a>
             </div>
         <?php endif; ?>
 
         <!-- Quick Actions -->
-        <h2 class="section-title" style="margin-top: 2rem;">Quick Actions</h2>
+        <h2 class="section-title" style="margin-top: 2rem;">សកម្មភាពរហ័ស</h2>
         <div class="quick-actions">
             <a href="admin_user.php" class="quick-action-card">
                 <div class="quick-action-icon users-icon">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
                 </div>
                 <div class="quick-action-text">
-                    <h3>Manage Users</h3>
-                    <p>View and manage user accounts</p>
+                    <h3>គ្រប់គ្រងអ្នកប្រើប្រាស់</h3>
+                    <p>មើល និងគ្រប់គ្រងគណនីអ្នកប្រើប្រាស់</p>
                 </div>
             </a>
             <a href="admin_product.php" class="quick-action-card">
@@ -610,8 +619,8 @@ $hiddenProducts = $stmtHiddenProducts->fetch()['total'];
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
                 </div>
                 <div class="quick-action-text">
-                    <h3>Manage Products</h3>
-                    <p>Review and moderate product listings</p>
+                    <h3>គ្រប់គ្រងទំនិញ</h3>
+                    <p>ពិនិត្យ និងគ្រប់គ្រងការដាក់លក់ទំនិញ</p>
                 </div>
             </a>
             <a href="admin_category.php" class="quick-action-card">
@@ -619,8 +628,8 @@ $hiddenProducts = $stmtHiddenProducts->fetch()['total'];
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
                 </div>
                 <div class="quick-action-text">
-                    <h3>Manage Categories</h3>
-                    <p>Add, edit, or remove categories</p>
+                    <h3>គ្រប់គ្រងប្រភេទ</h3>
+                    <p>បន្ថែម កែប្រែ ឬលុបប្រភេទ</p>
                 </div>
             </a>
         </div>
@@ -629,27 +638,27 @@ $hiddenProducts = $stmtHiddenProducts->fetch()['total'];
         <div class="recent-grid">
             <!-- Recent Products -->
             <div class="recent-card">
-                <h2 class="section-title">Recent Products</h2>
+                <h2 class="section-title">ទំនិញថ្មីៗ</h2>
                 <?php foreach ($recentProducts as $rp): ?>
                     <div class="recent-item">
                         <div class="recent-item-info">
                             <img src="../uploads/products/<?php echo htmlspecialchars($rp['main_image'] ?? 'default.png'); ?>" class="recent-item-img">
                             <div>
                                 <p class="recent-item-name"><?php echo htmlspecialchars($rp['name']); ?></p>
-                                <p class="recent-item-meta">by <?php echo htmlspecialchars($rp['owner_name']); ?> · $<?php echo number_format($rp['prices'], 2); ?></p>
+                                <p class="recent-item-meta">ដោយ <?php echo htmlspecialchars($rp['owner_name']); ?> · $<?php echo number_format($rp['prices'], 2); ?></p>
                             </div>
                         </div>
                         <span class="recent-item-badge <?php echo $rp['showed'] ? 'badge-visible' : 'badge-hidden'; ?>">
-                            <?php echo $rp['showed'] ? 'Active' : 'Hidden'; ?>
+                            <?php echo $rp['showed'] ? 'បង្ហាញ' : 'លាក់'; ?>
                         </span>
                     </div>
                 <?php endforeach; ?>
-                <a href="admin_product.php" class="view-all-link">View All Products →</a>
+                <a href="admin_product.php" class="view-all-link">មើលទំនិញទាំងអស់ →</a>
             </div>
 
             <!-- Recent Users -->
             <div class="recent-card">
-                <h2 class="section-title">Recent Users</h2>
+                <h2 class="section-title">អ្នកប្រើប្រាស់ថ្មីៗ</h2>
                 <?php foreach ($recentUsers as $ru): ?>
                     <div class="recent-item">
                         <div class="recent-item-info">
@@ -663,7 +672,7 @@ $hiddenProducts = $stmtHiddenProducts->fetch()['total'];
                         </div>
                     </div>
                 <?php endforeach; ?>
-                <a href="admin_user.php" class="view-all-link">View All Users →</a>
+                <a href="admin_user.php" class="view-all-link">មើលអ្នកប្រើប្រាស់ទាំងអស់ →</a>
             </div>
         </div>
     </div>

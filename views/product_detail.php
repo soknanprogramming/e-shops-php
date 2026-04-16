@@ -14,7 +14,7 @@ $productRepo = new ProductRepository($conn);
 $product = $productRepo->getById($_GET['id']);
 
 if (!$product) {
-    echo "Product not found.";
+    echo "រកមិនឃើញទំនិញទេ។";
     exit();
 }
 
@@ -27,13 +27,15 @@ $comments = $commentRepo->getAllByProductId($product['id']);
 
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="km">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo htmlspecialchars($product['name']); ?> - Details</title>
+    <title><?php echo htmlspecialchars($product['name']); ?> - ព័ត៌មានលម្អិត</title>
     <link rel="icon" href="../icon/e-commerce-logo.png" sizes="any" type="image/png">
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Moul&family=Hanuman:wght@100;400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #1a3325;
@@ -51,8 +53,12 @@ $comments = $commentRepo->getAllByProductId($product['id']);
             --radius-sm: 8px;
             --radius-md: 12px;
             --radius-lg: 16px;
-            --font-headline: 'Manrope', sans-serif;
-            --font-body: 'Public Sans', sans-serif;
+            
+            /* Khmer Typographic Recalibration */
+            --font-headline: 'Moul', serif;
+            --font-body: 'Hanuman', serif;
+            --lh-body: 1.9;
+            --lh-headline: 1.5;
         }
 
         * { box-sizing: border-box; }
@@ -63,7 +69,8 @@ $comments = $commentRepo->getAllByProductId($product['id']);
             padding: 0;
             background-color: var(--bg-body);
             color: var(--on-surface);
-            line-height: 1.6;
+            line-height: var(--lh-body);
+            font-size: 1.05rem;
         }
 
         .container {
@@ -82,7 +89,7 @@ $comments = $commentRepo->getAllByProductId($product['id']);
             align-items: center;
             gap: 0.5rem;
             margin-bottom: 2rem;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             color: var(--on-surface-variant);
         }
 
@@ -154,7 +161,7 @@ $comments = $commentRepo->getAllByProductId($product['id']);
             padding: 6px 14px;
             border-radius: 999px;
             font-weight: 700;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             z-index: 2;
         }
 
@@ -546,7 +553,7 @@ $comments = $commentRepo->getAllByProductId($product['id']);
     <div class="container">
         <!-- Breadcrumb -->
         <div class="breadcrumb">
-            <a href="home.php">Home</a>
+            <a href="home.php">ទំព័រដើម</a>
             <span class="sep">›</span>
             <a href="home.php?category_id=<?php echo $product['category_id']; ?>"><?php echo htmlspecialchars($product['category_name']); ?></a>
             <span class="sep">›</span>
@@ -593,11 +600,11 @@ $comments = $commentRepo->getAllByProductId($product['id']);
                 <?php if (isset($_SESSION['is_admin']) && $_SESSION['is_admin']): ?>
                     <div class="admin-badge">
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
-                        Admin
+                        អ្នកគ្រប់គ្រង
                         <?php if ($product['showed']): ?>
-                            · Visible
+                            · បង្ហាញ
                         <?php else: ?>
-                            · Hidden
+                            · លាក់
                         <?php endif; ?>
                     </div>
                 <?php endif; ?>
@@ -639,9 +646,9 @@ $comments = $commentRepo->getAllByProductId($product['id']);
                 <div class="divider"></div>
 
                 <!-- Seller Contact -->
-                <h4 class="section-label">Seller Contact</h4>
+                <h4 class="section-label">ព័ត៌មានអ្នកលក់</h4>
                 <div class="seller-block">
-                    <a href="home.php?seller=<?php echo urlencode($product['owner_name']); ?>" class="seller-name" title="View all products by <?php echo htmlspecialchars($product['owner_name']); ?>">
+                    <a href="home.php?seller=<?php echo urlencode($product['owner_name']); ?>" class="seller-name" title="មើលទំនិញទាំងអស់របស់ <?php echo htmlspecialchars($product['owner_name']); ?>">
                         <?php echo htmlspecialchars($product['owner_name']); ?>
                         <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-left: 4px; vertical-align: middle;">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
@@ -663,24 +670,24 @@ $comments = $commentRepo->getAllByProductId($product['id']);
 
                 <?php if (isset($_SESSION['is_admin']) && $_SESSION['is_admin']): ?>
                     <a href="../controllers/product.php?action=toggle_visibility&id=<?php echo $product['id']; ?>&status=<?php echo $product['showed'] ? '0' : '1'; ?>&redirect=product_detail.php"
-                       style="display: block; text-align: center; padding: 10px; background: <?php echo $product['showed'] ? 'var(--tertiary)' : 'var(--primary)'; ?>; color: #fff; text-decoration: none; border-radius: 6px; font-weight: 700; font-size: 0.8rem; text-transform: uppercase; margin-top: 1rem;">
-                        <?php echo $product['showed'] ? 'Hide Product' : 'Show Product'; ?>
+                       style="display: block; text-align: center; padding: 10px; background: <?php echo $product['showed'] ? 'var(--tertiary)' : 'var(--primary)'; ?>; color: #fff; text-decoration: none; border-radius: 6px; font-weight: 700; font-size: 0.8rem; margin-top: 1rem;">
+                        <?php echo $product['showed'] ? 'លាក់ទំនិញ' : 'បង្ហាញទំនិញ'; ?>
                     </a>
                 <?php endif; ?>
             </div>
 
             <!-- Description -->
             <div class="desc-block">
-                <h4 class="section-label">Description</h4>
+                <h4 class="section-label">ការពិពណ៌នា</h4>
                 <p class="desc-text"><?php echo nl2br(htmlspecialchars($product['description'])); ?></p>
             </div>
 
             <!-- Comments -->
             <div class="comments-area">
-                <h3>Comments (<?php echo count($comments); ?>)</h3>
+                <h3>មតិយោបល់ (<?php echo count($comments); ?>)</h3>
 
                 <?php if (empty($comments)): ?>
-                    <div class="no-comments">No comments yet. Be the first to share your thoughts!</div>
+                    <div class="no-comments">មិនទាន់មានមតិយោបល់នៅឡើយទេ។ ក្លាយជាអ្នកដំបូងដែលចែករំលែកមតិយោបល់!</div>
                 <?php else: ?>
                     <?php foreach ($comments as $cmt): ?>
                         <div class="comment-item">
@@ -696,10 +703,10 @@ $comments = $commentRepo->getAllByProductId($product['id']);
                             </div>
                             <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $cmt['user_id']): ?>
                                 <div class="comment-actions">
-                                    <form action="../controllers/comment.php" method="POST" onsubmit="return confirm('Are you sure you want to delete this comment?');">
+                                    <form action="../controllers/comment.php" method="POST" onsubmit="return confirm('តើអ្នកប្រាកដថាចង់លុបមតិយោបល់នេះមែនទេ?');">
                                         <input type="hidden" name="comment_id" value="<?php echo $cmt['id']; ?>">
                                         <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
-                                        <button type="submit" name="delete_comment" class="btn-delete-comment" title="Delete comment">
+                                        <button type="submit" name="delete_comment" class="btn-delete-comment" title="លុបមតិយោបល់">
                                             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                                             </svg>
@@ -714,8 +721,8 @@ $comments = $commentRepo->getAllByProductId($product['id']);
                 <?php if (isset($_SESSION['user_id'])): ?>
                     <form action="../controllers/comment.php" method="POST" class="comment-form">
                         <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
-                        <textarea name="comment" rows="3" placeholder="Write a comment..." required></textarea>
-                        <button type="submit" name="add_comment">Post</button>
+                        <textarea name="comment" rows="3" placeholder="បញ្ចេញមតិយោបល់..." required></textarea>
+                        <button type="submit" name="add_comment">ផ្ញើមតិ</button>
                     </form>
                 <?php endif; ?>
             </div>

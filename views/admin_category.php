@@ -28,13 +28,15 @@ try {
 }
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="km">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Categories</title>
+    <title>គ្រប់គ្រងប្រភេទ - Sana</title>
     <link rel="icon" href="../icon/e-commerce-logo.png" sizes="any" type="image/png">
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Moul&family=Hanuman:wght@100;400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #1a3325;
@@ -52,8 +54,12 @@ try {
             --radius-sm: 8px;
             --radius-md: 12px;
             --radius-lg: 16px;
-            --font-headline: 'Manrope', sans-serif;
-            --font-body: 'Public Sans', sans-serif;
+            
+            /* Khmer Typographic Recalibration */
+            --font-headline: 'Moul', serif;
+            --font-body: 'Hanuman', serif;
+            --lh-body: 1.9;
+            --lh-headline: 1.5;
         }
 
         * { box-sizing: border-box; }
@@ -66,6 +72,8 @@ try {
             color: var(--on-surface);
             display: flex;
             min-height: 100vh;
+            font-size: 1.05rem;
+            line-height: var(--lh-body);
         }
 
         .main-content {
@@ -98,13 +106,14 @@ try {
         .page-header h1 {
             font-family: var(--font-headline);
             font-size: 1.5rem;
-            font-weight: 800;
+            font-weight: 400;
             color: var(--primary);
             margin: 0;
+            line-height: var(--lh-headline);
         }
 
         .page-header .count-badge {
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             color: var(--on-surface-variant);
             font-weight: 600;
             background: var(--surface);
@@ -123,9 +132,7 @@ try {
             border-radius: var(--radius-sm);
             text-decoration: none;
             font-weight: 700;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.03em;
+            font-size: 0.85rem;
             transition: background 0.2s;
             white-space: nowrap;
         }
@@ -169,9 +176,7 @@ try {
             text-align: left;
             background: var(--bg-body);
             font-weight: 700;
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
+            font-size: 0.75rem;
             color: var(--on-surface-variant);
             border-bottom: 1px solid var(--outline);
         }
@@ -202,7 +207,7 @@ try {
         .action-link {
             text-decoration: none;
             font-weight: 600;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             transition: opacity 0.2s;
             white-space: nowrap;
         }
@@ -213,7 +218,7 @@ try {
 
         @media (max-width: 768px) {
             .action-link {
-                font-size: 0.75rem;
+                font-size: 0.8rem;
             }
             .cat-img {
                 width: 40px;
@@ -227,7 +232,7 @@ try {
 
         @media (max-width: 480px) {
             .action-link {
-                font-size: 0.7rem;
+                font-size: 0.75rem;
             }
             .cat-img {
                 width: 36px;
@@ -281,14 +286,14 @@ try {
     <div class="main-content">
         <!-- Page Header -->
         <div class="page-header">
-            <h1>Category Management</h1>
-            <span class="count-badge"><?php echo count($categories); ?> categor<?php echo count($categories) !== 1 ? 'ies' : 'y'; ?></span>
+            <h1>គ្រប់គ្រងប្រភេទ</h1>
+            <span class="count-badge">ប្រភេទសរុបចំនួន <?php echo count($categories); ?></span>
         </div>
 
         <div style="margin-bottom: 1.25rem;">
             <a href="admin_category_add.php" class="btn-add">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                Add New Category
+                បន្ថែមប្រភេទថ្មី
             </a>
         </div>
 
@@ -301,7 +306,7 @@ try {
                             <th>
                                 <a href="?order=<?php echo ($orderBy === 'id_asc') ? 'id_desc' : 'id_asc'; ?>"
                                    style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 4px;">
-                                    ID
+                                    លេខសម្គាល់
                                     <?php if (strpos($orderBy, 'id') !== false): ?>
                                         <span><?php echo $orderBy === 'id_asc' ? '↑' : '↓'; ?></span>
                                     <?php endif; ?>
@@ -310,14 +315,14 @@ try {
                             <th>
                                 <a href="?order=<?php echo ($orderBy === 'name_asc') ? 'name_desc' : 'name_asc'; ?>"
                                    style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 4px;">
-                                    Name
+                                    ឈ្មោះ
                                     <?php if (strpos($orderBy, 'name') !== false): ?>
                                         <span><?php echo $orderBy === 'name_asc' ? '↑' : '↓'; ?></span>
                                     <?php endif; ?>
                                 </a>
                             </th>
-                            <th>Image</th>
-                            <th>Actions</th>
+                            <th>រូបភាព</th>
+                            <th>សកម្មភាព</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -330,9 +335,9 @@ try {
                                         <img src="../uploads/categories/<?php echo htmlspecialchars($cat['category_image']); ?>" class="cat-img">
                                     </td>
                                     <td>
-                                        <a href="admin_category_edit.php?id=<?php echo $cat['id']; ?>" class="action-link edit">Edit</a>
+                                        <a href="admin_category_edit.php?id=<?php echo $cat['id']; ?>" class="action-link edit">កែប្រែ</a>
                                         <span style="margin: 0 6px; color: var(--outline-strong);">|</span>
-                                        <a href="../controllers/category.php?action=delete&id=<?php echo $cat['id']; ?>" class="action-link delete" onclick="return confirm('Are you sure you want to delete this category?');">Delete</a>
+                                        <a href="../controllers/category.php?action=delete&id=<?php echo $cat['id']; ?>" class="action-link delete" onclick="return confirm('តើអ្នកប្រាកដថាចង់លុបប្រភេទនេះមែនទេ?');">លុប</a>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -341,7 +346,7 @@ try {
                                 <td colspan="4">
                                     <div class="empty-state">
                                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
-                                        <p>No categories found.</p>
+                                        <p>រកមិនឃើញប្រភេទទេ។</p>
                                     </div>
                                 </td>
                             </tr>

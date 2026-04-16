@@ -35,13 +35,15 @@ $approvedCount = array_reduce($myProducts, fn($carry, $p) => $carry + ($p['showe
 $hiddenCount = count($myProducts) - $approvedCount;
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="km">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Dashboard</title>
+    <title>ផ្ទាំងគ្រប់គ្រង - Sana</title>
     <link rel="icon" href="../icon/e-commerce-logo.png" sizes="any" type="image/png">
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Moul&family=Hanuman:wght@100;400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #1a3325;
@@ -63,8 +65,12 @@ $hiddenCount = count($myProducts) - $approvedCount;
             --radius-lg: 16px;
             --shadow-sm: 0 2px 8px rgba(32, 27, 9, 0.06);
             --shadow-md: 0 4px 16px rgba(32, 27, 9, 0.08);
-            --font-headline: 'Manrope', sans-serif;
-            --font-body: 'Public Sans', sans-serif;
+            
+            /* Khmer Typographic Recalibration */
+            --font-headline: 'Moul', serif;
+            --font-body: 'Hanuman', serif;
+            --lh-body: 1.9;
+            --lh-headline: 1.5;
         }
 
         * { box-sizing: border-box; }
@@ -76,9 +82,10 @@ $hiddenCount = count($myProducts) - $approvedCount;
             background-color: var(--bg-body);
             color: var(--on-surface);
             -webkit-font-smoothing: antialiased;
-            line-height: 1.6;
+            line-height: var(--lh-body);
             display: flex;
             min-height: 100vh;
+            font-size: 1.05rem;
         }
 
         /* Main Content */
@@ -122,9 +129,10 @@ $hiddenCount = count($myProducts) - $approvedCount;
         .page-header h1 {
             font-family: var(--font-headline);
             font-size: 1.5rem;
-            font-weight: 800;
+            font-weight: 400;
             color: var(--primary);
             margin: 0;
+            line-height: var(--lh-headline);
         }
 
         .btn-header {
@@ -135,9 +143,7 @@ $hiddenCount = count($myProducts) - $approvedCount;
             border-radius: var(--radius-sm);
             text-decoration: none;
             font-weight: 700;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.03em;
+            font-size: 0.85rem;
             transition: all 0.2s;
             border: none;
             cursor: pointer;
@@ -643,14 +649,14 @@ $hiddenCount = count($myProducts) - $approvedCount;
     <div class="main-content">
         <!-- Page Header -->
         <div class="page-header">
-            <h1>My Products</h1>
+            <h1>ទំនិញរបស់ខ្ញុំ</h1>
             <div>
                 <?php if ($currentUser['can_post'] == 1): ?>
-                    <a href="product_create.php" class="btn-header btn-post-product">+ Post Product</a>
+                    <a href="product_create.php" class="btn-header btn-post-product">+ ដាក់លក់ទំនិញ</a>
                 <?php elseif ($currentUser['request_post_permission'] == 1): ?>
-                    <span class="btn-header btn-pending">Request Pending</span>
+                    <span class="btn-header btn-pending">កំពុងរង់ចាំការអនុម័ត</span>
                 <?php else: ?>
-                    <button id="request-btn" class="btn-header btn-request">Request Permission</button>
+                    <button id="request-btn" class="btn-header btn-request">ស្នើសុំការអនុញ្ញាត</button>
                 <?php endif; ?>
             </div>
         </div>
@@ -658,17 +664,17 @@ $hiddenCount = count($myProducts) - $approvedCount;
         <!-- Welcome Card -->
         <div class="welcome-card">
             <div class="welcome-text">
-                <h2>Welcome back, <?php echo htmlspecialchars(explode(' ', $currentUser['name'])[0]); ?>!</h2>
-                <p>Manage your products and track your listings</p>
+                <h2>សូមស្វាគមន៍ត្រឡប់មកវិញ, <?php echo htmlspecialchars(explode(' ', $currentUser['name'])[0]); ?>!</h2>
+                <p>គ្រប់គ្រងទំនិញ និងតាមដានការដាក់លក់របស់អ្នក</p>
             </div>
             <div class="welcome-actions">
                 <a href="user_profile.php" class="btn-welcome">
                     <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                    Edit Profile
+                    កែប្រែព័ត៌មានផ្ទាល់ខ្លួន
                 </a>
                 <a href="logout.php" class="btn-welcome">
                     <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
-                    Logout
+                    ចាកចេញ
                 </a>
             </div>
         </div>
@@ -678,7 +684,7 @@ $hiddenCount = count($myProducts) - $approvedCount;
             <div class="alert-card alert-warning">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
                 <div>
-                    <strong>Posting Pending:</strong> Your posting permission is awaiting admin approval. You can still browse and manage existing listings.
+                    <strong>កំពុងរង់ចាំការអនុញ្ញាត៖</strong> ការអនុញ្ញាតឱ្យដាក់លក់ទំនិញរបស់អ្នកកំពុងរង់ចាំការពិនិត្យពីអ្នកគ្រប់គ្រង។ អ្នកនៅតែអាចមើល និងគ្រប់គ្រងទំនិញដែលមានស្រាប់។
                 </div>
             </div>
         <?php endif; ?>
@@ -687,8 +693,8 @@ $hiddenCount = count($myProducts) - $approvedCount;
             <div class="alert-card alert-danger">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                 <div>
-                    <strong>Action Required:</strong> You must add a phone number before posting products.
-                    <a href="user_profile.php">Update your profile now</a>
+                    <strong>សកម្មភាពដែលត្រូវធ្វើ៖</strong> អ្នកត្រូវតែបន្ថែមលេខទូរស័ព្ទមុននឹងដាក់លក់ទំនិញ។
+                    <a href="user_profile.php">ធ្វើបច្ចុប្បន្នភាពព័ត៌មានរបស់អ្នកឥឡូវនេះ</a>
                 </div>
             </div>
         <?php endif; ?>
@@ -701,7 +707,7 @@ $hiddenCount = count($myProducts) - $approvedCount;
                 </div>
                 <div class="stat-info">
                     <p class="stat-value"><?php echo count($myProducts); ?></p>
-                    <p class="stat-label">Total</p>
+                    <p class="stat-label">សរុប</p>
                 </div>
             </div>
             <div class="stat-card">
@@ -710,7 +716,7 @@ $hiddenCount = count($myProducts) - $approvedCount;
                 </div>
                 <div class="stat-info">
                     <p class="stat-value"><?php echo $approvedCount; ?></p>
-                    <p class="stat-label">Active</p>
+                    <p class="stat-label">កំពុងបង្ហាញ</p>
                 </div>
             </div>
             <div class="stat-card">
@@ -719,14 +725,14 @@ $hiddenCount = count($myProducts) - $approvedCount;
                 </div>
                 <div class="stat-info">
                     <p class="stat-value"><?php echo $hiddenCount; ?></p>
-                    <p class="stat-label">Hidden</p>
+                    <p class="stat-label">បានលាក់</p>
                 </div>
             </div>
         </div>
 
         <!-- My Products -->
         <div class="section-header">
-            <h2>My Products</h2>
+            <h2>ទំនិញរបស់ខ្ញុំ</h2>
         </div>
 
         <!-- Search Bar -->
@@ -735,21 +741,21 @@ $hiddenCount = count($myProducts) - $approvedCount;
                 <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                 </svg>
-                <input type="text" name="search" class="search-input" placeholder="Search my products..." value="<?php echo htmlspecialchars($search); ?>">
+                <input type="text" name="search" class="search-input" placeholder="ស្វែងរកទំនិញរបស់ខ្ញុំ..." value="<?php echo htmlspecialchars($search); ?>">
             </div>
             <?php if (!empty($search)): ?>
                 <a href="user_dashboard.php" class="btn-search-clear">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                     </svg>
-                    Clear
+                    លុប
                 </a>
             <?php endif; ?>
         </form>
 
         <?php if (!empty($search)): ?>
             <div class="search-results-info">
-                Found <strong><?php echo count($myProducts); ?></strong> product<?php echo count($myProducts) !== 1 ? 's' : ''; ?> matching "<strong><?php echo htmlspecialchars($search); ?></strong>"
+                រកឃើញទំនិញចំនួន <strong><?php echo count($myProducts); ?></strong> ដែលត្រូវនឹងពាក្យ "<strong><?php echo htmlspecialchars($search); ?></strong>"
             </div>
         <?php endif; ?>
 
@@ -761,9 +767,9 @@ $hiddenCount = count($myProducts) - $approvedCount;
                             <div class="product-card-image">
                                 <img src="../uploads/products/<?php echo htmlspecialchars($product['main_image'] ?? 'default.png'); ?>" alt="Product Image">
                                 <?php if (!$product['showed']): ?>
-                                    <span class="badge badge-hidden">Hidden</span>
+                                    <span class="badge badge-hidden">បានលាក់</span>
                                 <?php else: ?>
-                                    <span class="badge badge-active">Active</span>
+                                    <span class="badge badge-active">កំពុងបង្ហាញ</span>
                                 <?php endif; ?>
                             </div>
                         </a>
@@ -776,9 +782,9 @@ $hiddenCount = count($myProducts) - $approvedCount;
                                 <?php endif; ?>
                             </div>
                             <div class="product-card-actions">
-                                <a href="product_detail.php?id=<?php echo $product['id']; ?>" class="btn-card btn-card-view">View</a>
-                                <a href="product_edit.php?id=<?php echo $product['id']; ?>" class="btn-card btn-card-edit">Edit</a>
-                                <a href="../controllers/product.php?action=delete&id=<?php echo $product['id']; ?>" class="btn-card btn-card-delete" onclick="return confirm('Are you sure you want to delete this product?')">Delete</a>
+                                <a href="product_detail.php?id=<?php echo $product['id']; ?>" class="btn-card btn-card-view">មើល</a>
+                                <a href="product_edit.php?id=<?php echo $product['id']; ?>" class="btn-card btn-card-edit">កែប្រែ</a>
+                                <a href="../controllers/product.php?action=delete&id=<?php echo $product['id']; ?>" class="btn-card btn-card-delete" onclick="return confirm('តើអ្នកប្រាកដថាចង់លុបទំនិញនេះមែនទេ?')">លុប</a>
                             </div>
                         </div>
                     </div>
@@ -787,8 +793,8 @@ $hiddenCount = count($myProducts) - $approvedCount;
         <?php else: ?>
             <div class="empty-state">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
-                <h3>No products yet</h3>
-                <p>Start by posting your first product listing</p>
+                <h3>មិនទាន់មានទំនិញទេ</h3>
+                <p>ចាប់ផ្តើមដោយការដាក់លក់ទំនិញដំបូងរបស់អ្នក</p>
             </div>
         <?php endif; ?>
     </div>
@@ -805,7 +811,7 @@ $hiddenCount = count($myProducts) - $approvedCount;
         if (requestBtn) {
             requestBtn.addEventListener('click', function() {
                 requestBtn.disabled = true;
-                requestBtn.textContent = 'Sending...';
+                requestBtn.textContent = 'កំពុងបញ្ជូន...';
 
                 fetch('../controllers/user.php?action=request_permission', {
                     headers: { 'X-Requested-With': 'XMLHttpRequest' }
@@ -813,18 +819,18 @@ $hiddenCount = count($myProducts) - $approvedCount;
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        requestBtn.parentElement.innerHTML = '<span class="btn-header btn-pending">Request Pending</span>';
+                        requestBtn.parentElement.innerHTML = '<span class="btn-header btn-pending">កំពុងរង់ចាំការអនុម័ត</span>';
                     } else {
-                        alert('Error: ' + data.message);
+                        alert('កំហុស៖ ' + data.message);
                         requestBtn.disabled = false;
-                        requestBtn.textContent = 'Request Permission';
+                        requestBtn.textContent = 'ស្នើសុំការអនុញ្ញាត';
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    alert('An error occurred. Please try again.');
+                    alert('មានកំហុសមួយបានកើតឡើង។ សូមព្យាយាមម្តងទៀត។');
                     requestBtn.disabled = false;
-                    requestBtn.textContent = 'Request Permission';
+                    requestBtn.textContent = 'ស្នើសុំការអនុញ្ញាត';
                 });
             });
         }

@@ -23,13 +23,15 @@ $userImage = $profile['user_image'] ?? '';
 $backgroundImage = $profile['background_image'] ?? '';
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="km">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Profile</title>
+    <title>ប្រវត្តិរូប - Sana</title>
     <link rel="icon" href="../icon/e-commerce-logo.png" sizes="any" type="image/png">
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Moul&family=Hanuman:wght@100;400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #1a3325;
@@ -48,8 +50,12 @@ $backgroundImage = $profile['background_image'] ?? '';
             --radius-sm: 8px;
             --radius-md: 12px;
             --radius-lg: 16px;
-            --font-headline: 'Manrope', sans-serif;
-            --font-body: 'Public Sans', sans-serif;
+            
+            /* Khmer Typographic Recalibration */
+            --font-headline: 'Moul', serif;
+            --font-body: 'Hanuman', serif;
+            --lh-body: 1.9;
+            --lh-headline: 1.5;
         }
 
         * { box-sizing: border-box; }
@@ -61,9 +67,10 @@ $backgroundImage = $profile['background_image'] ?? '';
             background-color: var(--bg-body);
             color: var(--on-surface);
             -webkit-font-smoothing: antialiased;
-            line-height: 1.6;
+            line-height: var(--lh-body);
             display: flex;
             min-height: 100vh;
+            font-size: 1.05rem;
         }
 
         .main-content {
@@ -99,13 +106,14 @@ $backgroundImage = $profile['background_image'] ?? '';
         .page-header h1 {
             font-family: var(--font-headline);
             font-size: 1.5rem;
-            font-weight: 800;
+            font-weight: 400;
             color: var(--primary);
             margin: 0 0 0.25rem;
+            line-height: var(--lh-headline);
         }
 
         .page-header p {
-            font-size: 0.875rem;
+            font-size: 0.9rem;
             color: var(--on-surface-variant);
             margin: 0;
         }
@@ -422,8 +430,8 @@ $backgroundImage = $profile['background_image'] ?? '';
 
     <div class="main-content">
         <div class="page-header">
-            <h1>My Profile</h1>
-            <p>Manage your personal information and settings</p>
+            <h1>ប្រវត្តិរូបរបស់ខ្ញុំ</h1>
+            <p>គ្រប់គ្រងព័ត៌មានផ្ទាល់ខ្លួន និងការកំណត់ផ្សេងៗ</p>
         </div>
 
         <div class="form-wrapper">
@@ -435,7 +443,7 @@ $backgroundImage = $profile['background_image'] ?? '';
                     <?php endif; ?>
                     <button type="button" class="banner-upload" id="bannerBtn">
                         <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                        Change Cover
+                        ប្តូររូបភាពផ្ទៃខាងក្រោយ
                     </button>
                     <input type="file" name="background_image" id="backgroundImageInput" accept="image/*" style="display:none;">
                     <div class="profile-banner-content">
@@ -465,23 +473,23 @@ $backgroundImage = $profile['background_image'] ?? '';
                         <div class="form-section">
                             <h3 class="section-title">
                                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                                Personal Information
+                                ព័ត៌មានផ្ទាល់ខ្លួន
                             </h3>
                             <div class="form-group">
-                                <label for="first_name">First Name <span class="required">*</span></label>
+                                <label for="first_name">នាមត្រកូល <span class="required">*</span></label>
                                 <input type="text" id="first_name" name="first_name" class="form-control" value="<?php echo htmlspecialchars($user['first_name']); ?>" required>
                             </div>
                             <div class="form-group">
-                                <label for="last_name">Last Name <span class="required">*</span></label>
+                                <label for="last_name">នាមខ្លួន <span class="required">*</span></label>
                                 <input type="text" id="last_name" name="last_name" class="form-control" value="<?php echo htmlspecialchars($user['last_name']); ?>" required>
                             </div>
                             <div class="form-group">
-                                <label for="email">Email</label>
+                                <label for="email">អ៊ីមែល</label>
                                 <input type="email" id="email" class="form-control disabled" value="<?php echo htmlspecialchars($user['email']); ?>" disabled>
                             </div>
                             <div class="form-group">
-                                <label for="bio">Bio / About Me <span class="hint">(optional)</span></label>
-                                <textarea id="bio" name="bio" class="form-control" rows="5" placeholder="Tell us about yourself..."><?php echo htmlspecialchars($bio); ?></textarea>
+                                <label for="bio">ជីវប្រវត្តិសង្ខេប <span class="hint">(មិនបង្ខំ)</span></label>
+                                <textarea id="bio" name="bio" class="form-control" rows="5" placeholder="រៀបរាប់អំពីខ្លួនអ្នក..."><?php echo htmlspecialchars($bio); ?></textarea>
                             </div>
                         </div>
 
@@ -489,7 +497,7 @@ $backgroundImage = $profile['background_image'] ?? '';
                         <div class="form-actions">
                             <button type="submit" class="btn-submit">
                                 <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                Save Changes
+                                រក្សាទុកការផ្លាស់ប្តូរ
                             </button>
                         </div>
                     </div>
@@ -499,17 +507,17 @@ $backgroundImage = $profile['background_image'] ?? '';
                         <div class="form-section">
                             <h3 class="section-title">
                                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
-                                Contact Details
+                                ព័ត៌មានទំនាក់ទំនង
                             </h3>
                             <div class="form-group">
-                                <label for="phone1">Phone Number 1 <span class="required">*</span></label>
+                                <label for="phone1">លេខទូរស័ព្ទទី១ <span class="required">*</span></label>
                                 <div class="input-wrapper">
                                     <svg class="input-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
                                     <input type="text" id="phone1" name="phone1" class="form-control" value="<?php echo htmlspecialchars($phone1); ?>" required placeholder="012345678">
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="phone2">Phone Number 2 <span class="hint">(optional)</span></label>
+                                <label for="phone2">លេខទូរស័ព្ទទី២ <span class="hint">(មិនបង្ខំ)</span></label>
                                 <div class="input-wrapper">
                                     <svg class="input-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
                                     <input type="text" id="phone2" name="phone2" class="form-control" value="<?php echo htmlspecialchars($phone2); ?>" placeholder="012345678">

@@ -21,7 +21,7 @@ $product = $productRepo->getById($productId);
 
 // Check if product exists and belongs to user
 if (!$product || $product['owner_id'] != $_SESSION['user_id']) {
-    header("Location: user_dashboard.php?error=Unauthorized access");
+    header("Location: user_dashboard.php?error=ការចូលប្រើប្រាស់មិនត្រូវបានអនុញ្ញាត");
     exit();
 }
 
@@ -30,13 +30,15 @@ $catRepo = new CategoryRepository($conn);
 $categories = $catRepo->getAll();
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="km">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Product</title>
+    <title>កែប្រែទំនិញ - Sana</title>
     <link rel="icon" href="../icon/e-commerce-logo.png" sizes="any" type="image/png">
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Moul&family=Hanuman:wght@100;400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #1a3325;
@@ -55,8 +57,12 @@ $categories = $catRepo->getAll();
             --radius-sm: 8px;
             --radius-md: 12px;
             --radius-lg: 16px;
-            --font-headline: 'Manrope', sans-serif;
-            --font-body: 'Public Sans', sans-serif;
+            
+            /* Khmer Typographic Recalibration */
+            --font-headline: 'Moul', serif;
+            --font-body: 'Hanuman', serif;
+            --lh-body: 1.9;
+            --lh-headline: 1.5;
         }
 
         * { box-sizing: border-box; }
@@ -68,9 +74,10 @@ $categories = $catRepo->getAll();
             background-color: var(--bg-body);
             color: var(--on-surface);
             -webkit-font-smoothing: antialiased;
-            line-height: 1.6;
+            line-height: var(--lh-body);
             display: flex;
             min-height: 100vh;
+            font-size: 1.05rem;
         }
 
         .main-content {
@@ -133,13 +140,14 @@ $categories = $catRepo->getAll();
         .page-header h1 {
             font-family: var(--font-headline);
             font-size: 1.5rem;
-            font-weight: 800;
+            font-weight: 400;
             color: var(--primary);
             margin: 0;
+            line-height: var(--lh-headline);
         }
 
         .page-header p {
-            font-size: 0.825rem;
+            font-size: 0.9rem;
             color: var(--on-surface-variant);
             margin: 0;
         }
@@ -478,8 +486,8 @@ $categories = $catRepo->getAll();
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
                 </a>
                 <div>
-                    <h1>Edit Product</h1>
-                    <p>Update details for "<?php echo htmlspecialchars($product['name']); ?>"</p>
+                    <h1>កែប្រែទំនិញ</h1>
+                    <p>ធ្វើបច្ចុប្បន្នភាពព័ត៌មានសម្រាប់ "<?php echo htmlspecialchars($product['name']); ?>"</p>
                 </div>
             </div>
         </div>
@@ -493,22 +501,22 @@ $categories = $catRepo->getAll();
                         <div class="form-section">
                             <h3 class="section-title">
                                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                                Product Details
+                                ព័ត៌មានទំនិញ
                             </h3>
                             <div class="form-group">
-                                <label for="name">Product Name <span class="required">*</span></label>
+                                <label for="name">ឈ្មោះទំនិញ <span class="required">*</span></label>
                                 <input type="text" id="name" name="name" class="form-control" value="<?php echo htmlspecialchars($product['name']); ?>" required>
                             </div>
                             <div class="form-group">
-                                <label for="prices">Price ($) <span class="required">*</span></label>
+                                <label for="prices">តម្លៃ ($) <span class="required">*</span></label>
                                 <input type="number" id="prices" name="prices" class="form-control" step="0.01" value="<?php echo htmlspecialchars($product['prices']); ?>" required>
                             </div>
                             <div class="form-group">
-                                <label for="discounts">Discount Amount ($)</label>
-                                <input type="number" id="discounts" name="discounts" class="form-control" step="0.01" value="<?php echo htmlspecialchars($product['discounts']); ?>" placeholder="0.00 if none">
+                                <label for="discounts">ចំនួនទឹកប្រាក់បញ្ចុះតម្លៃ ($)</label>
+                                <input type="number" id="discounts" name="discounts" class="form-control" step="0.01" value="<?php echo htmlspecialchars($product['discounts']); ?>" placeholder="0.00 ប្រសិនបើគ្មាន">
                             </div>
                             <div class="form-group">
-                                <label for="category_id">Category <span class="required">*</span></label>
+                                <label for="category_id">ប្រភេទ <span class="required">*</span></label>
                                 <select id="category_id" name="category_id" class="form-control" required>
                                     <?php foreach ($categories as $cat): ?>
                                         <option value="<?php echo $cat['id']; ?>" <?php echo $cat['id'] == $product['category_id'] ? 'selected' : ''; ?>>
@@ -518,11 +526,11 @@ $categories = $catRepo->getAll();
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label for="location">Location <span class="required">*</span></label>
+                                <label for="location">ទីតាំង <span class="required">*</span></label>
                                 <input type="text" id="location" name="location" class="form-control" value="<?php echo htmlspecialchars($product['location']); ?>" required>
                             </div>
                             <div class="form-group">
-                                <label for="description">Description <span class="required">*</span></label>
+                                <label for="description">ការពិពណ៌នា <span class="required">*</span></label>
                                 <textarea id="description" name="description" class="form-control" rows="5" required><?php echo htmlspecialchars($product['description']); ?></textarea>
                             </div>
                         </div>
@@ -531,9 +539,9 @@ $categories = $catRepo->getAll();
                         <div class="form-actions">
                             <button type="submit" name="update_product" class="btn-submit">
                                 <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                Update Product
+                                ធ្វើបច្ចុប្បន្នភាពទំនិញ
                             </button>
-                            <a href="user_dashboard.php" class="btn-cancel">Cancel</a>
+                            <a href="user_dashboard.php" class="btn-cancel">បោះបង់</a>
                         </div>
                     </div>
 
@@ -542,17 +550,17 @@ $categories = $catRepo->getAll();
                         <div class="form-section">
                             <h3 class="section-title">
                                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                                Product Images
+                                រូបភាពទំនិញ
                             </h3>
 
                             <!-- Main Image -->
                             <div class="upload-main">
-                                <label>Main Image (replace if needed)</label>
+                                <label>រូបភាពចម្បង (ប្តូរប្រសិនបើចាំបាច់)</label>
                                 <div class="upload-zone <?php echo $product['main_image'] ? 'has-image' : ''; ?>" id="mainZone">
                                     <div class="upload-placeholder">
                                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                                        <p>Click to replace main image</p>
-                                        <span class="hint">Leave unchanged to keep current</span>
+                                        <p>ចុចទីនេះដើម្បីប្តូររូបភាពចម្បង</p>
+                                        <span class="hint">ទុកឱ្យនៅដដែលដើម្បីរក្សារូបភាពបច្ចុប្បន្ន</span>
                                     </div>
                                     <?php if ($product['main_image']): ?>
                                         <img src="../uploads/products/<?php echo htmlspecialchars($product['main_image']); ?>" class="preview-img" alt="Current" id="mainPreview">
@@ -562,7 +570,7 @@ $categories = $catRepo->getAll();
                             </div>
 
                             <!-- Additional Images -->
-                            <label>Additional Images (replace if needed)</label>
+                            <label>រូបភាពបន្ថែម (ប្តូរប្រសិនបើចាំបាច់)</label>
                             <div class="additional-images-grid">
                                 <?php for ($i = 1; $i <= 5; $i++): ?>
                                 <div class="upload-thumb <?php echo !empty($product['image'.$i]) ? 'has-image' : ''; ?>" id="thumbZone<?php echo $i; ?>">

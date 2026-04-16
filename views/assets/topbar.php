@@ -3,7 +3,7 @@
         <div class="container-nav">
             <div class="navbar-content">
                 <div class="logo">
-                    <a href="home.php">Sana</a>
+                    <a href="home.php">សាណា</a>
                 </div>
 
                 <!-- Search Form -->
@@ -17,9 +17,9 @@
                     ?>
                     <div class="search-input-wrapper">
                         <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                        <input type="text" name="name" placeholder="Search products..." value="<?php echo htmlspecialchars($_GET['name'] ?? ''); ?>">
+                        <input type="text" name="name" placeholder="ស្វែងរកទំនិញ..." value="<?php echo htmlspecialchars($_GET['name'] ?? ''); ?>">
                     </div>
-                    <button type="submit">Search</button>
+                    <button type="submit">ស្វែងរក</button>
                 </form>
 
                 <!-- Mobile Menu Toggle -->
@@ -32,15 +32,15 @@
 
                 <div class="links" id="navLinks">
                     <?php if (isset($_SESSION['user_id'])): ?>
-                        <a href="user_dashboard.php">Dashboard</a>
+                        <a href="user_dashboard.php">ផ្ទាំងគ្រប់គ្រង</a>
                         <?php if (isset($_SESSION['is_admin']) && $_SESSION['is_admin']): ?>
-                            <a href="admin.php">Admin</a>
+                            <a href="admin.php">អ្នកគ្រប់គ្រង</a>
                         <?php endif; ?>
-                        <a href="product_create.php" class="btn-post">Post Product</a>
-                        <a href="logout.php" class="btn-logout">Logout</a>
+                        <a href="product_create.php" class="btn-post">ដាក់លក់ទំនិញ</a>
+                        <a href="logout.php" class="btn-logout">ចាកចេញ</a>
                     <?php else: ?>
-                        <a href="login.php">Login</a>
-                        <a href="register.php" class="btn-register">Register</a>
+                        <a href="login.php">ចូលប្រើ</a>
+                        <a href="register.php" class="btn-register">ចុះឈ្មោះ</a>
                     <?php endif; ?>
                 </div>
             </div>
@@ -51,15 +51,15 @@
 <div class="mobile-nav-overlay" id="mobileNavOverlay"></div>
 <div class="mobile-nav-drawer" id="mobileNavDrawer">
     <?php if (isset($_SESSION['user_id'])): ?>
-        <a href="user_dashboard.php">Dashboard</a>
+        <a href="user_dashboard.php">ផ្ទាំងគ្រប់គ្រង</a>
         <?php if (isset($_SESSION['is_admin']) && $_SESSION['is_admin']): ?>
-            <a href="admin.php">Admin</a>
+            <a href="admin.php">អ្នកគ្រប់គ្រង</a>
         <?php endif; ?>
-        <a href="product_create.php" class="btn-post">Post Product</a>
-        <a href="logout.php" class="btn-logout">Logout</a>
+        <a href="product_create.php" class="btn-post">ដាក់លក់ទំនិញ</a>
+        <a href="logout.php" class="btn-logout">ចាកចេញ</a>
     <?php else: ?>
-        <a href="login.php">Login</a>
-        <a href="register.php" class="btn-register">Register</a>
+        <a href="login.php">ចូលប្រើ</a>
+        <a href="register.php" class="btn-register">ចុះឈ្មោះ</a>
     <?php endif; ?>
 </div>
 
@@ -99,9 +99,9 @@
     .logo a {
         color: #fef3d5;
         text-decoration: none;
-        font-weight: 800;
+        font-weight: 400;
         font-size: 1.625rem;
-        letter-spacing: -0.05em;
+        font-family: 'Moul', serif;
         transition: color 0.2s;
     }
     .logo a:hover { color: #ffffff; }
@@ -134,8 +134,8 @@
         color: white;
         width: 100%;
         outline: none;
-        font-size: 0.9rem;
-        font-family: 'Public Sans', sans-serif;
+        font-size: 0.95rem;
+        font-family: 'Hanuman', serif;
     }
     .header-search input::placeholder { color: rgba(255,255,255,0.4); }
     .header-search button {
@@ -146,9 +146,8 @@
         border-radius: 9999px;
         cursor: pointer;
         font-weight: 700;
-        font-size: 0.8rem;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
+        font-size: 0.9rem;
+        font-family: 'Hanuman', serif;
         transition: background 0.2s;
     }
     .header-search button:hover { background: #b08f45; }
@@ -163,9 +162,8 @@
         color: rgba(255, 255, 255, 0.75);
         text-decoration: none;
         font-weight: 600;
-        font-size: 0.8rem;
-        text-transform: uppercase;
-        letter-spacing: 0.03em;
+        font-size: 0.85rem;
+        font-family: 'Hanuman', serif;
         transition: color 0.2s;
     }
     .links a:hover { color: #fef3d5; }

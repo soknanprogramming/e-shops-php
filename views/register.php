@@ -1,12 +1,14 @@
 <?php session_start(); ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="km">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register - Sana</title>
+    <title>ចុះឈ្មោះ - Sana</title>
     <link rel="icon" href="../icon/e-commerce-logo.png" sizes="any" type="image/png">
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Moul&family=Hanuman:wght@100;400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #1a3325;
@@ -24,8 +26,12 @@
             --radius-sm: 8px;
             --radius-md: 12px;
             --radius-lg: 16px;
-            --font-headline: 'Manrope', sans-serif;
-            --font-body: 'Public Sans', sans-serif;
+            
+            /* Khmer Typographic Recalibration */
+            --font-headline: 'Moul', serif;
+            --font-body: 'Hanuman', serif;
+            --lh-body: 1.9;
+            --lh-headline: 1.5;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -47,6 +53,8 @@
             overflow-y: auto;
             -ms-overflow-style: none;
             scrollbar-width: none;
+            line-height: var(--lh-body);
+            font-size: 1.05rem;
         }
 
         body::-webkit-scrollbar { display: none; }
@@ -111,15 +119,16 @@
         .brand-content h1 {
             font-family: var(--font-headline);
             font-size: 2rem;
-            font-weight: 800;
+            font-weight: 400;
             color: #ffffff;
             margin: 0 0 0.75rem;
+            line-height: var(--lh-headline);
         }
 
         .brand-content p {
             font-size: 0.95rem;
             color: rgba(255, 255, 255, 0.6);
-            line-height: 1.6;
+            line-height: 1.8;
             margin: 0;
         }
 
@@ -150,13 +159,14 @@
         .register-header .welcome-text {
             font-family: var(--font-headline);
             font-size: 1.5rem;
-            font-weight: 800;
+            font-weight: 400;
             color: var(--primary);
             margin: 0 0 0.5rem;
+            line-height: var(--lh-headline);
         }
 
         .register-header .subtitle {
-            font-size: 0.875rem;
+            font-size: 0.95rem;
             color: var(--on-surface-variant);
             margin: 0;
         }
@@ -393,8 +403,8 @@
             <div class="brand-logo">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z"></path></svg>
             </div>
-            <h1>Join Sana Marketplace</h1>
-            <p>Create your free account and start buying and selling with confidence.</p>
+            <h1>ចូលរួមជាមួយសាណា</h1>
+            <p>បង្កើតគណនីឥតគិតថ្លៃរបស់អ្នក និងចាប់ផ្តើមទិញលក់ដោយទំនុកចិត្ត។</p>
         </div>
     </div>
 
@@ -402,8 +412,8 @@
     <div class="form-panel">
         <div class="register-card">
             <div class="register-header">
-                <h2 class="welcome-text">Create your account</h2>
-                <p class="subtitle">Fill in the details below to get started</p>
+                <h2 class="welcome-text">បង្កើតគណនីថ្មី</h2>
+                <p class="subtitle">សូមបំពេញព័ត៌មានខាងក្រោមដើម្បីចាប់ផ្តើម</p>
             </div>
 
             <?php if (isset($_GET['error'])): ?>
@@ -416,9 +426,9 @@
             <form action="../controllers/auth.php" method="POST">
                 <!-- Username -->
                 <div class="form-group">
-                    <label for="name">Username</label>
+                    <label for="name">ឈ្មោះអ្នកប្រើប្រាស់</label>
                     <div class="input-wrapper">
-                        <input type="text" id="name" name="name" required placeholder="Choose a username" autocomplete="username" value="<?php echo htmlspecialchars($old['name'] ?? ''); ?>">
+                        <input type="text" id="name" name="name" required placeholder="ជ្រើសរើសឈ្មោះអ្នកប្រើប្រាស់" autocomplete="username" value="<?php echo htmlspecialchars($old['name'] ?? ''); ?>">
                         <svg class="input-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                     </div>
                 </div>
@@ -426,16 +436,16 @@
                 <!-- First & Last Name -->
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="first_name">First Name</label>
+                        <label for="first_name">នាមត្រកូល</label>
                         <div class="input-wrapper">
-                            <input type="text" id="first_name" name="first_name" required placeholder="First name" value="<?php echo htmlspecialchars($old['first_name'] ?? ''); ?>">
+                            <input type="text" id="first_name" name="first_name" required placeholder="នាមត្រកូល" value="<?php echo htmlspecialchars($old['first_name'] ?? ''); ?>">
                             <svg class="input-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="last_name">Last Name</label>
+                        <label for="last_name">នាមខ្លួន</label>
                         <div class="input-wrapper">
-                            <input type="text" id="last_name" name="last_name" required placeholder="Last name" value="<?php echo htmlspecialchars($old['last_name'] ?? ''); ?>">
+                            <input type="text" id="last_name" name="last_name" required placeholder="នាមខ្លួន" value="<?php echo htmlspecialchars($old['last_name'] ?? ''); ?>">
                             <svg class="input-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                         </div>
                     </div>
@@ -443,7 +453,7 @@
 
                 <!-- Email -->
                 <div class="form-group">
-                    <label for="email">Email Address</label>
+                    <label for="email">អាសយដ្ឋានអ៊ីមែល</label>
                     <div class="input-wrapper">
                         <input type="email" id="email" name="email" required placeholder="your@email.com" autocomplete="email" value="<?php echo htmlspecialchars($old['email'] ?? ''); ?>">
                         <svg class="input-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
@@ -452,9 +462,9 @@
 
                 <!-- Password -->
                 <div class="form-group">
-                    <label for="password">Password</label>
+                    <label for="password">លេខសម្ងាត់</label>
                     <div class="input-wrapper">
-                        <input type="password" id="password" name="password" required minlength="6" placeholder="Create a password" autocomplete="new-password">
+                        <input type="password" id="password" name="password" required minlength="6" placeholder="បង្កើតលេខសម្ងាត់" autocomplete="new-password">
                         <svg class="input-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
                         <button type="button" class="toggle-password" onclick="togglePass('password')">
                             <svg class="eye-on" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
@@ -467,9 +477,9 @@
 
                 <!-- Confirm Password -->
                 <div class="form-group">
-                    <label for="confirm_password">Confirm Password</label>
+                    <label for="confirm_password">បញ្ជាក់លេខសម្ងាត់</label>
                     <div class="input-wrapper">
-                        <input type="password" id="confirm_password" name="confirm_password" required placeholder="Confirm your password" autocomplete="new-password">
+                        <input type="password" id="confirm_password" name="confirm_password" required placeholder="បញ្ជាក់លេខសម្ងាត់របស់អ្នក" autocomplete="new-password">
                         <svg class="input-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
                         <button type="button" class="toggle-password" onclick="togglePass('confirm_password')">
                             <svg class="eye-on" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
@@ -480,15 +490,15 @@
                     </div>
                 </div>
 
-                <button type="submit" name="register" class="btn-submit">Create Account</button>
+                <button type="submit" name="register" class="btn-submit">បង្កើតគណនី</button>
             </form>
 
             <div class="divider">
-                <span>Already a member?</span>
+                <span>មានគណនីរួចហើយមែនទេ?</span>
             </div>
 
             <a href="login.php" class="login-link">
-                Sign in to your account
+                ចូលប្រើប្រាស់គណនីរបស់អ្នក
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
             </a>
         </div>

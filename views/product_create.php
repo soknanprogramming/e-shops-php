@@ -21,7 +21,7 @@ $profileRepo = new ProfileRepository($conn);
 $userProfile = $profileRepo->getByUserId($_SESSION['user_id']);
 
 if (empty($userProfile) || empty($userProfile['phone1'])) {
-    header("Location: user_profile.php?error=You must have at least one phone number to post a product");
+    header("Location: user_profile.php?error=អ្នកត្រូវតែមានលេខទូរស័ព្ទយ៉ាងហោចណាស់មួយដើម្បីដាក់លក់ទំនិញ។");
     exit();
 }
 
@@ -30,13 +30,15 @@ $catRepo = new CategoryRepository($conn);
 $categories = $catRepo->getAll();
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="km">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Post Product</title>
+    <title>ដាក់លក់ទំនិញ - Sana</title>
     <link rel="icon" href="../icon/e-commerce-logo.png" sizes="any" type="image/png">
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Moul&family=Hanuman:wght@100;400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #1a3325;
@@ -55,8 +57,12 @@ $categories = $catRepo->getAll();
             --radius-sm: 8px;
             --radius-md: 12px;
             --radius-lg: 16px;
-            --font-headline: 'Manrope', sans-serif;
-            --font-body: 'Public Sans', sans-serif;
+            
+            /* Khmer Typographic Recalibration */
+            --font-headline: 'Moul', serif;
+            --font-body: 'Hanuman', serif;
+            --lh-body: 1.9;
+            --lh-headline: 1.5;
         }
 
         * { box-sizing: border-box; }
@@ -68,9 +74,10 @@ $categories = $catRepo->getAll();
             background-color: var(--bg-body);
             color: var(--on-surface);
             -webkit-font-smoothing: antialiased;
-            line-height: 1.6;
+            line-height: var(--lh-body);
             display: flex;
             min-height: 100vh;
+            font-size: 1.05rem;
         }
 
         .main-content {
@@ -106,13 +113,14 @@ $categories = $catRepo->getAll();
         .page-header h1 {
             font-family: var(--font-headline);
             font-size: 1.5rem;
-            font-weight: 800;
+            font-weight: 400;
             color: var(--primary);
             margin: 0 0 0.25rem;
+            line-height: var(--lh-headline);
         }
 
         .page-header p {
-            font-size: 0.875rem;
+            font-size: 0.9rem;
             color: var(--on-surface-variant);
             margin: 0;
         }
@@ -146,8 +154,10 @@ $categories = $catRepo->getAll();
 
         .section-title {
             font-family: var(--font-headline);
-            font-size: 1rem;
-            font-weight: 700;
+            font-size: 1.1rem;
+            font-weight: 400;
+            line-height: var(--lh-headline);
+        }
             color: var(--on-surface);
             margin: 0 0 1.25rem;
             padding-bottom: 0.75rem;
@@ -443,8 +453,8 @@ $categories = $catRepo->getAll();
 
     <div class="main-content">
         <div class="page-header">
-            <h1>Post New Product</h1>
-            <p>Fill in the details below to list your product</p>
+            <h1>ដាក់លក់ទំនិញ</h1>
+            <p>សូមបំពេញព័ត៌មានខាងក្រោមដើម្បីដាក់លក់ទំនិញរបស់អ្នក</p>
         </div>
 
         <?php if ($canPost): ?>
@@ -454,39 +464,39 @@ $categories = $catRepo->getAll();
                         <!-- Left: Basic Info -->
                         <div>
                             <div class="form-section">
-                                <h3 class="section-title">Basic Information</h3>
+                                <h3 class="section-title">ព័ត៌មានទូទៅ</h3>
                                 <div class="form-group">
-                                    <label for="name">Product Name <span class="required">*</span></label>
-                                    <input type="text" id="name" name="name" class="form-control" placeholder="e.g. iPhone 15 Pro Max" required>
+                                    <label for="name">ឈ្មោះទំនិញ <span class="required">*</span></label>
+                                    <input type="text" id="name" name="name" class="form-control" placeholder="ឧទាហរណ៍៖ iPhone 15 Pro Max" required>
                                 </div>
                                 <div class="form-row">
                                     <div class="form-group">
-                                        <label for="prices">Price ($) <span class="required">*</span></label>
+                                        <label for="prices">តម្លៃ ($) <span class="required">*</span></label>
                                         <input type="number" id="prices" name="prices" class="form-control" step="0.01" placeholder="0.00" required>
                                     </div>
                                     <div class="form-group">
-                                        <label for="discounts">Discount ($)</label>
-                                        <input type="number" id="discounts" name="discounts" class="form-control" step="0.01" placeholder="Optional">
+                                        <label for="discounts">បញ្ចុះតម្លៃ ($)</label>
+                                        <input type="number" id="discounts" name="discounts" class="form-control" step="0.01" placeholder="មិនបង្ខំ">
                                     </div>
                                 </div>
                                 <div class="form-row">
                                     <div class="form-group">
-                                        <label for="category_id">Category <span class="required">*</span></label>
+                                        <label for="category_id">ប្រភេទ <span class="required">*</span></label>
                                         <select id="category_id" name="category_id" class="form-control" required>
-                                            <option value="">Select a category</option>
+                                            <option value="">ជ្រើសរើសប្រភេទ</option>
                                             <?php foreach ($categories as $cat): ?>
                                                 <option value="<?php echo $cat['id']; ?>"><?php echo htmlspecialchars($cat['name']); ?></option>
                                             <?php endforeach; ?>
                                         </select>
                                     </div>
                                     <div class="form-group">
-                                        <label for="location">Location <span class="required">*</span></label>
-                                        <input type="text" id="location" name="location" class="form-control" placeholder="e.g. Phnom Penh" required>
+                                        <label for="location">ទីតាំង <span class="required">*</span></label>
+                                        <input type="text" id="location" name="location" class="form-control" placeholder="ឧទាហរណ៍៖ ភ្នំពេញ" required>
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="description">Description <span class="required">*</span></label>
-                                    <textarea id="description" name="description" class="form-control" rows="10" placeholder="Describe your product condition, features, and any other details..." required></textarea>
+                                    <label for="description">ការពិពណ៌នា <span class="required">*</span></label>
+                                    <textarea id="description" name="description" class="form-control" rows="10" placeholder="រៀបរាប់អំពីស្ថានភាពទំនិញ លក្ខណៈពិសេស និងព័ត៌មានផ្សេងៗ..." required></textarea>
                                 </div>
                             </div>
                         </div>
@@ -494,16 +504,16 @@ $categories = $catRepo->getAll();
                         <!-- Right: Images -->
                         <div>
                             <div class="form-section">
-                                <h3 class="section-title">Product Images</h3>
+                                <h3 class="section-title">រូបភាពទំនិញ</h3>
 
                                 <!-- Main Image -->
                                 <div class="upload-main">
-                                    <label>Main Image <span class="required">*</span></label>
+                                    <label>រូបភាពចម្បង <span class="required">*</span></label>
                                     <div class="upload-zone" id="mainZone">
                                         <div class="upload-placeholder">
                                             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                                            <p>Click to upload main image</p>
-                                            <span class="hint">PNG, JPG up to 5MB</span>
+                                            <p>ចុចទីនេះដើម្បីបង្ហោះរូបភាពចម្បង</p>
+                                            <span class="hint">ប្រភេទ PNG, JPG ទំហំត្រឹម 5MB</span>
                                         </div>
                                         <img id="mainPreview" class="preview-img" alt="Preview">
                                         <input type="file" id="mainImage" name="image" accept="image/*" required>
@@ -511,7 +521,7 @@ $categories = $catRepo->getAll();
                                 </div>
 
                                 <!-- Additional Images -->
-                                <label>Additional Images (Optional)</label>
+                                <label>រូបភាពបន្ថែម (មិនបង្ខំ)</label>
                                 <div class="additional-images-grid">
                                     <?php for ($i = 1; $i <= 5; $i++): ?>
                                     <div class="upload-thumb" id="thumbZone<?php echo $i; ?>">
@@ -532,21 +542,22 @@ $categories = $catRepo->getAll();
                     <div class="form-actions" style="margin-top: 1.25rem;">
                         <button type="submit" name="create_product" class="btn-submit">
                             <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                            Post Product
+                            ដាក់លក់ឥឡូវនេះ
                         </button>
-                        <a href="user_dashboard.php" class="btn-cancel">Cancel</a>
+                        <a href="user_dashboard.php" class="btn-cancel">បោះបង់</a>
                     </div>
                 </form>
             </div>
         <?php else: ?>
             <div class="alert-block">
-                <strong>Permission Required:</strong> You currently do not have permission to post products. Please contact an administrator for approval.
+                <strong>ត្រូវការការអនុញ្ញាត៖</strong> បច្ចុប្បន្នអ្នកមិនមានការអនុញ្ញាតឱ្យដាក់លក់ទំនិញទេ។ សូមទាក់ទងអ្នកគ្រប់គ្រងដើម្បីស្នើសុំការអនុញ្ញាត។
             </div>
             <a href="user_dashboard.php" class="btn-back">
                 <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
-                Back to Dashboard
+                ត្រឡប់ទៅផ្ទាំងគ្រប់គ្រង
             </a>
         <?php endif; ?>
+    </div>
     </div>
 
     <script>
