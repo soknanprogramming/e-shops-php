@@ -76,4 +76,10 @@ class CategoryRepository {
         $stmt = $this->conn->prepare($sql);
         return $stmt->execute([':id' => $id]);
     }
+
+    public function hasProducts($id) {
+        $stmt = $this->conn->prepare("SELECT COUNT(*) FROM Product WHERE category_id = :id");
+        $stmt->execute([':id' => $id]);
+        return $stmt->fetchColumn() > 0;
+    }
 }
