@@ -221,7 +221,6 @@
 
 <div class="admin-sidebar">
     <div class="sidebar-brand">
-        <div class="sidebar-brand-icon">S</div>
         <div>
             <p class="sidebar-brand-text">Sana</p>
             <p class="sidebar-brand-sub">Admin Panel</p>
