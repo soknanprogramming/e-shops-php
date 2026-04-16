@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_category'])) {
 
     // 2. Basic Validation
     if (empty($name) || empty($image['name'])) {
-        header("Location: ../views/admin_category_add.php?error=Please fill all fields");
+        header("Location: ../views/admin_category_add.php?error=សូមបំពេញព័ត៌មានឱ្យបានគ្រប់ចន្លោះ");
         exit();
     }
 
@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_category'])) {
     $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
 
     if (!in_array($image_extension, $allowed_extensions)) {
-        header("Location: ../views/admin_category_add.php?error=Invalid file format");
+        header("Location: ../views/admin_category_add.php?error=ប្រភេទឯកសារមិនត្រឹមត្រូវ");
         exit();
     }
 
@@ -49,15 +49,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_category'])) {
                 'category_image' => $new_filename
             ]);
 
-            header("Location: ../views/admin_category.php?success=Category added successfully");
+            header("Location: ../views/admin_category.php?success=បានបន្ថែមប្រភេទដោយជោគជ័យ");
             exit();
 
         } catch (PDOException $e) {
-            header("Location: ../views/admin_category_add.php?error=Database error: " . $e->getMessage());
+            header("Location: ../views/admin_category_add.php?error=កំហុសមូលដ្ឋានទិន្នន័យ៖ " . $e->getMessage());
             exit();
         }
     } else {
-        header("Location: ../views/admin_category_add.php?error=Failed to upload image");
+        header("Location: ../views/admin_category_add.php?error=បរាជ័យក្នុងការបង្ហោះរូបភាព");
         exit();
     }
 }
@@ -76,7 +76,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_category'])) {
     $image = $_FILES['image'];
 
     if (empty($name)) {
-        header("Location: ../views/admin_category_edit.php?id=$id&error=Name is required");
+        header("Location: ../views/admin_category_edit.php?id=$id&error=ឈ្មោះប្រភេទត្រូវបានតម្រូវ");
         exit();
     }
 
@@ -104,7 +104,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_category'])) {
             'name' => $name,
             'category_image' => $final_image_name
         ]);
-        header("Location: ../views/admin_category.php?success=Category updated successfully");
+        header("Location: ../views/admin_category.php?success=បានធ្វើបច្ចុប្បន្នភាពប្រភេទដោយជោគជ័យ");
         exit();
     } catch (PDOException $e) {
         header("Location: ../views/admin_category_edit.php?id=$id&error=" . $e->getMessage());
@@ -133,7 +133,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])
         }
 
         $categoryRepo->delete($id);
-        header("Location: ../views/admin_category.php?success=Category deleted successfully");
+        header("Location: ../views/admin_category.php?success=បានលុបប្រភេទដោយជោគជ័យ");
         exit();
     } catch (PDOException $e) {
         header("Location: ../views/admin_category.php?error=" . $e->getMessage());

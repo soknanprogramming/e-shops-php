@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_product'])) {
 
     // Check if user has permission to post
     if (!$user || $user['can_post'] != 1) {
-        header("Location: ../views/user_dashboard.php?error=You need admin approval to post products");
+        header("Location: ../views/user_dashboard.php?error=អ្នកត្រូវការការអនុញ្ញាតពីអ្នកគ្រប់គ្រងដើម្បីដាក់លក់ទំនិញ");
         exit();
     }
 
@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_product'])) {
     $userProfile = $profileRepo->getByUserId($_SESSION['user_id']);
 
     if (empty($userProfile) || empty($userProfile['phone1'])) {
-        header("Location: ../views/user_profile.php?error=You must have at least one phone number to post a product");
+        header("Location: ../views/user_profile.php?error=អ្នកត្រូវតែមានលេខទូរស័ព្ទយ៉ាងហោចណាស់មួយដើម្បីដាក់លក់ទំនិញ");
         exit();
     }
 
@@ -66,16 +66,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_product'])) {
     // Check for PHP Upload Errors
     if ($image['error'] !== UPLOAD_ERR_OK) {
         $error_messages = [
-            UPLOAD_ERR_INI_SIZE   => 'The uploaded file exceeds the upload_max_filesize directive in php.ini.',
-            UPLOAD_ERR_FORM_SIZE  => 'The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form.',
-            UPLOAD_ERR_PARTIAL    => 'The uploaded file was only partially uploaded.',
-            UPLOAD_ERR_NO_FILE    => 'No file was uploaded.',
-            UPLOAD_ERR_NO_TMP_DIR => 'Missing a temporary folder.',
-            UPLOAD_ERR_CANT_WRITE => 'Failed to write file to disk.',
-            UPLOAD_ERR_EXTENSION  => 'A PHP extension stopped the file upload.',
+            UPLOAD_ERR_INI_SIZE   => 'ឯកសារដែលបានបង្ហោះលើសពីទំហំកំណត់ក្នុង php.ini',
+            UPLOAD_ERR_FORM_SIZE  => 'ឯកសារដែលបានបង្ហោះលើសពីទំហំកំណត់ក្នុងទម្រង់ HTML',
+            UPLOAD_ERR_PARTIAL    => 'ឯកសារត្រូវបានបង្ហោះតែមួយផ្នែកប៉ុណ្ណោះ',
+            UPLOAD_ERR_NO_FILE    => 'មិនមានឯកសារត្រូវបានបង្ហោះទេ',
+            UPLOAD_ERR_NO_TMP_DIR => 'បាត់ថតបណ្តោះអាសន្ន',
+            UPLOAD_ERR_CANT_WRITE => 'បរាជ័យក្នុងការសរសេរឯកសារទៅក្នុងថាស',
+            UPLOAD_ERR_EXTENSION  => 'ផ្នែកបន្ថែម PHP បានបញ្ឈប់ការបង្ហោះឯកសារ',
         ];
-        $msg = $error_messages[$image['error']] ?? 'Unknown upload error.';
-        die("PHP Upload Error: " . $msg);
+        $msg = $error_messages[$image['error']] ?? 'កំហុសបង្ហោះមិនស្គាល់';
+        die("កំហុសក្នុងការបង្ហោះ៖ " . $msg);
     }
 
     $new_filename = upload_file($image, 'prod_main_', $target_dir);
@@ -106,13 +106,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_product'])) {
                 'description' => $description
             ]);
 
-            header("Location: ../views/user_dashboard.php?success=Product posted successfully");
+            header("Location: ../views/user_dashboard.php?success=បានដាក់លក់ទំនិញដោយជោគជ័យ");
             exit();
         } catch (PDOException $e) {
-            echo "Database Error: " . $e->getMessage();
+            echo "កំហុសមូលដ្ឋានទិន្នន័យ៖ " . $e->getMessage();
         }
     } else {
-        echo "Failed to upload image.";
+        echo "បរាជ័យក្នុងការបង្ហោះរូបភាព។";
     }
 }
 
@@ -163,10 +163,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_product'])) {
             'image5' => $additional_images['image5']
         ]);
 
-        header("Location: ../views/user_dashboard.php?success=Product updated successfully");
+        header("Location: ../views/user_dashboard.php?success=បានធ្វើបច្ចុប្បន្នភាពទំនិញដោយជោគជ័យ");
         exit();
     } catch (PDOException $e) {
-        echo "Database Error: " . $e->getMessage();
+        echo "កំហុសមូលដ្ឋានទិន្នន័យ៖ " . $e->getMessage();
     }
 }
 
@@ -176,12 +176,12 @@ if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])
         exit();
     }
 
-    $productRepo = new ProductRepository($conn);
+    $product_repo = new ProductRepository($conn);
 
     // If admin, they can delete any product. If regular user, only their own.
     $ownerId = (isset($_SESSION['is_admin']) && $_SESSION['is_admin'] == 1) ? null : $_SESSION['user_id'];
 
-    $deletedImages = $productRepo->delete($_GET['id'], $ownerId);
+    $deletedImages = $product_repo->delete($_GET['id'], $ownerId);
 
     // Determine redirect destination based on HTTP_REFERER
     $referer = $_SERVER['HTTP_REFERER'] ?? '';
@@ -208,9 +208,9 @@ if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])
             }
         }
 
-        header("Location: " . $redirect . "?success=Product deleted successfully");
+        header("Location: " . $redirect . "?success=បានលុបទំនិញដោយជោគជ័យ");
     } else {
-        header("Location: " . $redirect . "?error=Failed to delete product");
+        header("Location: " . $redirect . "?error=បរាជ័យក្នុងការលុបទំនិញ");
     }
     exit();
 }
@@ -239,11 +239,11 @@ if (isset($_GET['action']) && $_GET['action'] === 'toggle_visibility' && isset($
         }
     }
 
-    $productRepo = new ProductRepository($conn);
-    if ($productRepo->toggleVisibility($id, $status)) {
-        header("Location: ../views/" . $redirect . (strpos($redirect, '?') !== false ? '&' : '?') . "success=Product visibility updated");
+    $product_repo = new ProductRepository($conn);
+    if ($product_repo->toggleVisibility($id, $status)) {
+        header("Location: ../views/" . $redirect . (strpos($redirect, '?') !== false ? '&' : '?') . "success=បានធ្វើបច្ចុប្បន្នភាពការបង្ហាញទំនិញ");
     } else {
-        header("Location: ../views/" . $redirect . (strpos($redirect, '?') !== false ? '&' : '?') . "error=Failed to update visibility");
+        header("Location: ../views/" . $redirect . (strpos($redirect, '?') !== false ? '&' : '?') . "error=បរាជ័យក្នុងការធ្វើបច្ចុប្បន្នភាពការបង្ហាញ");
     }
     exit();
 }

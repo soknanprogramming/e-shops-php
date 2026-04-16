@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (strlen($password) < 6) {
             $_SESSION['register_input'] = compact('name', 'first_name', 'last_name', 'email');
             session_write_close();
-            header("Location: ../views/register.php?error=Password must be at least 6 characters");
+            header("Location: ../views/register.php?error=លេខសម្ងាត់ត្រូវមានយ៉ាងហោចណាស់ ៦ តួអក្សរ");
             exit();
         }
 
@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($password !== $confirm_password) {
             $_SESSION['register_input'] = compact('name', 'first_name', 'last_name', 'email');
             session_write_close();
-            header("Location: ../views/register.php?error=Passwords do not match");
+            header("Location: ../views/register.php?error=លេខសម្ងាត់មិនផ្ទៀងផ្ទាត់គ្នាឡើយ");
             exit();
         }
 
@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($userRepo->findByName($name)) {
             $_SESSION['register_input'] = compact('name', 'first_name', 'last_name', 'email');
             session_write_close();
-            header("Location: ../views/register.php?error=Username already taken");
+            header("Location: ../views/register.php?error=ឈ្មោះអ្នកប្រើប្រាស់ត្រូវបានគេយកទៅប្រើហើយ");
             exit();
         }
 
@@ -47,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($userRepo->findByEmail($email)) {
             $_SESSION['register_input'] = compact('name', 'first_name', 'last_name', 'email');
             session_write_close();
-            header("Location: ../views/register.php?error=Email already registered");
+            header("Location: ../views/register.php?error=អ៊ីមែលនេះត្រូវបានចុះឈ្មោះរួចហើយ");
             exit();
         }
 
@@ -68,12 +68,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // 5. Create User
         $userRepo->create($data);
-        header("Location: ../views/login.php?success=Registration successful. Please login.");
+        header("Location: ../views/login.php?success=ការចុះឈ្មោះជោគជ័យ។ សូមចូលប្រើប្រាស់។");
         exit();
-    }
+        }
 
-    // --- LOGIN LOGIC ---
-    if (isset($_POST['login'])) {
+        // --- LOGIN LOGIC ---
+        if (isset($_POST['login'])) {
         $email = $_POST['email'];
         $password = $_POST['password'];
 
@@ -89,8 +89,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             $_SESSION['login_email'] = $email;
             session_write_close();
-            header("Location: ../views/login.php?error=Invalid email or password");
+            header("Location: ../views/login.php?error=អ៊ីមែល ឬលេខសម្ងាត់មិនត្រឹមត្រូវ");
             exit();
         }
-    }
-}
+        }
+        }

@@ -61,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'background_image' => $background_image
     ]);
 
-    header("Location: ../views/user_profile.php?success=Profile updated successfully");
+    header("Location: ../views/user_profile.php?success=ប្រវត្តិរូបត្រូវបានធ្វើបច្ចុប្បន្នភាពដោយជោគជ័យ");
     exit();
 }
 ?>

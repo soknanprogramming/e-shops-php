@@ -22,7 +22,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'toggle_role' && isset($_GET['
 
     // Prevent changing own role to avoid locking yourself out
     if ($id == $_SESSION['user_id']) {
-        header("Location: ../views/admin_user.php?error=You cannot change your own role");
+        header("Location: ../views/admin_user.php?error=អ្នកមិនអាចប្តូរតួនាទីខ្លួនឯងបានទេ");
         exit();
     }
 
@@ -34,11 +34,11 @@ if (isset($_GET['action']) && $_GET['action'] === 'toggle_role' && isset($_GET['
         
         $userRepo->update($id, ['is_admin' => $new_role]);
         
-        $msg = $new_role ? "User promoted to Admin" : "User demoted to User";
+        $msg = $new_role ? "អ្នកប្រើប្រាស់ត្រូវបានតម្លើងជាអ្នកគ្រប់គ្រង" : "អ្នកគ្រប់គ្រងត្រូវបានទម្លាក់ជាអ្នកប្រើប្រាស់";
         header("Location: ../views/admin_user.php?success=" . urlencode($msg));
         exit();
     } else {
-        header("Location: ../views/admin_user.php?error=User not found");
+        header("Location: ../views/admin_user.php?error=រកមិនឃើញអ្នកប្រើប្រាស់ឡើយ");
         exit();
     }
 }
@@ -67,11 +67,11 @@ if (isset($_GET['action']) && $_GET['action'] === 'toggle_permission' && isset($
 
         $userRepo->update($id, $updateData);
         
-        $msg = $new_status ? "User allowed to post products" : "User posting permission revoked";
+        $msg = $new_status ? "អ្នកប្រើប្រាស់ត្រូវបានអនុញ្ញាតឱ្យដាក់លក់ទំនិញ" : "ការអនុញ្ញាតដាក់លក់ទំនិញត្រូវបានដកហូត";
         header("Location: ../views/admin_user.php?success=" . urlencode($msg));
         exit();
     } else {
-        header("Location: ../views/admin_user.php?error=User not found");
+        header("Location: ../views/admin_user.php?error=រកមិនឃើញអ្នកប្រើប្រាស់ឡើយ");
         exit();
     }
 }
@@ -82,11 +82,11 @@ if (isset($_GET['action']) && $_GET['action'] === 'request_permission') {
     
     if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest') {
         header('Content-Type: application/json');
-        echo json_encode(['success' => $success, 'message' => 'Permission requested successfully.']);
+        echo json_encode(['success' => $success, 'message' => 'បានស្នើសុំការអនុញ្ញាតដោយជោគជ័យ។']);
         exit();
     }
     
-    header("Location: ../views/user_dashboard.php?success=Permission requested successfully. Please wait for admin approval.");
+    header("Location: ../views/user_dashboard.php?success=បានស្នើសុំការអនុញ្ញាតដោយជោគជ័យ។ សូមរង់ចាំការអនុម័តពីអ្នកគ្រប់គ្រង។");
     exit();
 }
 ?>
